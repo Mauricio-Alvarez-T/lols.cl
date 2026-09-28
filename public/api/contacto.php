@@ -57,7 +57,9 @@ function campo(string $nombre, int $maximo): string
 {
     $valor = trim((string) ($_POST[$nombre] ?? ''));
     $valor = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $valor) ?? '';
-    return mb_substr($valor, 0, $maximo);
+    // Truncar por caracteres con PCRE (no depende de mbstring, que el hosting no trae);
+    // si el texto no es UTF-8 válido, preg falla y el campo queda vacío.
+    return preg_match('/^.{0,' . $maximo . '}/us', $valor, $m) ? $m[0] : '';
 }
 
 function unaLinea(string $valor): string
