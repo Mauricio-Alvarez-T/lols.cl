@@ -1,0 +1,9 @@
+# El docroot de nuevo.lols.cl queda en public_html/nuevo.lols.cl (el hosting no permite
+# sacarlo de public_html). Declarar RewriteEngine aquí corta la herencia de las reglas
+# de WordPress del public_html/.htaccess padre.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+</IfModule>
+
+Options -Indexes
+ErrorDocument 404 /404.html

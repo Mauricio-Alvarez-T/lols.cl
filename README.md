@@ -3,7 +3,7 @@
 Sitio corporativo de LOLS Ingeniería Limitada. Reemplaza el WordPress 4.9 (2018) de lols.cl.
 
 - **Stack**: Astro, salida 100% estática. Node solo para construir; en el servidor quedan HTML/CSS/imágenes (sin PHP, sin BD, sin Passenger).
-- **Staging**: https://nuevo.lols.cl (docroot `/home/lolscl/nuevo.lols.cl`, fuera de `public_html`). `robots.txt` bloquea indexación.
+- **Staging**: https://nuevo.lols.cl (docroot `/home/lolscl/public_html/nuevo.lols.cl`; el hosting obliga a que cuelgue de `public_html`). `public/.htaccess` corta la herencia de las reglas de WordPress. `robots.txt` bloquea indexación.
 - **Producción**: https://lols.cl, cuando el rediseño esté aprobado.
 
 ## Comandos
@@ -32,6 +32,6 @@ Páginas: Inicio, Quiénes somos, Nuestros servicios (Construcción, Muebles, Mo
 1. Respaldo completo de cPanel (directorio home + base de datos de WordPress) descargado y verificado.
 2. `SITE=https://lols.cl npm run build`, reemplazar `robots.txt` por uno que permita indexar.
 3. Redirecciones 301 en `.htaccess` para URLs del sitio viejo que cambien.
-4. Vaciar `public_html` (sin tocar subcarpetas ajenas a WordPress) y subir `dist/`.
+4. Vaciar `public_html` y subir `dist/`. **NO borrar** las carpetas de otros dominios que cuelgan de ahí (`nuevo.lols.cl/` y cualquier docroot de subdominio: revisar cPanel → Dominios antes).
 5. Eliminar la base de datos y el usuario MySQL de WordPress.
 6. DNS y correo no se tocan.
