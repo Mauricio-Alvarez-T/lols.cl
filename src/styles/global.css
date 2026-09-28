@@ -277,6 +277,37 @@ video {
 	object-fit: cover;
 }
 
+/* Modo propuesta (Pendiente.astro, Referencial.astro, AvisoPropuesta.astro): los marcadores
+   de contenido faltante quedan ocultos hasta activar "Ver marcadores" (html.ver-marcadores). */
+html:not(.ver-marcadores) .marcador,
+html:not(.ver-marcadores) .solo-marcador,
+html:not(.ver-marcadores) .etiqueta-ref {
+	display: none;
+}
+html.ver-marcadores .ejemplo {
+	outline: 2px dashed #c98a00;
+	outline-offset: 2px;
+	background: rgb(255 244 214 / 0.6);
+}
+html.ver-marcadores .ejemplo::after {
+	content: attr(data-pendiente);
+	display: block;
+	width: fit-content;
+	margin-top: 0.25rem;
+	padding: 0.1em 0.45em;
+	background: #fff4d6;
+	color: #7a4a00;
+	font: 600 0.75rem/1.4 var(--fuente-texto);
+	letter-spacing: normal;
+	text-transform: none;
+	border-radius: 3px;
+}
+html.ver-marcadores span.ejemplo::after {
+	display: inline-block;
+	margin: 0 0 0 0.4em;
+	vertical-align: middle;
+}
+
 .sr-only {
 	position: absolute;
 	width: 1px;

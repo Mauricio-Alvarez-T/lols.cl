@@ -1,8 +1,17 @@
 ---
-// Marcador visible de contenido faltante (docs/brief.md: "no inventes contenido").
-//   <Pendiente texto="foto de obra" />                  → falta el dato
-//   <Pendiente bloque texto="foto" />                   → ocupa un marco de foto o un bloque entero
-//   <Pendiente revisar="confirmar vigencia">…</Pendiente> → dato en uso, sin confirmar
+// Contenido faltante o sin confirmar (docs/brief.md: "no inventes contenido").
+//
+//   <Pendiente texto="mandante">Inmobiliaria Ejemplo</Pendiente>
+//       Falta el dato. Se muestra el contenido de ejemplo con el estilo final (modo propuesta).
+//   <Pendiente bloque texto="alcance"><ul>…</ul></Pendiente>
+//       Igual, para un bloque entero.
+//   <Pendiente texto="mapa" bloque />
+//       Sin ejemplo: se muestra el marcador amarillo.
+//   <Pendiente revisar="confirmar vigencia">dato real</Pendiente>
+//       Dato en uso pero sin confirmar.
+//
+// Los marcadores ([PENDIENTE…], [REVISAR…]) quedan ocultos y aparecen con el botón
+// "Ver marcadores" del aviso de propuesta (AvisoPropuesta.astro, clase html.ver-marcadores).
 // El build de producción (site = lols.cl) falla si queda alguno.
 interface Props {
 	texto?: string;
@@ -14,20 +23,32 @@ const { texto, revisar, bloque = false } = Astro.props;
 if (Astro.site?.hostname === 'lols.cl') {
 	throw new Error(`Marcador sin resolver en ${Astro.url.pathname}: ${texto ?? revisar}`);
 }
+const tieneEjemplo = Astro.slots.has('default');
+const marca = `[PENDIENTE: ${texto}]`;
 ---
 
 {
 	revisar ? (
 		<span class="revisar">
 			<slot />
-			<small>[REVISAR: {revisar}]</small>
+			<small class="marcador">[REVISAR: {revisar}]</small>
 		</span>
+	) : tieneEjemplo ? (
+		bloque ? (
+			<div class="ejemplo" data-pendiente={marca}>
+				<slot />
+			</div>
+		) : (
+			<span class="ejemplo" data-pendiente={marca}>
+				<slot />
+			</span>
+		)
 	) : bloque ? (
 		<div class="bloque">
-			<span class="pendiente">[PENDIENTE: {texto}]</span>
+			<span class="pendiente">{marca}</span>
 		</div>
 	) : (
-		<span class="pendiente">[PENDIENTE: {texto}]</span>
+		<span class="pendiente solo-marcador">{marca}</span>
 	)
 }
 
@@ -59,7 +80,7 @@ if (Astro.site?.hostname === 'lols.cl') {
 	.bloque .pendiente {
 		max-width: 36rem;
 	}
-	.revisar small {
+	.marcador {
 		margin-left: 0.4em;
 		font-family: var(--fuente-texto);
 		font-size: 0.75em;

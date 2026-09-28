@@ -10,6 +10,7 @@ import { servicioPorSlug } from '../../data/empresa';
 import { proyectos, plantilla, estados, type Proyecto } from '../../data/proyectos';
 import Referencial from '../../components/Referencial.astro';
 import { bandas, obras2018 } from '../../data/referencia';
+import { ejemploProyecto as ej } from '../../data/ejemplos';
 
 export function getStaticPaths() {
 	// La plantilla de ejemplo solo existe fuera de producción.
@@ -23,24 +24,24 @@ const [portada, ...galeria] = p.fotos;
 const esEjemplo = p.slug === plantilla.slug;
 const otros = proyectos.filter((o) => o.slug !== p.slug).slice(0, 2);
 const relato = [
-	{ titulo: 'Desafío', texto: p.desafio, pendiente: 'qué problema tenía el mandante' },
-	{ titulo: 'Solución', texto: p.solucion, pendiente: 'qué hizo LOLS y cómo' },
-	{ titulo: 'Resultado', texto: p.resultado, pendiente: 'qué se logró' },
+	{ titulo: 'Desafío', texto: p.desafio, pendiente: 'qué problema tenía el mandante', ejemplo: ej.desafio },
+	{ titulo: 'Solución', texto: p.solucion, pendiente: 'qué hizo LOLS y cómo', ejemplo: ej.solucion },
+	{ titulo: 'Resultado', texto: p.resultado, pendiente: 'qué se logró', ejemplo: ej.resultado },
 ];
 ---
 
-<Base title={p.nombre ?? 'Proyecto'}>
+<Base title={p.nombre ?? ej.nombre}>
 	<header class="portadilla contenedor">
 		<p class="etiqueta"><a href="/proyectos/">Proyectos</a></p>
-		<p class="nombre">{p.nombre ?? <Pendiente texto="nombre del proyecto" />}</p>
-		<h1>{p.titular ?? <Pendiente texto="el resultado en una frase (no el nombre de la obra)" />}</h1>
+		<p class="nombre">{p.nombre ?? <Pendiente texto="nombre del proyecto">{ej.nombre}</Pendiente>}</p>
+		<h1>{p.titular ?? <Pendiente texto="el resultado en una frase (no el nombre de la obra)">{ej.titular}</Pendiente>}</h1>
 		<dl class="datos">
-			<div><dt>Mandante</dt><dd>{p.mandante ?? <Pendiente texto="mandante" />}</dd></div>
-			<div><dt>Ubicación</dt><dd>{p.comuna ?? <Pendiente texto="comuna" />}</dd></div>
-			<div><dt>Año</dt><dd>{p.anio ?? <Pendiente texto="año" />}</dd></div>
-			<div><dt>Magnitud</dt><dd>{p.magnitud ?? <Pendiente texto="m² o plazo" />}</dd></div>
+			<div><dt>Mandante</dt><dd>{p.mandante ?? <Pendiente texto="mandante">{ej.mandante}</Pendiente>}</dd></div>
+			<div><dt>Ubicación</dt><dd>{p.comuna ?? <Pendiente texto="comuna">{ej.comuna}</Pendiente>}</dd></div>
+			<div><dt>Año</dt><dd>{p.anio ?? <Pendiente texto="año">{ej.anio}</Pendiente>}</dd></div>
+			<div><dt>Magnitud</dt><dd>{p.magnitud ?? <Pendiente texto="m² o plazo">{ej.magnitud}</Pendiente>}</dd></div>
 			<div><dt>Servicios</dt><dd>{p.servicios.map((s) => servicioPorSlug(s).nombre).join(', ')}</dd></div>
-			<div><dt>Estado</dt><dd>{p.estado ? estados[p.estado] : <Pendiente texto="estado" />}</dd></div>
+			<div><dt>Estado</dt><dd>{p.estado ? estados[p.estado] : <Pendiente texto="estado">{ej.estado}</Pendiente>}</dd></div>
 		</dl>
 	</header>
 
@@ -61,13 +62,13 @@ const relato = [
 			relato.map((r) => (
 				<div class="paso">
 					<h2>{r.titulo}</h2>
-					<p>{r.texto ?? <Pendiente texto={r.pendiente} />}</p>
+					<p>{r.texto ?? <Pendiente texto={r.pendiente}>{r.ejemplo}</Pendiente>}</p>
 				</div>
 			))
 		}
 		<div class="cifra">
-			<p class="numero">{p.cifra?.valor ?? <Pendiente texto="cifra" />}</p>
-			<p>{p.cifra?.etiqueta ?? <Pendiente texto="qué mide (plazo, m², ahorro…)" />}</p>
+			<p class="numero">{p.cifra?.valor ?? <Pendiente texto="cifra">{ej.cifra.valor}</Pendiente>}</p>
+			<p>{p.cifra?.etiqueta ?? <Pendiente texto="qué mide (plazo, m², ahorro…)">{ej.cifra.etiqueta}</Pendiente>}</p>
 		</div>
 	</section>
 

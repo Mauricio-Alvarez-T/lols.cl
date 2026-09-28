@@ -6,7 +6,8 @@ import Pendiente from '../components/Pendiente.astro';
 import Contacto from '../components/Contacto.astro';
 import { empresa, valores } from '../data/empresa';
 import Referencial from '../components/Referencial.astro';
-import { bandas } from '../data/referencia';
+import { bandas, retratos } from '../data/referencia';
+import { ejemplosEmpresa as ej } from '../data/ejemplos';
 ---
 
 <Base title="Empresa" description={`Quiénes somos: ${empresa.razonSocial}.`}>
@@ -28,10 +29,10 @@ import { bandas } from '../data/referencia';
 		<div class="cabecera"><h2>Nuestra trayectoria</h2></div>
 		<ol class="linea">
 			{
-				['fundación', 'primer hito', 'hito reciente', 'hoy'].map((hito) => (
+				ej.hitos.map((h) => (
 					<li>
-						<p class="anio"><Pendiente texto="año" /></p>
-						<p><Pendiente texto={hito} /></p>
+						<p class="anio"><Pendiente texto="año del hito">{h.anio}</Pendiente></p>
+						<p><Pendiente texto="hito de la empresa">{h.texto}</Pendiente></p>
 					</li>
 				))
 			}
@@ -50,7 +51,7 @@ import { bandas } from '../data/referencia';
 						<div>
 							<p class="indice">0{i + 1}</p>
 							<h3>{v.titulo}</h3>
-							<p>{v.texto ?? <Pendiente texto="qué significa en la práctica" />}</p>
+							<p>{v.texto ?? <Pendiente texto="qué significa en la práctica">{ej.valores[v.titulo]}</Pendiente>}</p>
 						</div>
 					))
 				}
@@ -63,7 +64,9 @@ import { bandas } from '../data/referencia';
 			<p class="etiqueta">Seguridad y medio ambiente</p>
 			<h2>Compromiso con las normas de seguridad y el medio ambiente</h2>
 		</div>
-		<Pendiente bloque texto="políticas, certificaciones, mutualidad e indicadores de seguridad" />
+		<Pendiente bloque texto="políticas, certificaciones, mutualidad e indicadores de seguridad">
+			<ul class="lista">{ej.seguridad.map((x) => <li>{x}</li>)}</ul>
+		</Pendiente>
 	</section>
 
 	<section class="seccion contenedor">
@@ -71,13 +74,13 @@ import { bandas } from '../data/referencia';
 		<div class="cabecera"><h2>Las personas a cargo</h2></div>
 		<div class="equipo">
 			{
-				[1, 2, 3, 4].map(() => (
+				ej.equipo.map((m, i) => (
 					<div>
 						<div class="retrato marco">
-							<Pendiente bloque texto="foto" />
+							<Referencial imagen={retratos.equipo[i]} sizes="(max-width: 960px) 50vw, 25vw" />
 						</div>
-						<p class="persona"><Pendiente texto="nombre" /></p>
-						<p><Pendiente texto="cargo" /></p>
+						<p class="persona"><Pendiente texto="nombre">{m.nombre}</Pendiente></p>
+						<p class="cargo"><Pendiente texto="cargo">{m.cargo}</Pendiente></p>
 					</div>
 				))
 			}
@@ -163,6 +166,30 @@ import { bandas } from '../data/referencia';
 	.persona {
 		font-family: var(--fuente-titulos);
 		font-weight: 700;
+	}
+	.cargo {
+		color: var(--gris-medio);
+	}
+	.lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid var(--linea);
+	}
+	.lista li {
+		padding: 0.85rem 0 0.85rem 1.5rem;
+		border-bottom: 1px solid var(--linea);
+		position: relative;
+		font-size: 1.1rem;
+	}
+	.lista li::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 1.35rem;
+		width: 0.55rem;
+		height: 0.55rem;
+		background: var(--lols-verde);
 	}
 	@media (max-width: 960px) {
 		.linea,

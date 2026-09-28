@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
+import { empresa } from '../data/empresa';
 ---
 
 <Base title="Política de privacidad">
@@ -9,17 +10,49 @@ import Pendiente from '../components/Pendiente.astro';
 	</header>
 
 	<section class="seccion contenedor">
-		<div class="texto">
-			<Pendiente
-				bloque
-				texto="texto legal (Ley 21.719, vigente desde el 1-dic-2026): finalidad de los datos, plazo de conservación y cómo ejercer los derechos. Lo revisa quien vea lo legal."
-			/>
-		</div>
+		<Pendiente
+			bloque
+			texto="texto legal definitivo (Ley 21.719, vigente desde el 1-dic-2026). Este es un esquema de ejemplo: lo revisa y aprueba quien vea lo legal."
+		>
+			<div class="texto">
+				<h2>Quién es responsable de sus datos</h2>
+				<p>{empresa.razonSocial} es responsable de los datos personales que usted entrega a través de este sitio.</p>
+
+				<h2>Qué datos recogemos</h2>
+				<p>
+					Solo los que usted escribe en el formulario de contacto: nombre, empresa, correo, teléfono, servicio de
+					interés y mensaje.
+				</p>
+
+				<h2>Para qué los usamos</h2>
+				<p>Para responder su solicitud y, si corresponde, preparar una cotización. No los usamos para otros fines ni los compartimos con terceros.</p>
+
+				<h2>Cuánto tiempo los guardamos</h2>
+				<p>Mientras dure la gestión de su solicitud y el plazo que exija la ley. Luego se eliminan.</p>
+
+				<h2>Sus derechos</h2>
+				<p>
+					Puede pedir acceso, rectificación, supresión u oposición al uso de sus datos, y la portabilidad de estos,
+					escribiendo a nuestro correo de contacto.
+				</p>
+			</div>
+		</Pendiente>
 	</section>
 </Base>
 
 <style>
 	.texto {
-		max-width: 48rem;
+		max-width: 44rem;
+	}
+	.texto h2 {
+		font-size: 1.35rem;
+		letter-spacing: -0.02em;
+		margin-top: 2.25rem;
+	}
+	.texto h2:first-child {
+		margin-top: 0;
+	}
+	.texto p {
+		color: var(--lols-gris);
 	}
 </style>

@@ -15,6 +15,7 @@ const foto = proyecto?.fotos[0];
 const servicio = proyecto?.servicios[0] ? servicioPorSlug(proyecto.servicios[0]).nombre : null;
 const href = proyecto ? `/proyectos/${proyecto.slug}/` : undefined;
 const Tag = href ? 'a' : 'div';
+const ej = referencia?.ejemplo;
 ---
 
 <article class="tarjeta" data-servicios={proyecto?.servicios.join(' ')} data-estado={proyecto?.estado}>
@@ -22,11 +23,11 @@ const Tag = href ? 'a' : 'div';
 		<div class="foto marco">
 			{foto ? <img src={foto.src} alt={foto.alt} loading="lazy" /> : referencia ? <Referencial imagen={referencia} /> : <Pendiente bloque texto="foto" />}
 		</div>
-		<h3>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto" />}</h3>
+		<h3>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto">{ej?.nombre}</Pendiente>}</h3>
 		<p class="meta">
-			<span>{servicio ?? <Pendiente texto="servicio" />}</span>
-			<span>{proyecto?.comuna ?? <Pendiente texto="comuna" />}</span>
-			<span>{proyecto?.anio ?? <Pendiente texto="año" />}</span>
+			<span>{servicio ?? <Pendiente texto="servicio">{ej?.servicio}</Pendiente>}</span>
+			<span>{proyecto?.comuna ?? <Pendiente texto="comuna">{ej?.comuna}</Pendiente>}</span>
+			<span>{proyecto?.anio ?? <Pendiente texto="año">{ej?.anio}</Pendiente>}</span>
 		</p>
 	</Tag>
 </article>

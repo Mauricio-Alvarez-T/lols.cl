@@ -15,7 +15,7 @@ import { obras2018 } from '../../data/referencia';
 	<header class="portadilla contenedor">
 		<p class="etiqueta">Proyectos</p>
 		<h1>Obras que hablan por nosotros</h1>
-		<p class="bajada"><Pendiente texto="una frase sobre el portafolio (tipos de obra, años, regiones)" /></p>
+		<p class="bajada"><Pendiente texto="una frase sobre el portafolio (tipos de obra, años, regiones)">Edificios comerciales, oficinas e instalaciones industriales en la Región Metropolitana.</Pendiente></p>
 	</header>
 
 	<section class="contenedor filtros" aria-label="Filtrar proyectos">
@@ -49,9 +49,7 @@ import { obras2018 } from '../../data/referencia';
 				</div>
 			) : (
 				<>
-					<p class="aviso">
-						<Pendiente texto="listado de 6 a 12 proyectos con ficha (docs/brief.md § 4). Mientras tanto, tarjetas de muestra; ver la ficha de ejemplo en /proyectos/ejemplo/" />
-					</p>
+					<Pendiente texto="listado de 6 a 12 proyectos con ficha (docs/brief.md § 4); las tarjetas son de muestra" />
 					<div class="grilla">
 						{obras2018.map((f) => <TarjetaProyecto referencia={f} />)}
 					</div>

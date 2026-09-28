@@ -2,6 +2,8 @@
 // Cierre de página con una persona responsable (patrón Arup / Mott MacDonald / Ramboll).
 import Pendiente from './Pendiente.astro';
 import { empresa, telefonoHref } from '../data/empresa';
+import Referencial from './Referencial.astro';
+import { retratos } from '../data/referencia';
 
 interface Props {
 	titulo?: string;
@@ -18,10 +20,11 @@ const { titulo = 'Hablemos de su proyecto' } = Astro.props;
 		</div>
 		<div class="persona">
 			<div class="retrato marco">
-				<Pendiente bloque texto="foto" />
+				<Referencial imagen={retratos.contacto} sizes="7rem" />
 			</div>
 			<div>
-				<p class="nombre"><Pendiente texto="nombre y cargo de quien atiende cotizaciones" /></p>
+				<p class="nombre"><Pendiente texto="nombre y cargo de quien atiende cotizaciones">Nombre Apellido</Pendiente></p>
+				<p class="cargo"><Pendiente texto="cargo">Jefe de proyectos</Pendiente></p>
 				<p>
 					<Pendiente revisar={empresa.telefono.revisar}>
 						<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
@@ -66,6 +69,10 @@ const { titulo = 'Hablemos de su proyecto' } = Astro.props;
 	.nombre {
 		font-family: var(--fuente-titulos);
 		font-weight: 700;
+	}
+	.cargo {
+		color: #b5b5b5;
+		margin-bottom: 0.75rem !important;
 	}
 	@media (max-width: 860px) {
 		.grilla {

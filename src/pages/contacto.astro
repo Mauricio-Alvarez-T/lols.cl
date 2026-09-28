@@ -20,7 +20,7 @@ import { empresa, telefonoHref } from '../data/empresa';
 			<dl class="datos vertical">
 				<div>
 					<dt>Quién atiende</dt>
-					<dd><Pendiente texto="nombre y cargo" /></dd>
+					<dd><Pendiente texto="nombre y cargo">Nombre Apellido · Jefe de proyectos</Pendiente></dd>
 				</div>
 				<div>
 					<dt>Teléfono</dt>
@@ -44,8 +44,13 @@ import { empresa, telefonoHref } from '../data/empresa';
 				</div>
 			</dl>
 			<div class="mapa marco">
-				<Pendiente bloque texto="mapa" />
+				<iframe
+					title="Mapa: El Mirador 112-150, Cerrillos"
+					src="https://www.openstreetmap.org/export/embed.html?bbox=-70.7236%2C-33.5093%2C-70.7077%2C-33.5013&layer=mapnik&marker=-33.50535%2C-70.71567"
+					loading="lazy"
+					referrerpolicy="no-referrer"></iframe>
 			</div>
+			<a class="ver-mapa" href="https://www.openstreetmap.org/?mlat=-33.50535&mlon=-70.71567#map=17/-33.50535/-70.71567">Ver en el mapa</a>
 		</aside>
 	</section>
 </Base>
@@ -67,6 +72,17 @@ import { empresa, telefonoHref } from '../data/empresa';
 	}
 	.mapa {
 		aspect-ratio: 4 / 3;
+	}
+	.mapa iframe {
+		width: 100%;
+		height: 100%;
+		border: 0;
+		filter: grayscale(0.6);
+	}
+	.ver-mapa {
+		display: inline-block;
+		margin-top: 0.5rem;
+		font-size: 0.9rem;
 	}
 	@media (max-width: 860px) {
 		.columnas {

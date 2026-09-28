@@ -10,6 +10,7 @@ import { servicios, type Servicio } from '../../data/empresa';
 import { proyectos } from '../../data/proyectos';
 import Referencial from '../../components/Referencial.astro';
 import { bandasServicio, obras2018 } from '../../data/referencia';
+import { ejemplosServicio } from '../../data/ejemplos';
 
 export function getStaticPaths() {
 	return servicios.map((servicio) => ({ params: { slug: servicio.slug }, props: { servicio } }));
@@ -18,14 +19,15 @@ export function getStaticPaths() {
 const { servicio: s } = Astro.props as { servicio: Servicio };
 const relacionados = proyectos.filter((p) => p.servicios.includes(s.slug)).slice(0, 3);
 const otros = servicios.filter((o) => o.slug !== s.slug);
+const ej = ejemplosServicio[s.slug];
 ---
 
 <Base title={s.nombre}>
 	<header class="portadilla contenedor">
 		<p class="etiqueta"><a href="/servicios/">Servicios</a></p>
 		<div class="nombre"><Icono nombre={s.icono} /><span>{s.nombre}</span></div>
-		<h1>{s.problema ?? <Pendiente texto="el problema del cliente que este servicio resuelve, como titular" />}</h1>
-		<p class="bajada">{s.resumen ?? <Pendiente texto="cómo lo resuelve LOLS, en dos líneas" />}</p>
+		<h1>{s.problema ?? <Pendiente texto="el problema del cliente que este servicio resuelve, como titular">{ej.problema}</Pendiente>}</h1>
+		<p class="bajada">{s.resumen ?? <Pendiente texto="cómo lo resuelve LOLS, en dos líneas">{ej.resumen}</Pendiente>}</p>
 	</header>
 
 	<div class="banda marco">
@@ -35,11 +37,15 @@ const otros = servicios.filter((o) => o.slug !== s.slug);
 	<section class="seccion contenedor columnas">
 		<div>
 			<h2>Qué hacemos</h2>
-			<Pendiente bloque texto="alcance: lista de trabajos que incluye" />
+			<Pendiente bloque texto="alcance: lista de trabajos que incluye">
+				<ul class="lista">{ej.alcance.map((a) => <li>{a}</li>)}</ul>
+			</Pendiente>
 		</div>
 		<div>
 			<h2>Para quién</h2>
-			<Pendiente bloque texto="tipos de cliente o industria" />
+			<Pendiente bloque texto="tipos de cliente o industria">
+				<ul class="lista">{ej.clientes.map((c) => <li>{c}</li>)}</ul>
+			</Pendiente>
 		</div>
 	</section>
 
@@ -99,6 +105,27 @@ const otros = servicios.filter((o) => o.slug !== s.slug);
 	.columnas h2 {
 		font-size: 1.75rem;
 		letter-spacing: -0.02em;
+	}
+	.lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid var(--linea);
+	}
+	.lista li {
+		padding: 0.85rem 0 0.85rem 1.5rem;
+		border-bottom: 1px solid var(--linea);
+		position: relative;
+		font-size: 1.1rem;
+	}
+	.lista li::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 1.35rem;
+		width: 0.55rem;
+		height: 0.55rem;
+		background: var(--lols-verde);
 	}
 	.grilla {
 		display: grid;

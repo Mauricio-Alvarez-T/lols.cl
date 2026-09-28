@@ -1,0 +1,70 @@
+---
+// Aviso fijo del modo propuesta: recuerda que el contenido es de ejemplo y permite ver
+// u ocultar los marcadores de lo que falta. También se activa con ?marcadores en la URL.
+// Solo se incluye fuera de producción (ver Base.astro).
+---
+
+<aside class="aviso" aria-label="Aviso de propuesta">
+	<span>Propuesta · contenido de ejemplo</span>
+	<button type="button" aria-pressed="false">Ver marcadores</button>
+</aside>
+
+<script>
+	const raiz = document.documentElement;
+	const boton = document.querySelector<HTMLButtonElement>('.aviso button')!;
+	const clave = 'lols-ver-marcadores';
+	let activo = new URLSearchParams(location.search).has('marcadores');
+	try {
+		activo ||= localStorage.getItem(clave) === '1';
+	} catch {}
+
+	function aplicar() {
+		raiz.classList.toggle('ver-marcadores', activo);
+		boton.setAttribute('aria-pressed', String(activo));
+		boton.textContent = activo ? 'Ocultar marcadores' : 'Ver marcadores';
+	}
+	boton.addEventListener('click', () => {
+		activo = !activo;
+		try {
+			localStorage.setItem(clave, activo ? '1' : '0');
+		} catch {}
+		aplicar();
+	});
+	aplicar();
+</script>
+
+<style>
+	.aviso {
+		position: fixed;
+		left: 1rem;
+		bottom: 1rem;
+		z-index: 30;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.4rem 0.4rem 0.4rem 0.9rem;
+		background: rgb(20 20 20 / 0.88);
+		color: #fff;
+		font: 600 0.8rem/1.2 var(--fuente-texto);
+		border-radius: 999px;
+		box-shadow: 0 6px 20px rgb(0 0 0 / 0.2);
+	}
+	button {
+		padding: 0.35rem 0.75rem;
+		border: 0;
+		border-radius: 999px;
+		background: #fff;
+		color: var(--lols-carbon);
+		font: inherit;
+		cursor: pointer;
+	}
+	button[aria-pressed='true'] {
+		background: #fff4d6;
+		color: #7a4a00;
+	}
+	@media print {
+		.aviso {
+			display: none;
+		}
+	}
+</style>
