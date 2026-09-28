@@ -1,0 +1,34 @@
+---
+// Logo de docs/marca/logo-lols.svg, inline y en currentColor: así hereda el color del
+// contexto y el <text> usa la DM Sans cargada por la página (dentro de un <img> no la vería).
+interface Props {
+	class?: string;
+	simbolo?: boolean;
+}
+const { class: clase, simbolo = false } = Astro.props;
+---
+
+<svg
+	class={clase}
+	viewBox={simbolo ? '0 0 220 240' : '0 0 540 240'}
+	fill="currentColor"
+	xmlns="http://www.w3.org/2000/svg"
+	role="img"
+	aria-label="LOLS Ingeniería"
+>
+	<rect x="20" y="20" width={simbolo ? 180 : 500} height="12"></rect>
+	<rect x="20" y="208" width={simbolo ? 180 : 500} height="12"></rect>
+	<rect x="20" y="48" width="75" height="144"></rect>
+	<rect x="119" y="52" width="77" height="32" fill="none" stroke="currentColor" stroke-width="8"></rect>
+	<rect x="119" y="104" width="77" height="32" fill="none" stroke="currentColor" stroke-width="8"></rect>
+	<rect x="115" y="152" width="85" height="40"></rect>
+	{
+		!simbolo && (
+			<>
+				<text x="220" y="134" font-family="'DM Sans Variable', 'DM Sans', sans-serif" font-weight="700" font-size="115" letter-spacing="-0.02em">LOLS</text>
+				<rect x="220" y="148" width="300" height="6" />
+				<text x="225" y="192" font-family="'DM Sans Variable', 'DM Sans', sans-serif" font-weight="700" font-size="42" letter-spacing="0.01em">INGENIERIA</text>
+			</>
+		)
+	}
+</svg>

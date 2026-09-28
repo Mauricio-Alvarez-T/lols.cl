@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import Pendiente from '../components/Pendiente.astro';
+import { empresa } from '../data/empresa';
+---
+
+<Base title="Empresa" description={`Quiénes somos: ${empresa.razonSocial}.`}>
+	<header class="encabezado-pagina">
+		<div class="contenedor">
+			<p class="antetitulo">Empresa</p>
+			<h1>Quiénes somos</h1>
+			<p>{empresa.directrices}</p>
+		</div>
+	</header>
+
+	<section class="seccion">
+		<div class="contenedor columnas">
+			<div>
+				<h2>Nuestra forma de trabajar</h2>
+				<p>
+					<Pendiente revisar="recalcular: el texto es de 2018">Más de 20 años de experiencia</Pendiente> en el área de
+					construcción.
+				</p>
+				<p>Un esquema de trabajo basado en el esfuerzo, la creatividad y la responsabilidad.</p>
+				<p>Compromiso con las normas de seguridad y el respeto por el medio ambiente.</p>
+			</div>
+			<div class="foto marco">
+				<Pendiente bloque texto="foto del equipo o de faena" />
+			</div>
+		</div>
+	</section>
+
+	<section class="seccion gris">
+		<div class="contenedor">
+			<h2>Historia</h2>
+			<Pendiente bloque texto="hitos de la empresa (año de fundación, obras clave) para la línea de tiempo" />
+		</div>
+	</section>
+
+	<section class="seccion">
+		<div class="contenedor">
+			<h2>Seguridad y medio ambiente</h2>
+			<Pendiente bloque texto="políticas, certificaciones y mutualidad" />
+		</div>
+	</section>
+</Base>
+
+<style>
+	.columnas {
+		display: grid;
+		grid-template-columns: 1.2fr 1fr;
+		gap: clamp(2rem, 6vw, 5rem);
+		align-items: center;
+	}
+	.foto {
+		aspect-ratio: 4 / 3;
+	}
+	@media (max-width: 860px) {
+		.columnas {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

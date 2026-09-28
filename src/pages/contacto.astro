@@ -1,0 +1,77 @@
+---
+import Base from '../layouts/Base.astro';
+import Pendiente from '../components/Pendiente.astro';
+import { empresa, telefonoHref } from '../data/empresa';
+---
+
+<Base title="Contacto" description="Solicite una cotización a LOLS Ingeniería.">
+	<header class="encabezado-pagina">
+		<div class="contenedor">
+			<p class="antetitulo">Contacto</p>
+			<h1>¿Tiene un proyecto en mente?</h1>
+			<p>Contáctenos y resolveremos todas sus dudas.</p>
+		</div>
+	</header>
+
+	<section class="seccion">
+		<div class="contenedor columnas">
+			<div>
+				<h2>Solicitar cotización</h2>
+				<Pendiente bloque texto="formulario con casilla de consentimiento (Ley 21.719)" />
+			</div>
+			<div>
+				<h2>Datos</h2>
+				<dl>
+					<dt>Dirección</dt>
+					<dd><Pendiente revisar={empresa.direccion.revisar}>{empresa.direccion.valor}</Pendiente></dd>
+					<dt>Teléfono</dt>
+					<dd>
+						<Pendiente revisar={empresa.telefono.revisar}>
+							<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
+						</Pendiente>
+					</dd>
+					<dt>Correo</dt>
+					<dd>
+						<Pendiente revisar={empresa.correo.revisar}>
+							<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
+						</Pendiente>
+					</dd>
+				</dl>
+				<div class="mapa marco">
+					<Pendiente bloque texto="mapa" />
+				</div>
+			</div>
+		</div>
+	</section>
+</Base>
+
+<style>
+	.columnas {
+		display: grid;
+		grid-template-columns: 1.3fr 1fr;
+		gap: clamp(2rem, 6vw, 5rem);
+	}
+	dl {
+		margin: 0 0 2rem;
+	}
+	dt {
+		font-family: var(--fuente-titulos);
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--lols-gris);
+	}
+	dd {
+		margin: 0.25rem 0 1.25rem;
+		font-size: 1.1rem;
+	}
+	.mapa {
+		aspect-ratio: 4 / 3;
+	}
+	@media (max-width: 860px) {
+		.columnas {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

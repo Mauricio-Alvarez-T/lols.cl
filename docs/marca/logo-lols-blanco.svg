@@ -1,0 +1,14 @@
+<svg viewBox="0 0 540 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LOLS Ingeniería">
+  <!-- Fuente: boveda.lols.cl. El texto usa DM Sans: cargarla en el sitio o convertir el texto a trazados. -->
+  <g fill="#FFFFFF">
+    <rect x="20" y="20" width="500" height="12"/>
+    <rect x="20" y="208" width="500" height="12"/>
+    <rect x="20" y="48" width="75" height="144"/>
+    <rect x="119" y="52" width="77" height="32" fill="none" stroke="#FFFFFF" stroke-width="8"/>
+    <rect x="119" y="104" width="77" height="32" fill="none" stroke="#FFFFFF" stroke-width="8"/>
+    <rect x="115" y="152" width="85" height="40"/>
+    <text x="220" y="134" font-family="'DM Sans', sans-serif" font-weight="700" font-size="115" letter-spacing="-0.02em">LOLS</text>
+    <rect x="220" y="148" width="300" height="6"/>
+    <text x="225" y="192" font-family="'DM Sans', sans-serif" font-weight="700" font-size="42" letter-spacing="0.01em">INGENIERIA</text>
+  </g>
+</svg>

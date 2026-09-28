@@ -1,0 +1,183 @@
+---
+import Logo from './Logo.astro';
+import { navegacion } from '../data/empresa';
+
+const ruta = Astro.url.pathname;
+---
+
+<header class="encabezado">
+	<div class="contenedor fila">
+		<a href="/" class="marca" aria-label="LOLS Ingeniería, inicio">
+			<Logo class="logo" />
+		</a>
+		<button class="menu-boton" type="button" aria-expanded="false" aria-controls="menu">
+			<span class="sr-only">Menú</span>
+			<span class="barras" aria-hidden="true"></span>
+		</button>
+		<nav id="menu" aria-label="Principal">
+			<ul>
+				{
+					navegacion.map((item) => (
+						<li>
+							<a href={item.href} aria-current={ruta.startsWith(item.href) ? 'page' : undefined}>
+								{item.texto}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+			<a href="/contacto/" class="boton">Solicitar cotización</a>
+		</nav>
+	</div>
+</header>
+
+<script>
+	const boton = document.querySelector<HTMLButtonElement>('.menu-boton')!;
+	boton.addEventListener('click', () => {
+		const abierto = boton.getAttribute('aria-expanded') === 'true';
+		boton.setAttribute('aria-expanded', String(!abierto));
+	});
+</script>
+
+<style>
+	.encabezado {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		background: var(--lols-blanco);
+		border-bottom: 1px solid #e2e2e2;
+	}
+	.fila {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem;
+		min-height: 4.5rem;
+	}
+	.marca {
+		color: var(--lols-verde);
+		flex-shrink: 0;
+	}
+	.marca :global(.logo) {
+		width: 8.5rem;
+		height: auto;
+	}
+	nav,
+	nav ul {
+		display: flex;
+		align-items: center;
+		gap: 2rem;
+	}
+	nav ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	nav ul a {
+		position: relative;
+		display: block;
+		padding-block: 0.5rem;
+		color: var(--lols-carbon);
+		font-family: var(--fuente-titulos);
+		font-weight: 600;
+		text-decoration: none;
+	}
+	nav ul a::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 3px;
+		background: var(--lols-verde);
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 0.2s;
+	}
+	nav ul a:hover::after,
+	nav ul a[aria-current='page']::after {
+		transform: scaleX(1);
+	}
+	.menu-boton {
+		display: none;
+	}
+
+	@media (max-width: 860px) {
+		.menu-boton {
+			display: grid;
+			place-items: center;
+			width: 3rem;
+			height: 3rem;
+			margin-right: -0.5rem;
+			border: 0;
+			background: none;
+			cursor: pointer;
+		}
+		.barras,
+		.barras::before,
+		.barras::after {
+			display: block;
+			width: 1.5rem;
+			height: 2px;
+			background: var(--lols-carbon);
+			transition: transform 0.2s, opacity 0.2s;
+		}
+		.barras {
+			position: relative;
+		}
+		.barras::before,
+		.barras::after {
+			content: '';
+			position: absolute;
+			left: 0;
+		}
+		.barras::before {
+			top: -7px;
+		}
+		.barras::after {
+			top: 7px;
+		}
+		[aria-expanded='true'] .barras {
+			background: transparent;
+		}
+		[aria-expanded='true'] .barras::before {
+			transform: translateY(7px) rotate(45deg);
+		}
+		[aria-expanded='true'] .barras::after {
+			transform: translateY(-7px) rotate(-45deg);
+		}
+
+		nav {
+			display: none;
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			flex-direction: column;
+			align-items: stretch;
+			gap: 1rem;
+			padding: 1rem var(--gutter) 1.5rem;
+			background: var(--lols-blanco);
+			border-bottom: 1px solid #e2e2e2;
+			box-shadow: 0 12px 24px rgb(0 0 0 / 0.08);
+		}
+		.menu-boton[aria-expanded='true'] + nav {
+			display: flex;
+		}
+		nav ul {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 0;
+		}
+		nav ul a {
+			padding-block: 0.85rem;
+			border-bottom: 1px solid var(--lols-gris-claro);
+		}
+		nav ul a::after {
+			display: none;
+		}
+		nav ul a[aria-current='page'] {
+			color: var(--lols-verde-oscuro);
+		}
+	}
+</style>

@@ -1,0 +1,58 @@
+---
+// Marcador visible de contenido faltante (docs/brief.md: "no inventes contenido").
+//   <Pendiente texto="foto de obra" />                  → falta el dato
+//   <Pendiente revisar="confirmar vigencia">…</Pendiente> → dato en uso, sin confirmar
+// El build de producción (site = lols.cl) falla si queda alguno.
+interface Props {
+	texto?: string;
+	revisar?: string;
+	bloque?: boolean;
+}
+const { texto, revisar, bloque = false } = Astro.props;
+
+if (Astro.site?.hostname === 'lols.cl') {
+	throw new Error(`Marcador sin resolver en ${Astro.url.pathname}: ${texto ?? revisar}`);
+}
+const Tag = bloque ? 'div' : 'span';
+---
+
+{
+	revisar ? (
+		<span class="revisar">
+			<slot />
+			<small>[REVISAR: {revisar}]</small>
+		</span>
+	) : (
+		<Tag class:list={['pendiente', { bloque }]}>[PENDIENTE: {texto}]</Tag>
+	)
+}
+
+<style>
+	.pendiente {
+		font-family: var(--fuente-texto);
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #7a4a00;
+		background: #fff4d6;
+		border: 1px dashed #c98a00;
+		border-radius: 4px;
+		padding: 0.1em 0.45em;
+	}
+	.pendiente.bloque {
+		display: grid;
+		place-items: center;
+		/* Dentro de un marco de foto (.marco, display grid) se estira a todo el marco. */
+		min-height: 8rem;
+		padding: 2rem 1rem;
+		text-align: center;
+	}
+	.revisar small {
+		margin-left: 0.4em;
+		font-size: 0.75em;
+		font-weight: 600;
+		color: #7a4a00;
+		background: #fff4d6;
+		border-radius: 3px;
+		padding: 0 0.3em;
+	}
+</style>

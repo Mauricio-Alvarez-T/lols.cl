@@ -16,6 +16,12 @@ npm run build                   # genera dist/
 node scripts/extraer-wp.mjs     # re-extrae el contenido del WordPress viejo (solo mientras exista)
 ```
 
+## Contenido y marca
+
+- Especificación: [docs/brief.md](docs/brief.md) (colores, tipografías, estructura, requisitos, preguntas para don Luis). Logos originales en `docs/marca/`.
+- Datos de empresa y servicios: `src/data/empresa.ts`. Tokens de color: `src/styles/global.css`.
+- **No se inventa contenido.** Lo que falta va con `<Pendiente texto="…" />` y lo que está sin confirmar con `<Pendiente revisar="…">dato</Pendiente>`; ambos se ven destacados en amarillo. **El build para `lols.cl` falla mientras quede alguno**, así que no se puede lanzar con huecos.
+
 ## Contenido heredado
 
 `respaldo-wp/` es la copia del contenido del WordPress viejo (extraída 2026-09-28): 21 páginas (JSON de la API + HTML renderizado) y 95 imágenes originales. **Es la única copia fuera de WordPress: no borrar.**

@@ -7,3 +7,12 @@
 
 Options -Indexes
 ErrorDocument 404 /404.html
+
+# URLs del WordPress de 2018 → estructura nueva (docs/brief.md § 5).
+# Incluye las subpáginas de cada proyecto viejo (/proyectos-terminados/abate/, ...).
+<IfModule mod_alias.c>
+  RedirectMatch 301 ^/quienes-somos/?$ /empresa/
+  RedirectMatch 301 ^/nuestros-servicios/?$ /servicios/
+  RedirectMatch 301 ^/proyectos-terminados(/.*)?$ /proyectos/?estado=terminado
+  RedirectMatch 301 ^/proyectos-en-construccion(/.*)?$ /proyectos/?estado=en-curso
+</IfModule>

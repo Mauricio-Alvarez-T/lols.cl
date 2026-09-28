@@ -1,0 +1,80 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icono from '../../components/Icono.astro';
+import Pendiente from '../../components/Pendiente.astro';
+import { servicios } from '../../data/empresa';
+---
+
+<Base title="Servicios" description={`Servicios de LOLS Ingeniería: ${servicios.map((s) => s.nombre).join(', ')}.`}>
+	<header class="encabezado-pagina">
+		<div class="contenedor">
+			<p class="antetitulo">Servicios</p>
+			<h1>Lo que hacemos</h1>
+			<p><Pendiente texto="introducción a los servicios" /></p>
+		</div>
+	</header>
+
+	<section class="seccion">
+		<div class="contenedor">
+			<ul class="lista">
+				{
+					servicios.map((s) => (
+						<li>
+							<a href={`/servicios/${s.slug}/`}>
+								<Icono nombre={s.icono} />
+								<div>
+									<h2>{s.nombre}</h2>
+									<p>{s.resumen ?? <Pendiente texto="descripción breve" />}</p>
+								</div>
+								<span class="flecha" aria-hidden="true">→</span>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+</Base>
+
+<style>
+	.lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid #e2e2e2;
+	}
+	.lista a {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		gap: 1.5rem;
+		padding: 1.75rem 0;
+		border-bottom: 1px solid #e2e2e2;
+		color: inherit;
+		text-decoration: none;
+	}
+	.lista :global(.icono) {
+		width: 2.75rem;
+		height: 2.75rem;
+		color: var(--lols-verde);
+	}
+	.lista h2 {
+		font-size: 1.5rem;
+		margin-bottom: 0.25rem;
+	}
+	.lista p {
+		margin: 0;
+		color: var(--lols-gris);
+	}
+	.flecha {
+		font-size: 1.5rem;
+		color: var(--lols-verde-oscuro);
+		transition: transform 0.2s;
+	}
+	.lista a:hover .flecha {
+		transform: translateX(6px);
+	}
+	.lista a:hover h2 {
+		color: var(--lols-verde-oscuro);
+	}
+</style>
