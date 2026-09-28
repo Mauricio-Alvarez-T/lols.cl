@@ -3,11 +3,14 @@
 import Pendiente from './Pendiente.astro';
 import { servicioPorSlug } from '../data/empresa';
 import type { Proyecto } from '../data/proyectos';
+import type { ImagenReferencial } from '../data/referencia';
+import Referencial from './Referencial.astro';
 
 interface Props {
 	proyecto?: Proyecto; // sin proyecto = tarjeta de muestra con marcadores
+	referencia?: ImagenReferencial; // foto referencial para la tarjeta de muestra
 }
-const { proyecto } = Astro.props;
+const { proyecto, referencia } = Astro.props;
 const foto = proyecto?.fotos[0];
 const servicio = proyecto?.servicios[0] ? servicioPorSlug(proyecto.servicios[0]).nombre : null;
 const href = proyecto ? `/proyectos/${proyecto.slug}/` : undefined;
@@ -17,7 +20,7 @@ const Tag = href ? 'a' : 'div';
 <article class="tarjeta" data-servicios={proyecto?.servicios.join(' ')} data-estado={proyecto?.estado}>
 	<Tag href={href} class="vinculo">
 		<div class="foto marco">
-			{foto ? <img src={foto.src} alt={foto.alt} loading="lazy" /> : <Pendiente bloque texto="foto" />}
+			{foto ? <img src={foto.src} alt={foto.alt} loading="lazy" /> : referencia ? <Referencial imagen={referencia} /> : <Pendiente bloque texto="foto" />}
 		</div>
 		<h3>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto" />}</h3>
 		<p class="meta">

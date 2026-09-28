@@ -8,6 +8,8 @@ import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
 import Contacto from '../../components/Contacto.astro';
 import { servicios, type Servicio } from '../../data/empresa';
 import { proyectos } from '../../data/proyectos';
+import Referencial from '../../components/Referencial.astro';
+import { bandasServicio, obras2018 } from '../../data/referencia';
 
 export function getStaticPaths() {
 	return servicios.map((servicio) => ({ params: { slug: servicio.slug }, props: { servicio } }));
@@ -27,7 +29,7 @@ const otros = servicios.filter((o) => o.slug !== s.slug);
 	</header>
 
 	<div class="banda marco">
-		<Pendiente bloque texto={`foto de ${s.nombre.toLowerCase()} en una obra propia`} />
+		<Referencial imagen={bandasServicio[s.slug]} carga="eager" />
 	</div>
 
 	<section class="seccion contenedor columnas">
@@ -47,7 +49,7 @@ const otros = servicios.filter((o) => o.slug !== s.slug);
 			<a href={`/proyectos/?servicio=${s.slug}`} class="enlace-flecha">Proyectos de {s.nombre.toLowerCase()}</a>
 		</div>
 		<div class="grilla">
-			{relacionados.length ? relacionados.map((p) => <TarjetaProyecto proyecto={p} />) : [1, 2, 3].map(() => <TarjetaProyecto />)}
+			{relacionados.length ? relacionados.map((p) => <TarjetaProyecto proyecto={p} />) : obras2018.slice(0, 3).map((f) => <TarjetaProyecto referencia={f} />)}
 		</div>
 	</section>
 

@@ -11,6 +11,8 @@ import TarjetaProyecto from '../components/TarjetaProyecto.astro';
 import Contacto from '../components/Contacto.astro';
 import { empresa, necesidades, necesidadesRevisar, servicioPorSlug } from '../data/empresa';
 import { proyectos } from '../data/proyectos';
+import Referencial from '../components/Referencial.astro';
+import { bandas, destacado, obras2018 } from '../data/referencia';
 
 const recientes = proyectos.slice(0, 3);
 const cifras = [
@@ -34,7 +36,7 @@ const cifras = [
 	</section>
 
 	<div class="banda marco">
-		<Pendiente bloque texto="video corto o foto de obra propia a todo el ancho (con botón de pausa si es video)" />
+		<Referencial imagen={bandas.portada} carga="eager" />
 	</div>
 
 	<section class="cifras contenedor" aria-label="LOLS en cifras">
@@ -87,7 +89,7 @@ const cifras = [
 	<section class="seccion gris">
 		<div class="contenedor destacado">
 			<div class="destacado-foto marco">
-				<Pendiente bloque texto="foto principal del proyecto destacado" />
+				<Referencial imagen={destacado} />
 			</div>
 			<div>
 				<p class="etiqueta">Proyecto destacado</p>
@@ -115,7 +117,7 @@ const cifras = [
 				<a href="/proyectos/" class="enlace-flecha">Todos los proyectos</a>
 			</div>
 			<div class="grilla-proyectos">
-				{recientes.length ? recientes.map((p) => <TarjetaProyecto proyecto={p} />) : [1, 2, 3].map(() => <TarjetaProyecto />)}
+				{recientes.length ? recientes.map((p) => <TarjetaProyecto proyecto={p} />) : obras2018.slice(0, 3).map((f) => <TarjetaProyecto referencia={f} />)}
 			</div>
 		</div>
 	</section>

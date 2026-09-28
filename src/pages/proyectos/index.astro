@@ -8,6 +8,7 @@ import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
 import Contacto from '../../components/Contacto.astro';
 import { servicios } from '../../data/empresa';
 import { proyectos, estados } from '../../data/proyectos';
+import { obras2018 } from '../../data/referencia';
 ---
 
 <Base title="Proyectos" description="Proyectos de LOLS Ingeniería.">
@@ -52,7 +53,7 @@ import { proyectos, estados } from '../../data/proyectos';
 						<Pendiente texto="listado de 6 a 12 proyectos con ficha (docs/brief.md § 4). Mientras tanto, tarjetas de muestra; ver la ficha de ejemplo en /proyectos/ejemplo/" />
 					</p>
 					<div class="grilla">
-						{[1, 2, 3, 4, 5, 6].map(() => <TarjetaProyecto />)}
+						{obras2018.map((f) => <TarjetaProyecto referencia={f} />)}
 					</div>
 				</>
 			)

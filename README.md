@@ -21,6 +21,7 @@ node scripts/extraer-wp.mjs     # re-extrae el contenido del WordPress viejo (so
 - Especificación: [docs/brief.md](docs/brief.md) (colores, tipografías, estructura, requisitos, preguntas para don Luis). Logos originales en `docs/marca/`.
 - Datos de empresa y servicios: `src/data/empresa.ts`. Tokens de color: `src/styles/global.css`.
 - **No se inventa contenido.** Lo que falta va con `<Pendiente texto="…" />` y lo que está sin confirmar con `<Pendiente revisar="…">dato</Pendiente>`; ambos se ven destacados en amarillo. **El build para `lols.cl` falla mientras quede alguno**, así que no se puede lanzar con huecos.
+- **Imágenes referenciales** (`src/data/referencia.ts`, componente `<Referencial>`): fotos de Unsplash en las bandas grandes y obras LOLS de 2018 recortadas (`public/referencia/`) en tarjetas, todas con etiqueta visible. También bloquean el build de producción: hay que reemplazarlas por fotos propias.
 
 ## Contenido heredado
 

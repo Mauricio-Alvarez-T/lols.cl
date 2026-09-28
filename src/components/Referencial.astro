@@ -1,0 +1,43 @@
+---
+// Imagen referencial (src/data/referencia.ts) con etiqueta visible. Igual que <Pendiente>,
+// el build de producción (site = lols.cl) falla si queda alguna.
+import type { ImagenReferencial } from '../data/referencia';
+
+interface Props {
+	imagen: ImagenReferencial;
+	sizes?: string;
+	carga?: 'eager' | 'lazy';
+}
+const { imagen, sizes = '100vw', carga = 'lazy' } = Astro.props;
+
+if (Astro.site?.hostname === 'lols.cl') {
+	throw new Error(`Imagen referencial sin reemplazar en ${Astro.url.pathname}: ${imagen.src}`);
+}
+const etiqueta = imagen.origen === 'unsplash' ? 'Imagen referencial · Unsplash' : 'Obra LOLS · foto de 2018, baja resolución';
+---
+
+<img src={imagen.src} srcset={imagen.srcset} sizes={imagen.srcset ? sizes : undefined} alt={imagen.alt} loading={carga} decoding="async" />
+<span class="etiqueta-ref">{etiqueta}</span>
+
+<style>
+	img {
+		grid-area: 1 / 1;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.etiqueta-ref {
+		grid-area: 1 / 1;
+		align-self: end;
+		justify-self: start;
+		margin: 0.6rem;
+		padding: 0.15rem 0.5rem;
+		background: rgb(20 20 20 / 0.75);
+		color: #fff;
+		font: 600 0.72rem/1.4 var(--fuente-texto);
+		letter-spacing: normal;
+		text-transform: none;
+		border-radius: 3px;
+		pointer-events: none;
+	}
+</style>

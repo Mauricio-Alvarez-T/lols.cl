@@ -265,6 +265,8 @@ video {
 /* Contenedor de foto con proporción fija: su contenido (img, video o marcador) lo llena. */
 .marco {
 	display: grid;
+	/* La fila mide lo que el marco (aspect-ratio), no lo que la imagen trae. */
+	grid-template: minmax(0, 1fr) / minmax(0, 1fr);
 	background: #e7e7e4;
 	overflow: hidden;
 }

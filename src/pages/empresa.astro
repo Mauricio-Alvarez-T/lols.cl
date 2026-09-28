@@ -5,6 +5,8 @@ import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import Contacto from '../components/Contacto.astro';
 import { empresa, valores } from '../data/empresa';
+import Referencial from '../components/Referencial.astro';
+import { bandas } from '../data/referencia';
 ---
 
 <Base title="Empresa" description={`Quiénes somos: ${empresa.razonSocial}.`}>
@@ -18,7 +20,7 @@ import { empresa, valores } from '../data/empresa';
 	</header>
 
 	<div class="banda marco">
-		<Pendiente bloque texto="foto del equipo en faena" />
+		<Referencial imagen={bandas.empresa} carga="eager" />
 	</div>
 
 	<section class="seccion contenedor">

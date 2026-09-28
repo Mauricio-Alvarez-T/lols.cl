@@ -8,6 +8,8 @@ import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
 import Contacto from '../../components/Contacto.astro';
 import { servicioPorSlug } from '../../data/empresa';
 import { proyectos, plantilla, estados, type Proyecto } from '../../data/proyectos';
+import Referencial from '../../components/Referencial.astro';
+import { bandas, obras2018 } from '../../data/referencia';
 
 export function getStaticPaths() {
 	// La plantilla de ejemplo solo existe fuera de producción.
@@ -18,6 +20,7 @@ export function getStaticPaths() {
 
 const { proyecto: p } = Astro.props as { proyecto: Proyecto };
 const [portada, ...galeria] = p.fotos;
+const esEjemplo = p.slug === plantilla.slug;
 const otros = proyectos.filter((o) => o.slug !== p.slug).slice(0, 2);
 const relato = [
 	{ titulo: 'Desafío', texto: p.desafio, pendiente: 'qué problema tenía el mandante' },
@@ -42,7 +45,15 @@ const relato = [
 	</header>
 
 	<div class="portada marco">
-		{portada ? <img src={portada.src} alt={portada.alt} /> : <Pendiente bloque texto="foto principal, horizontal, alta resolución" />}
+		{
+			portada ? (
+				<img src={portada.src} alt={portada.alt} />
+			) : esEjemplo ? (
+				<Referencial imagen={bandas.fichaEjemplo} carga="eager" />
+			) : (
+				<Pendiente bloque texto="foto principal, horizontal, alta resolución" />
+			)
+		}
 	</div>
 
 	<section class="seccion contenedor relato">
@@ -70,11 +81,17 @@ const relato = [
 								<img src={f.src} alt={f.alt} loading="lazy" />
 							</div>
 						))
-					: [1, 2, 3].map(() => (
-							<div class="marco">
-								<Pendiente bloque texto="foto de galería" />
-							</div>
-						))
+					: esEjemplo
+						? obras2018.slice(3, 6).map((f) => (
+								<div class="marco">
+									<Referencial imagen={f} />
+								</div>
+							))
+						: [1, 2, 3].map(() => (
+								<div class="marco">
+									<Pendiente bloque texto="foto de galería" />
+								</div>
+							))
 			}
 		</div>
 	</section>
