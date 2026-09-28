@@ -2,9 +2,11 @@
 import '@fontsource-variable/inter';
 import '@fontsource-variable/dm-sans';
 import '../styles/global.css';
+import '../styles/animaciones.css';
 import Encabezado from '../components/Encabezado.astro';
 import Pie from '../components/Pie.astro';
 import AvisoPropuesta from '../components/AvisoPropuesta.astro';
+import Animaciones from '../components/Animaciones.astro';
 
 interface Props {
 	title: string;
@@ -25,6 +27,16 @@ const titulo = title === 'LOLS Ingeniería' ? title : `${title} · LOLS Ingenier
 		{description && <meta name="description" content={description} />}
 		{!indexable && <meta name="robots" content="noindex, nofollow" />}
 		<title>{titulo}</title>
+		<script is:inline>
+			// Animaciones solo si no se pidió reducir movimiento. Si el script de Animaciones.astro
+			// no corre en 3 s, se quita html.anim para que nada quede oculto.
+			if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+				document.documentElement.classList.add("anim");
+				setTimeout(function () {
+					if (!window.__animaciones) document.documentElement.classList.remove("anim");
+				}, 3000);
+			}
+		</script>
 	</head>
 	<body>
 		<a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -33,6 +45,7 @@ const titulo = title === 'LOLS Ingeniería' ? title : `${title} · LOLS Ingenier
 			<slot />
 		</main>
 		<Pie />
+		<Animaciones />
 		{!indexable && <AvisoPropuesta />}
 	</body>
 </html>

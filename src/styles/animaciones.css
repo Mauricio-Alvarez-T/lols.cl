@@ -1,0 +1,141 @@
+/* Animaciones livianas: solo opacity y transform (no provocan relayout).
+   Todo cuelga de html.anim, que Base.astro pone solo si el usuario no pidió reducir el
+   movimiento y quita si el script de Animaciones.astro no llega a correr. Sin html.anim
+   el sitio se ve estático y completo. */
+
+:root {
+	--suave: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* 1. Hero de la portada: entra al cargar. */
+.anim .hero .display {
+	animation: subir 0.9s var(--suave) both;
+}
+.anim .hero .punto {
+	display: inline-block;
+	animation: aparecer-punto 0.5s 0.7s var(--suave) both;
+}
+.anim .hero .hero-pie {
+	animation: subir 0.9s 0.25s var(--suave) both;
+}
+
+@keyframes subir {
+	from {
+		opacity: 0;
+		transform: translateY(28px);
+	}
+}
+@keyframes aparecer-punto {
+	from {
+		opacity: 0;
+		transform: scale(0);
+	}
+}
+
+/* 2. Revelado al hacer scroll (Animaciones.astro agrega .visible). */
+.anim
+	:is(
+		.portadilla > *,
+		.etiqueta,
+		.cabecera,
+		.cifras > div,
+		.necesidad,
+		.tarjeta,
+		.logos li,
+		.destacado > *,
+		.bloque,
+		.paso,
+		.cifra,
+		.linea li,
+		.valores > div,
+		.equipo > div,
+		.dos > *,
+		.columnas > *,
+		.contacto .grilla > *
+	) {
+	opacity: 0;
+	transform: translateY(24px);
+	transition:
+		opacity 0.7s var(--suave),
+		transform 0.7s var(--suave);
+}
+.anim :is(.portadilla > *, .etiqueta, .cabecera, .cifras > div, .necesidad, .tarjeta, .logos li, .destacado > *, .bloque, .paso, .cifra, .linea li, .valores > div, .equipo > div, .dos > *, .columnas > *, .contacto .grilla > *).visible {
+	opacity: 1;
+	transform: none;
+}
+
+/* Desfase entre hermanos (tarjetas, cifras, columnas…). */
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(2) {
+	transition-delay: 0.08s;
+}
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(3) {
+	transition-delay: 0.16s;
+}
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(4) {
+	transition-delay: 0.24s;
+}
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(5) {
+	transition-delay: 0.32s;
+}
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(n + 6) {
+	transition-delay: 0.4s;
+}
+
+/* 3. Fotos grandes: aparecen con un zoom leve hacia su tamaño. */
+.anim :is(.banda, .portada, .galeria > *) {
+	opacity: 0;
+	transition: opacity 0.9s var(--suave);
+}
+.anim :is(.banda, .portada, .galeria > *) > img {
+	transform: scale(1.08);
+	transition: transform 1.6s var(--suave);
+}
+.anim :is(.banda, .portada, .galeria > *).visible {
+	opacity: 1;
+}
+.anim :is(.banda, .portada, .galeria > *).visible > img {
+	transform: none;
+}
+
+/* 4. Línea de tiempo: la línea se dibuja de izquierda a derecha. */
+/* !important: el estilo con alcance de empresa.astro tiene más especificidad. */
+.anim .linea li {
+	border-top-color: transparent !important;
+}
+.anim .linea li::after {
+	content: '';
+	position: absolute;
+	top: -2px;
+	left: 0;
+	right: 0;
+	height: 2px;
+	background: var(--lols-carbon);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 0.9s 0.2s var(--suave);
+}
+.anim .linea li.visible::after {
+	transform: scaleX(1);
+}
+
+/* 5. Encabezado: sombra suave al bajar. */
+.encabezado {
+	transition: box-shadow 0.25s;
+}
+.encabezado.con-sombra {
+	box-shadow: 0 6px 18px rgb(0 0 0 / 0.07);
+}
+
+/* 6. Botones: leve elevación al pasar el mouse. */
+.boton {
+	transition:
+		background-color 0.15s,
+		color 0.15s,
+		transform 0.15s;
+}
+.boton:hover {
+	transform: translateY(-1px);
+}
+.boton:active {
+	transform: none;
+}
