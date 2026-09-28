@@ -1,0 +1,48 @@
+# BEGIN LOLS hardening (2026-09-28)
+# Pegar ARRIBA de "# BEGIN WordPress". WordPress reescribe solo su propio bloque;
+# esto queda intacto al guardar enlaces permanentes.
+
+# 1) xmlrpc.php: fuerza bruta de contraseñas y pingbacks. El sitio no lo usa.
+<Files "xmlrpc.php">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</Files>
+
+# 2) wp-config.php: nunca debe servirse por HTTP.
+<Files "wp-config.php">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</Files>
+
+# 3) Enumeración de usuarios.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # /wp-json/wp/v2/users (y /users/1, etc.)
+  RewriteRule ^wp-json/wp/v2/users - [F,NC,L]
+
+  # ?rest_route=/wp/v2/users (también con barras codificadas %2F)
+  RewriteCond %{QUERY_STRING} (^|&)rest_route=(/|%2F)wp(/|%2F)v2(/|%2F)users [NC]
+  RewriteRule ^ - [F,L]
+
+  # /?author=1 redirige a /author/admin/ y revela el usuario
+  RewriteCond %{REQUEST_URI} ^/(index\.php)?$
+  RewriteCond %{QUERY_STRING} (^|&)author=\d [NC]
+  RewriteRule ^ - [F,L]
+</IfModule>
+
+# 4) No anunciar xmlrpc en las cabeceras.
+<IfModule mod_headers.c>
+  Header always unset X-Pingback
+</IfModule>
+# END LOLS hardening

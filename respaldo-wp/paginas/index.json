@@ -1,0 +1,86 @@
+{
+  "id": 2,
+  "date": "2018-07-11T15:00:38",
+  "date_gmt": "2018-07-11T15:00:38",
+  "guid": {
+    "rendered": "http://lols.cl/?page_id=2"
+  },
+  "modified": "2018-09-04T02:03:27",
+  "modified_gmt": "2018-09-04T02:03:27",
+  "slug": "index",
+  "status": "publish",
+  "type": "page",
+  "link": "https://lols.cl/",
+  "title": {
+    "rendered": "index"
+  },
+  "content": {
+    "rendered": "<div id=\"pl-2\"  class=\"panel-layout\" ><div id=\"pg-2-0\"  class=\"panel-grid panel-no-style\" ><div id=\"pgc-2-0-0\"  class=\"panel-grid-cell\" ><div id=\"panel-2-0-0-0\" class=\"so-panel widget widget_sow-editor panel-first-child panel-last-child\" data-index=\"0\" ><div class=\"so-widget-sow-editor so-widget-sow-editor-base\">\n<div class=\"siteorigin-widget-tinymce textwidget\">\n\t<style>div#n2-ss-16{width:1200px;float:left;margin:0px 0px 0px 0px;}html[dir=\"rtl\"] div#n2-ss-16{float:right;}div#n2-ss-16 .n2-ss-slider-1{position:relative;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;height:500px;border-style:solid;border-width:0px;border-color:#3e3e3e;border-color:RGBA(62,62,62,1);border-radius:0px;background-clip:padding-box;background-repeat:repeat;background-position:50% 50%;background-size:cover;background-attachment:scroll;}div#n2-ss-16 .n2-ss-slider-background-video-container{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;}div#n2-ss-16 .n2-ss-slider-2{position:relative;width:100%;height:100%;}.x-firefox div#n2-ss-16 .n2-ss-slider-2{opacity:0.99999;}div#n2-ss-16 .n2-ss-slider-3{position:relative;width:100%;height:100%;overflow:hidden;outline:1px solid rgba(0,0,0,0);z-index:10;}div#n2-ss-16 .n2-ss-slide-backgrounds,div#n2-ss-16 .n2-ss-slider-3 > .n-particles-js-canvas-el,div#n2-ss-16 .n2-ss-slider-3 > .n2-ss-divider{position:absolute;left:0;top:0;width:100%;height:100%;}div#n2-ss-16 .n2-ss-slide-backgrounds{z-index:10;}div#n2-ss-16 .n2-ss-slider-3 > .n-particles-js-canvas-el{z-index:12;}div#n2-ss-16 .n2-ss-slide-backgrounds > *{overflow:hidden;}div#n2-ss-16 .n2-ss-slide{position:absolute;top:0;left:0;width:100%;height:100%;z-index:20;display:block;-webkit-backface-visibility:hidden;}div#n2-ss-16 .n2-ss-layers-container{position:relative;width:1200px;height:500px;}div#n2-ss-16 .n2-ss-parallax-clip > .n2-ss-layers-container{position:absolute;right:0;}div#n2-ss-16 .n2-ss-slide{-webkit-perspective:1500px;perspective:1500px;}div#n2-ss-16 .n2-ss-slide-active{z-index:21;}div#n2-ss-16 .nextend-arrow{cursor:pointer;overflow:hidden;line-height:0 !important;z-index:20;}div#n2-ss-16 .nextend-arrow img{position:relative;min-height:0;min-width:0;vertical-align:top;width:auto;height:auto;max-width:100%;max-height:100%;display:inline;}div#n2-ss-16 .nextend-arrow img.n2-arrow-hover-img{display:none;}div#n2-ss-16 .nextend-arrow:HOVER img.n2-arrow-hover-img{display:inline;}div#n2-ss-16 .nextend-arrow:HOVER img.n2-arrow-normal-img{display:none;}div#n2-ss-16 .nextend-arrow-animated{overflow:hidden;}div#n2-ss-16 .nextend-arrow-animated > div{position:relative;width:100%;height:100%;box-sizing:border-box;}div#n2-ss-16 .nextend-arrow-animated .n2-active{position:absolute;}div#n2-ss-16 .nextend-arrow-animated-fade{transition:background 0.3s, opacity 0.4s;}div#n2-ss-16 .nextend-arrow-animated-horizontal > div{transition:all 0.4s;left:0;}div#n2-ss-16 .nextend-arrow-animated-horizontal .n2-active{top:0;}div#n2-ss-16 .nextend-arrow-previous.nextend-arrow-animated-horizontal:HOVER > div,div#n2-ss-16 .nextend-arrow-next.nextend-arrow-animated-horizontal .n2-active{left:-100%;}div#n2-ss-16 .nextend-arrow-previous.nextend-arrow-animated-horizontal .n2-active,div#n2-ss-16 .nextend-arrow-next.nextend-arrow-animated-horizontal:HOVER > div{left:100%;}div#n2-ss-16 .nextend-arrow.nextend-arrow-animated-horizontal:HOVER .n2-active{left:0;}div#n2-ss-16 .nextend-arrow-animated-vertical > div{transition:all 0.4s;top:0;}div#n2-ss-16 .nextend-arrow-animated-vertical .n2-active{left:0;}div#n2-ss-16 .nextend-arrow-animated-vertical .n2-active{top:-100%;}div#n2-ss-16 .nextend-arrow-animated-vertical:HOVER > div{top:100%;}div#n2-ss-16 .nextend-arrow-animated-vertical:HOVER .n2-active{top:0;}</style><div class=\"n2-ss-margin\" style=\"margin: -40px 0px -40px 0px;\"><div id=\"n2-ss-16-align\" class=\"n2-ss-align\"><div class=\"n2-padding\"><div id=\"n2-ss-16\" data-creator=\"Smart Slider 3\" class=\"n2-ss-slider n2-ow n2-has-hover n2notransition n2-ss-load-fade \" data-minFontSizedesktopPortrait=\"4\" data-minFontSizedesktopLandscape=\"4\" data-minFontSizetabletPortrait=\"4\" data-minFontSizetabletLandscape=\"4\" data-minFontSizemobilePortrait=\"4\" data-minFontSizemobileLandscape=\"4\" style=\"font-size: 16px;\" data-fontsize=\"16\">\r\n        <div class=\"n2-ss-slider-1 n2-ss-swipe-element n2-ow\" style=\"\">\r\n                        <div class=\"n2-ss-slider-2 n2-ow\">\r\n                                <div class=\"n2-ss-slider-3 n2-ow\" style=\"\">\r\n\r\n                    <div class=\"n2-ss-slide-backgrounds\"></div><div data-first=\"1\" data-slide-duration=\"0\" data-id=\"30\" style=\"\" class=\"n2-ss-slide n2-ss-canvas n2-ow  n2-ss-slide-30\"><div class=\"n2-ss-slide-background n2-ow\" data-mode=\"fit\"><img data-hash=\"6a7d1de2d7cb0fda45409f15996895fd\" data-desktop=\"//lols.cl/wp-content/uploads/2018/08/sliderbg1500x500.jpg\" data-blur=\"0\" data-opacity=\"100\" data-x=\"50\" data-y=\"50\" src=\"//lols.cl/wp-content/uploads/2018/08/sliderbg1500x500.jpg\" alt=\"\" /></div><div class=\"n2-ss-layers-container n2-ow\" data-csstextalign=\"center\" style=\"\"></div></div><div data-slide-duration=\"0\" data-id=\"31\" style=\"cursor:pointer;\" onclick=\"\" data-href=\"http://lols.cl/proyectos-terminados/\" data-n2click=\"n2const.setLocation(this.getAttribute(&#039;data-href&#039;))\" data-n2middleclick=\"window.open(this.getAttribute(&#039;data-href&#039;),&#039;_blank&#039;);\" class=\"n2-ss-slide n2-ss-canvas n2-ow  n2-ss-slide-31\"><div class=\"n2-ss-slide-background n2-ow\" data-mode=\"fit\"><img data-hash=\"2bacc70e20fd6801463b218e0eca8322\" data-desktop=\"//lols.cl/wp-content/uploads/2018/08/sliderbg1500x500_2.jpg\" data-blur=\"0\" data-opacity=\"100\" data-x=\"50\" data-y=\"50\" src=\"//lols.cl/wp-content/uploads/2018/08/sliderbg1500x500_2.jpg\" alt=\"\" /></div><div class=\"n2-ss-layers-container n2-ow\" data-csstextalign=\"center\" style=\"\"></div></div>                </div>\r\n            </div>\r\n            <div data-ssleft=\"0+15\" data-sstop=\"height/2-previousheight/2\" id=\"n2-ss-16-arrow-previous\" class=\"n2-ss-widget n2-ss-widget-display-desktop n2-ss-widget-display-tablet n2-ss-widget-display-mobile nextend-arrow n2-ow nextend-arrow-previous  nextend-arrow-animated-fade n2-ib\" style=\"position: absolute;\" role=\"button\" aria-label=\"Previous slide\" tabindex=\"0\"><img class=\"n2-ow\" data-no-lazy=\"1\" data-hack=\"data-lazy-src\" src=\"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTEuNDMzIDE1Ljk5MkwyMi42OSA1LjcxMmMuMzkzLS4zOS4zOTMtMS4wMyAwLTEuNDItLjM5My0uMzktMS4wMy0uMzktMS40MjMgMGwtMTEuOTggMTAuOTRjLS4yMS4yMS0uMy40OS0uMjg1Ljc2LS4wMTUuMjguMDc1LjU2LjI4NC43N2wxMS45OCAxMC45NGMuMzkzLjM5IDEuMDMuMzkgMS40MjQgMCAuMzkzLS40LjM5My0xLjAzIDAtMS40MmwtMTEuMjU3LTEwLjI5IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjgiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==\" alt=\"previous arrow\" /></div>\n<div data-ssright=\"0+15\" data-sstop=\"height/2-nextheight/2\" id=\"n2-ss-16-arrow-next\" class=\"n2-ss-widget n2-ss-widget-display-desktop n2-ss-widget-display-tablet n2-ss-widget-display-mobile nextend-arrow n2-ow nextend-arrow-next  nextend-arrow-animated-fade n2-ib\" style=\"position: absolute;\" role=\"button\" aria-label=\"Next slide\" tabindex=\"0\"><img class=\"n2-ow\" data-no-lazy=\"1\" data-hack=\"data-lazy-src\" src=\"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAuNzIyIDQuMjkzYy0uMzk0LS4zOS0xLjAzMi0uMzktMS40MjcgMC0uMzkzLjM5LS4zOTMgMS4wMyAwIDEuNDJsMTEuMjgzIDEwLjI4LTExLjI4MyAxMC4yOWMtLjM5My4zOS0uMzkzIDEuMDIgMCAxLjQyLjM5NS4zOSAxLjAzMy4zOSAxLjQyNyAwbDEyLjAwNy0xMC45NGMuMjEtLjIxLjMtLjQ5LjI4NC0uNzcuMDE0LS4yNy0uMDc2LS41NS0uMjg2LS43NkwxMC43MiA0LjI5M3oiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOCIgZmlsbC1ydWxlPSJldmVub2RkIi8+PC9zdmc+\" alt=\"next arrow\" /></div>\n        </div>\r\n        </div><div class=\"n2-clear\"></div><div id=\"n2-ss-16-spinner\" style=\"display: none;\"><div><div class=\"n2-ss-spinner-simple-white-container\"><div class=\"n2-ss-spinner-simple-white\"></div></div></div></div></div></div></div><div id=\"n2-ss-16-placeholder\" style=\"position: relative;z-index:2;background-color:RGBA(0,0,0,0);max-height:3000px; background-color:RGBA(255,255,255,0);\"><img style=\"width: 100%; max-width:3000px; display: block;opacity:0;\" class=\"n2-ow\" src=\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMCIgd2lkdGg9IjEyMDAiIGhlaWdodD0iNTAwIiA+PC9zdmc+\" alt=\"Slider\" /></div>\n</div>\n</div></div></div></div></div>",
+    "protected": false
+  },
+  "excerpt": {
+    "rendered": "",
+    "protected": false
+  },
+  "author": 1,
+  "featured_media": 0,
+  "parent": 0,
+  "menu_order": 0,
+  "comment_status": "closed",
+  "ping_status": "open",
+  "template": "",
+  "meta": [],
+  "_links": {
+    "self": [
+      {
+        "href": "https://lols.cl/wp-json/wp/v2/pages/2"
+      }
+    ],
+    "collection": [
+      {
+        "href": "https://lols.cl/wp-json/wp/v2/pages"
+      }
+    ],
+    "about": [
+      {
+        "href": "https://lols.cl/wp-json/wp/v2/types/page"
+      }
+    ],
+    "author": [
+      {
+        "embeddable": true,
+        "href": "https://lols.cl/wp-json/wp/v2/users/1"
+      }
+    ],
+    "replies": [
+      {
+        "embeddable": true,
+        "href": "https://lols.cl/wp-json/wp/v2/comments?post=2"
+      }
+    ],
+    "version-history": [
+      {
+        "count": 25,
+        "href": "https://lols.cl/wp-json/wp/v2/pages/2/revisions"
+      }
+    ],
+    "predecessor-version": [
+      {
+        "id": 747,
+        "href": "https://lols.cl/wp-json/wp/v2/pages/2/revisions/747"
+      }
+    ],
+    "wp:attachment": [
+      {
+        "href": "https://lols.cl/wp-json/wp/v2/media?parent=2"
+      }
+    ],
+    "curies": [
+      {
+        "name": "wp",
+        "href": "https://api.w.org/{rel}",
+        "templated": true
+      }
+    ]
+  }
+}
