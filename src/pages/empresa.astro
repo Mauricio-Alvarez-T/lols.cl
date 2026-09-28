@@ -1,62 +1,183 @@
 ---
+// Empresa: propósito en grande (Heatherwick), línea de tiempo (Tecsa / Ingevec), valores,
+// seguridad y equipo con nombre (Mott MacDonald).
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
-import { empresa } from '../data/empresa';
+import Contacto from '../components/Contacto.astro';
+import { empresa, valores } from '../data/empresa';
 ---
 
 <Base title="Empresa" description={`Quiénes somos: ${empresa.razonSocial}.`}>
-	<header class="encabezado-pagina">
-		<div class="contenedor">
-			<p class="antetitulo">Empresa</p>
-			<h1>Quiénes somos</h1>
-			<p>{empresa.directrices}</p>
-		</div>
+	<header class="portadilla contenedor">
+		<p class="etiqueta">Empresa</p>
+		<h1>{empresa.directrices}</h1>
+		<p class="bajada">
+			<Pendiente revisar="recalcular: el texto es de 2018">Más de 20 años de experiencia</Pendiente> en el área de construcción,
+			con compromiso por las normas de seguridad y el respeto por el medio ambiente.
+		</p>
 	</header>
 
-	<section class="seccion">
-		<div class="contenedor columnas">
-			<div>
-				<h2>Nuestra forma de trabajar</h2>
-				<p>
-					<Pendiente revisar="recalcular: el texto es de 2018">Más de 20 años de experiencia</Pendiente> en el área de
-					construcción.
-				</p>
-				<p>Un esquema de trabajo basado en el esfuerzo, la creatividad y la responsabilidad.</p>
-				<p>Compromiso con las normas de seguridad y el respeto por el medio ambiente.</p>
-			</div>
-			<div class="foto marco">
-				<Pendiente bloque texto="foto del equipo o de faena" />
-			</div>
-		</div>
+	<div class="banda marco">
+		<Pendiente bloque texto="foto del equipo en faena" />
+	</div>
+
+	<section class="seccion contenedor">
+		<p class="etiqueta">Historia</p>
+		<div class="cabecera"><h2>Nuestra trayectoria</h2></div>
+		<ol class="linea">
+			{
+				['fundación', 'primer hito', 'hito reciente', 'hoy'].map((hito) => (
+					<li>
+						<p class="anio"><Pendiente texto="año" /></p>
+						<p><Pendiente texto={hito} /></p>
+					</li>
+				))
+			}
+		</ol>
 	</section>
 
 	<section class="seccion gris">
 		<div class="contenedor">
-			<h2>Historia</h2>
-			<Pendiente bloque texto="hitos de la empresa (año de fundación, obras clave) para la línea de tiempo" />
+			<p class="etiqueta">Cómo trabajamos</p>
+			<div class="cabecera">
+				<h2>Un esquema basado en el esfuerzo, la creatividad y la responsabilidad</h2>
+			</div>
+			<div class="valores">
+				{
+					valores.map((v, i) => (
+						<div>
+							<p class="indice">0{i + 1}</p>
+							<h3>{v.titulo}</h3>
+							<p>{v.texto ?? <Pendiente texto="qué significa en la práctica" />}</p>
+						</div>
+					))
+				}
+			</div>
 		</div>
 	</section>
 
-	<section class="seccion">
-		<div class="contenedor">
-			<h2>Seguridad y medio ambiente</h2>
-			<Pendiente bloque texto="políticas, certificaciones y mutualidad" />
+	<section class="seccion contenedor dos">
+		<div>
+			<p class="etiqueta">Seguridad y medio ambiente</p>
+			<h2>Compromiso con las normas de seguridad y el medio ambiente</h2>
+		</div>
+		<Pendiente bloque texto="políticas, certificaciones, mutualidad e indicadores de seguridad" />
+	</section>
+
+	<section class="seccion contenedor">
+		<p class="etiqueta">Equipo</p>
+		<div class="cabecera"><h2>Las personas a cargo</h2></div>
+		<div class="equipo">
+			{
+				[1, 2, 3, 4].map(() => (
+					<div>
+						<div class="retrato marco">
+							<Pendiente bloque texto="foto" />
+						</div>
+						<p class="persona"><Pendiente texto="nombre" /></p>
+						<p><Pendiente texto="cargo" /></p>
+					</div>
+				))
+			}
 		</div>
 	</section>
+
+	<Contacto />
 </Base>
 
 <style>
-	.columnas {
+	.portadilla h1 {
+		max-width: 16ch;
+	}
+	.banda {
+		aspect-ratio: 21 / 8;
+		background: #2a2a2a;
+	}
+	.linea {
+		list-style: none;
+		margin: 0;
+		padding: 0;
 		display: grid;
-		grid-template-columns: 1.2fr 1fr;
-		gap: clamp(2rem, 6vw, 5rem);
-		align-items: center;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 1.5rem;
 	}
-	.foto {
-		aspect-ratio: 4 / 3;
+	.linea li {
+		position: relative;
+		padding-top: 2rem;
+		border-top: 2px solid var(--lols-carbon);
 	}
-	@media (max-width: 860px) {
-		.columnas {
+	.linea li::before {
+		content: '';
+		position: absolute;
+		top: -0.45rem;
+		left: 0;
+		width: 0.8rem;
+		height: 0.8rem;
+		background: var(--lols-verde);
+	}
+	.anio {
+		font-family: var(--fuente-titulos);
+		font-size: 2rem;
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		margin-bottom: 0.5rem;
+	}
+	.valores {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: clamp(1.5rem, 4vw, 3rem);
+	}
+	.indice {
+		margin: 0 0 0.5rem;
+		font-family: var(--fuente-titulos);
+		font-weight: 700;
+		color: var(--lols-verde-oscuro);
+	}
+	.valores h3 {
+		font-size: 1.75rem;
+		letter-spacing: -0.03em;
+	}
+	.dos {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: clamp(2rem, 5vw, 4rem);
+		align-items: start;
+	}
+	.dos h2 {
+		font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+	}
+	.equipo {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 1.5rem;
+	}
+	.retrato {
+		aspect-ratio: 4 / 5;
+		margin-bottom: 1rem;
+	}
+	.equipo p {
+		margin: 0 0 0.25rem;
+	}
+	.persona {
+		font-family: var(--fuente-titulos);
+		font-weight: 700;
+	}
+	@media (max-width: 960px) {
+		.linea,
+		.equipo {
+			grid-template-columns: repeat(2, 1fr);
+			row-gap: 2.5rem;
+		}
+		.valores,
+		.dos {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (max-width: 560px) {
+		.banda {
+			aspect-ratio: 4 / 3;
+		}
+		.linea {
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}

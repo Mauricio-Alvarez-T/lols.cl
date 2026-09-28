@@ -1,6 +1,7 @@
 ---
 // Marcador visible de contenido faltante (docs/brief.md: "no inventes contenido").
 //   <Pendiente texto="foto de obra" />                  → falta el dato
+//   <Pendiente bloque texto="foto" />                   → ocupa un marco de foto o un bloque entero
 //   <Pendiente revisar="confirmar vigencia">…</Pendiente> → dato en uso, sin confirmar
 // El build de producción (site = lols.cl) falla si queda alguno.
 interface Props {
@@ -13,7 +14,6 @@ const { texto, revisar, bloque = false } = Astro.props;
 if (Astro.site?.hostname === 'lols.cl') {
 	throw new Error(`Marcador sin resolver en ${Astro.url.pathname}: ${texto ?? revisar}`);
 }
-const Tag = bloque ? 'div' : 'span';
 ---
 
 {
@@ -22,8 +22,12 @@ const Tag = bloque ? 'div' : 'span';
 			<slot />
 			<small>[REVISAR: {revisar}]</small>
 		</span>
+	) : bloque ? (
+		<div class="bloque">
+			<span class="pendiente">[PENDIENTE: {texto}]</span>
+		</div>
 	) : (
-		<Tag class:list={['pendiente', { bloque }]}>[PENDIENTE: {texto}]</Tag>
+		<span class="pendiente">[PENDIENTE: {texto}]</span>
 	)
 }
 
@@ -32,27 +36,39 @@ const Tag = bloque ? 'div' : 'span';
 		font-family: var(--fuente-texto);
 		font-size: 0.85rem;
 		font-weight: 600;
+		letter-spacing: normal;
+		line-height: 1.4;
+		text-transform: none;
 		color: #7a4a00;
 		background: #fff4d6;
 		border: 1px dashed #c98a00;
 		border-radius: 4px;
 		padding: 0.1em 0.45em;
+		-webkit-box-decoration-break: clone;
+		box-decoration-break: clone;
 	}
-	.pendiente.bloque {
+	/* Dentro de un .marco (display grid) se estira a todo el marco. */
+	.bloque {
 		display: grid;
 		place-items: center;
-		/* Dentro de un marco de foto (.marco, display grid) se estira a todo el marco. */
-		min-height: 8rem;
-		padding: 2rem 1rem;
+		min-height: 6rem;
+		padding: 0.75rem;
 		text-align: center;
+		border: 1px dashed rgb(128 128 128 / 0.45);
+	}
+	.bloque .pendiente {
+		max-width: 36rem;
 	}
 	.revisar small {
 		margin-left: 0.4em;
+		font-family: var(--fuente-texto);
 		font-size: 0.75em;
 		font-weight: 600;
+		letter-spacing: normal;
 		color: #7a4a00;
 		background: #fff4d6;
 		border-radius: 3px;
 		padding: 0 0.3em;
+		overflow-wrap: anywhere;
 	}
 </style>

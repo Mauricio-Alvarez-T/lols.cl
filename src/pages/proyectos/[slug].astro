@@ -1,0 +1,184 @@
+---
+// Ficha de proyecto (patrones Mott MacDonald / Heatherwick / Arup):
+//   titular que dice el resultado → recuadro de datos fijo → foto principal →
+//   desafío / solución / resultado con una cifra → galería → otros proyectos.
+import Base from '../../layouts/Base.astro';
+import Pendiente from '../../components/Pendiente.astro';
+import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
+import Contacto from '../../components/Contacto.astro';
+import { servicioPorSlug } from '../../data/empresa';
+import { proyectos, plantilla, estados, type Proyecto } from '../../data/proyectos';
+
+export function getStaticPaths() {
+	// La plantilla de ejemplo solo existe fuera de producción.
+	const produccion = (process.env.SITE ?? '').includes('://lols.cl');
+	const lista = produccion ? proyectos : [...proyectos, plantilla];
+	return lista.map((proyecto) => ({ params: { slug: proyecto.slug }, props: { proyecto } }));
+}
+
+const { proyecto: p } = Astro.props as { proyecto: Proyecto };
+const [portada, ...galeria] = p.fotos;
+const otros = proyectos.filter((o) => o.slug !== p.slug).slice(0, 2);
+const relato = [
+	{ titulo: 'Desafío', texto: p.desafio, pendiente: 'qué problema tenía el mandante' },
+	{ titulo: 'Solución', texto: p.solucion, pendiente: 'qué hizo LOLS y cómo' },
+	{ titulo: 'Resultado', texto: p.resultado, pendiente: 'qué se logró' },
+];
+---
+
+<Base title={p.nombre ?? 'Proyecto'}>
+	<header class="portadilla contenedor">
+		<p class="etiqueta"><a href="/proyectos/">Proyectos</a></p>
+		<p class="nombre">{p.nombre ?? <Pendiente texto="nombre del proyecto" />}</p>
+		<h1>{p.titular ?? <Pendiente texto="el resultado en una frase (no el nombre de la obra)" />}</h1>
+		<dl class="datos">
+			<div><dt>Mandante</dt><dd>{p.mandante ?? <Pendiente texto="mandante" />}</dd></div>
+			<div><dt>Ubicación</dt><dd>{p.comuna ?? <Pendiente texto="comuna" />}</dd></div>
+			<div><dt>Año</dt><dd>{p.anio ?? <Pendiente texto="año" />}</dd></div>
+			<div><dt>Magnitud</dt><dd>{p.magnitud ?? <Pendiente texto="m² o plazo" />}</dd></div>
+			<div><dt>Servicios</dt><dd>{p.servicios.map((s) => servicioPorSlug(s).nombre).join(', ')}</dd></div>
+			<div><dt>Estado</dt><dd>{p.estado ? estados[p.estado] : <Pendiente texto="estado" />}</dd></div>
+		</dl>
+	</header>
+
+	<div class="portada marco">
+		{portada ? <img src={portada.src} alt={portada.alt} /> : <Pendiente bloque texto="foto principal, horizontal, alta resolución" />}
+	</div>
+
+	<section class="seccion contenedor relato">
+		{
+			relato.map((r) => (
+				<div class="paso">
+					<h2>{r.titulo}</h2>
+					<p>{r.texto ?? <Pendiente texto={r.pendiente} />}</p>
+				</div>
+			))
+		}
+		<div class="cifra">
+			<p class="numero">{p.cifra?.valor ?? <Pendiente texto="cifra" />}</p>
+			<p>{p.cifra?.etiqueta ?? <Pendiente texto="qué mide (plazo, m², ahorro…)" />}</p>
+		</div>
+	</section>
+
+	<section class="seccion contenedor">
+		<h2 class="sr-only">Galería</h2>
+		<div class="galeria">
+			{
+				galeria.length
+					? galeria.map((f) => (
+							<div class="marco">
+								<img src={f.src} alt={f.alt} loading="lazy" />
+							</div>
+						))
+					: [1, 2, 3].map(() => (
+							<div class="marco">
+								<Pendiente bloque texto="foto de galería" />
+							</div>
+						))
+			}
+		</div>
+	</section>
+
+	{
+		otros.length > 0 && (
+			<section class="seccion contenedor">
+				<div class="cabecera">
+					<h2>Otros proyectos</h2>
+					<a href="/proyectos/" class="enlace-flecha">Todos los proyectos</a>
+				</div>
+				<div class="otros">
+					{otros.map((o) => <TarjetaProyecto proyecto={o} />)}
+				</div>
+			</section>
+		)
+	}
+
+	<Contacto titulo="¿Un proyecto parecido?" />
+</Base>
+
+<style>
+	.etiqueta a {
+		color: inherit;
+		text-decoration: none;
+	}
+	.nombre {
+		margin-bottom: 0.75rem;
+		font-family: var(--fuente-titulos);
+		font-weight: 700;
+		font-size: 1.15rem;
+		color: var(--lols-verde-oscuro);
+	}
+	.portadilla h1 {
+		max-width: 20ch;
+		font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+		margin-bottom: clamp(2rem, 5vw, 3.5rem);
+	}
+	.portada {
+		aspect-ratio: 21 / 9;
+		max-height: 85vh;
+		background: #2a2a2a;
+	}
+	.relato {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr) 0.8fr;
+		gap: clamp(1.5rem, 4vw, 3rem);
+	}
+	.paso {
+		padding-top: 1.25rem;
+		border-top: 3px solid var(--lols-carbon);
+	}
+	.paso h2 {
+		font-size: 1.5rem;
+		letter-spacing: -0.02em;
+	}
+	.cifra {
+		padding-top: 1.25rem;
+		border-top: 3px solid var(--lols-verde);
+	}
+	.cifra .numero {
+		margin-bottom: 0.25rem;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(2.5rem, 5vw, 3.75rem);
+		font-weight: 700;
+		letter-spacing: -0.04em;
+		line-height: 1;
+	}
+	.cifra p:last-child {
+		color: var(--gris-medio);
+	}
+	.galeria {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: 1rem;
+	}
+	.galeria .marco {
+		aspect-ratio: 4 / 3;
+	}
+	.galeria .marco:first-child {
+		grid-row: span 2;
+		aspect-ratio: auto;
+	}
+	.otros {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 2rem;
+	}
+	@media (max-width: 960px) {
+		.relato {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (max-width: 560px) {
+		.portada {
+			aspect-ratio: 4 / 3;
+		}
+		.galeria,
+		.otros {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.galeria .marco:first-child {
+			grid-row: auto;
+			aspect-ratio: 4 / 3;
+		}
+	}
+</style>

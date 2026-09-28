@@ -1,47 +1,30 @@
 ---
+// Pie mínimo (patrón Heatherwick): marca, datos de contacto y lo legal.
 import Logo from './Logo.astro';
 import Pendiente from './Pendiente.astro';
-import { empresa, navegacion, servicios, telefonoHref } from '../data/empresa';
+import { empresa, navegacion, telefonoHref } from '../data/empresa';
 
 const anio = new Date().getFullYear();
 ---
 
 <footer class="pie">
-	<div class="contenedor grilla">
-		<div class="col-marca">
-			<Logo class="logo" />
-			<p class="lema">{empresa.lema}</p>
-		</div>
-		<div>
-			<h2>Servicios</h2>
-			<ul>
-				{servicios.map((s) => <li><a href={`/servicios/${s.slug}/`}>{s.nombre}</a></li>)}
-			</ul>
-		</div>
-		<div>
-			<h2>Sitio</h2>
+	<div class="contenedor fila">
+		<a href="/" class="marca" aria-label="LOLS Ingeniería, inicio"><Logo class="logo" /></a>
+		<nav aria-label="Pie de página">
 			<ul>
 				{navegacion.map((n) => <li><a href={n.href}>{n.texto}</a></li>)}
 			</ul>
-		</div>
-		<div>
-			<h2>Contacto</h2>
-			<address>
-				<p>
-					<Pendiente revisar={empresa.direccion.revisar}>{empresa.direccion.valor}</Pendiente>
-				</p>
-				<p>
-					<Pendiente revisar={empresa.telefono.revisar}>
-						<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
-					</Pendiente>
-				</p>
-				<p>
-					<Pendiente revisar={empresa.correo.revisar}>
-						<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
-					</Pendiente>
-				</p>
-			</address>
-		</div>
+		</nav>
+		<address>
+			<Pendiente revisar={empresa.direccion.revisar}>{empresa.direccion.valor}</Pendiente><br />
+			<Pendiente revisar={empresa.telefono.revisar}>
+				<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
+			</Pendiente>
+			·
+			<Pendiente revisar={empresa.correo.revisar}>
+				<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
+			</Pendiente>
+		</address>
 	</div>
 	<div class="contenedor legal">
 		<p>© {anio} {empresa.razonSocial}</p>
@@ -51,80 +34,69 @@ const anio = new Date().getFullYear();
 
 <style>
 	.pie {
-		background: var(--lols-carbon);
-		color: #d6d6d6;
-		padding-top: clamp(3rem, 7vw, 4.5rem);
+		border-top: 1px solid var(--linea);
 		font-size: 0.95rem;
 	}
-	.grilla {
+	.fila {
 		display: grid;
-		grid-template-columns: 1.4fr repeat(3, 1fr);
+		grid-template-columns: auto 1fr auto;
+		align-items: start;
 		gap: 2.5rem;
+		padding-block: 3rem;
 	}
-	.col-marca :global(.logo) {
-		width: 10rem;
+	.marca {
+		color: var(--lols-verde);
+	}
+	.marca :global(.logo) {
+		width: 8rem;
 		height: auto;
-		color: var(--lols-blanco);
-	}
-	.lema {
-		margin-top: 1rem;
-		color: var(--lols-lima);
-		font-family: var(--fuente-titulos);
-		font-weight: 600;
-	}
-	h2 {
-		margin-bottom: 1rem;
-		font-size: 0.8rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: var(--lols-blanco);
 	}
 	ul {
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		display: grid;
-		gap: 0.5rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 2rem;
+	}
+	nav a {
+		color: var(--lols-carbon);
+		font-family: var(--fuente-titulos);
+		font-weight: 600;
+		text-decoration: none;
+	}
+	nav a:hover {
+		color: var(--lols-verde-oscuro);
 	}
 	address {
 		font-style: normal;
-	}
-	address p {
-		margin-bottom: 0.5rem;
-	}
-	a {
-		color: #d6d6d6;
-		text-decoration: none;
-	}
-	a:hover {
-		color: var(--lols-blanco);
-		text-decoration: underline;
+		text-align: right;
+		line-height: 1.8;
+		color: var(--lols-gris);
 	}
 	.legal {
 		display: flex;
 		justify-content: space-between;
 		gap: 1rem;
 		flex-wrap: wrap;
-		margin-top: 3rem;
-		padding-block: 1.5rem;
-		border-top: 1px solid #2e2e2e;
+		padding-block: 1.25rem;
+		border-top: 1px solid var(--linea);
 		font-size: 0.85rem;
-		color: #a3a3a3;
+		color: var(--gris-medio);
 	}
 	.legal p {
 		margin: 0;
 	}
-	@media (max-width: 860px) {
-		.grilla {
-			grid-template-columns: 1fr 1fr;
-		}
-		.col-marca {
-			grid-column: 1 / -1;
-		}
+	.legal a {
+		color: var(--gris-medio);
 	}
-	@media (max-width: 480px) {
-		.grilla {
+	@media (max-width: 860px) {
+		.fila {
 			grid-template-columns: minmax(0, 1fr);
+			gap: 1.75rem;
+		}
+		address {
+			text-align: left;
 		}
 	}
 </style>

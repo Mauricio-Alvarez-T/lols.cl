@@ -70,16 +70,33 @@ Lema institucional ✅: **"Sus proyectos en las mejores manos"** (portada del si
 
 ## 3. Referencias visuales
 
-⚠️ **Pendiente:** que don Luis elija una o dos. Mientras tanto, esta es la lista corta, con qué tomar de cada una:
+⚠️ **Pendiente:** que don Luis elija una o dos. Las tres primeras son las más cercanas a LOLS y las que conviene mostrarle primero. Todas se revisaron en septiembre de 2026.
+
+**Chilenas, mismo rubro**
 
 | Sitio | Qué tomar |
 |---|---|
-| **tecsa.cl** (CL) | La estructura: divisiones como tarjetas con ícono, franja de logos de clientes, línea de tiempo. Es el modelo más cercano a LOLS. |
-| **ingevec.cl** (CL) | Video de obra propia en la portada y la historia de la empresa como línea de tiempo. |
-| **salfacorp.com** (CL) | Portafolio filtrable por tipo de obra. |
-| **besix.com** | El estándar de fotografía: obra a pantalla completa y en alta resolución. |
-| **skanska.com** | Franja de cifras clave en la portada (años, obras, m², dotación). |
-| **big.dk** | Grilla de proyectos limpia, siempre con los mismos campos. |
+| [Tecsa — https://www.tecsa.cl/](https://www.tecsa.cl/) | La estructura: divisiones como tarjetas con ícono, franja de logos de clientes, línea de tiempo. Es el modelo más cercano a LOLS. |
+| [Ingevec — https://www.ingevec.cl/](https://www.ingevec.cl/) | Video de obra propia en la portada y la historia de la empresa como línea de tiempo. |
+| [SalfaCorp — https://www.salfacorp.com/](https://www.salfacorp.com/) | Portafolio filtrable por tipo de obra. |
+
+**Constructoras internacionales**
+
+| Sitio | Qué tomar |
+|---|---|
+| [BESIX — https://www.besix.com/en](https://www.besix.com/en) | El estándar de fotografía: obra a pantalla completa y en alta resolución. |
+| [Skanska — https://www.skanska.com/](https://www.skanska.com/) | Franja de cifras clave en la portada (años, obras, m², dotación). |
+| [Webuild — https://www.webuildgroup.com/en](https://www.webuildgroup.com/en) | Un solo color de marca usado con disciplina sobre fotografía sobria. |
+| [Ramboll — https://www.ramboll.com/](https://www.ramboll.com/) | Contenido agrupado por lo que necesita el cliente, no por el organigrama. |
+
+**Ingeniería y estudios de diseño**
+
+| Sitio | Qué tomar |
+|---|---|
+| [Arup — https://www.arup.com/](https://www.arup.com/) | Cada servicio contado desde el problema que resolvió en un proyecto real. |
+| [Mott MacDonald — https://www.mottmac.com/](https://www.mottmac.com/) | El formato de ficha de proyecto: título, ubicación, alcance, resultado. |
+| [BIG — https://big.dk/](https://big.dk/) | Grilla de proyectos limpia, siempre con los mismos campos. |
+| [Heatherwick Studio — https://www.heatherwick.com/](https://www.heatherwick.com/) | Una frase de portada grande y clara sobre mucho espacio en blanco. |
 
 ## 4. Contenido
 

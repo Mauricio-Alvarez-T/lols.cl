@@ -1,0 +1,149 @@
+---
+// Portafolio: grilla con campos fijos (BIG) y filtro por servicio y estado (SalfaCorp /
+// Ingevec). Con 6–12 proyectos basta un filtro simple; más dimensiones se verían vacías.
+// Los filtros leen ?servicio= y ?estado= (las URLs viejas redirigen a ?estado=...).
+import Base from '../../layouts/Base.astro';
+import Pendiente from '../../components/Pendiente.astro';
+import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
+import Contacto from '../../components/Contacto.astro';
+import { servicios } from '../../data/empresa';
+import { proyectos, estados } from '../../data/proyectos';
+---
+
+<Base title="Proyectos" description="Proyectos de LOLS Ingeniería.">
+	<header class="portadilla contenedor">
+		<p class="etiqueta">Proyectos</p>
+		<h1>Obras que hablan por nosotros</h1>
+		<p class="bajada"><Pendiente texto="una frase sobre el portafolio (tipos de obra, años, regiones)" /></p>
+	</header>
+
+	<section class="contenedor filtros" aria-label="Filtrar proyectos">
+		<div class="grupo" role="group" aria-label="Servicio">
+			<button type="button" data-filtro="servicio" data-valor="" aria-pressed="true">Todos</button>
+			{
+				servicios.map((s) => (
+					<button type="button" data-filtro="servicio" data-valor={s.slug} aria-pressed="false">
+						{s.nombre}
+					</button>
+				))
+			}
+		</div>
+		<div class="grupo" role="group" aria-label="Estado">
+			<button type="button" data-filtro="estado" data-valor="" aria-pressed="true">Todos</button>
+			{
+				Object.entries(estados).map(([valor, texto]) => (
+					<button type="button" data-filtro="estado" data-valor={valor} aria-pressed="false">
+						{texto}
+					</button>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="seccion contenedor">
+		{
+			proyectos.length ? (
+				<div class="grilla" id="grilla">
+					{proyectos.map((p) => <TarjetaProyecto proyecto={p} />)}
+				</div>
+			) : (
+				<>
+					<p class="aviso">
+						<Pendiente texto="listado de 6 a 12 proyectos con ficha (docs/brief.md § 4). Mientras tanto, tarjetas de muestra; ver la ficha de ejemplo en /proyectos/ejemplo/" />
+					</p>
+					<div class="grilla">
+						{[1, 2, 3, 4, 5, 6].map(() => <TarjetaProyecto />)}
+					</div>
+				</>
+			)
+		}
+		<p class="vacio" id="vacio" hidden>No hay proyectos con esos filtros.</p>
+	</section>
+
+	<Contacto />
+</Base>
+
+<script>
+	const params = new URLSearchParams(location.search);
+	const filtros: Record<string, string> = { servicio: params.get('servicio') ?? '', estado: params.get('estado') ?? '' };
+	const botones = [...document.querySelectorAll<HTMLButtonElement>('[data-filtro]')];
+	const tarjetas = [...document.querySelectorAll<HTMLElement>('#grilla .tarjeta')];
+	const vacio = document.getElementById('vacio')!;
+
+	function aplicar() {
+		for (const b of botones) b.setAttribute('aria-pressed', String(filtros[b.dataset.filtro!] === b.dataset.valor));
+		let visibles = 0;
+		for (const t of tarjetas) {
+			const ok =
+				(!filtros.servicio || (t.dataset.servicios ?? '').split(' ').includes(filtros.servicio)) &&
+				(!filtros.estado || t.dataset.estado === filtros.estado);
+			t.hidden = !ok;
+			if (ok) visibles++;
+		}
+		vacio.hidden = !tarjetas.length || visibles > 0;
+		const url = new URL(location.href);
+		for (const [k, v] of Object.entries(filtros)) v ? url.searchParams.set(k, v) : url.searchParams.delete(k);
+		history.replaceState(null, '', url);
+	}
+
+	for (const b of botones) {
+		b.addEventListener('click', () => {
+			filtros[b.dataset.filtro!] = b.dataset.valor!;
+			aplicar();
+		});
+	}
+	aplicar();
+</script>
+
+<style>
+	.filtros {
+		display: grid;
+		gap: 0.75rem;
+		padding-bottom: 2rem;
+		border-bottom: 1px solid var(--linea);
+	}
+	.grupo {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+	.grupo button {
+		min-height: 2.5rem;
+		padding: 0.4rem 1rem;
+		border: 1px solid var(--linea);
+		border-radius: 999px;
+		background: var(--lols-blanco);
+		color: var(--lols-carbon);
+		font: 600 0.95rem var(--fuente-titulos);
+		cursor: pointer;
+	}
+	.grupo button:hover {
+		border-color: var(--lols-carbon);
+	}
+	.grupo button[aria-pressed='true'] {
+		background: var(--lols-carbon);
+		border-color: var(--lols-carbon);
+		color: var(--lols-blanco);
+	}
+	.aviso {
+		margin-bottom: 2rem;
+	}
+	.grilla {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
+	}
+	.vacio {
+		color: var(--gris-medio);
+	}
+	@media (max-width: 960px) {
+		.grilla {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	@media (max-width: 560px) {
+		.grilla {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

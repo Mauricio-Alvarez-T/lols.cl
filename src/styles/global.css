@@ -1,6 +1,8 @@
 /* Tokens de marca: docs/brief.md § 2.
    Contraste sobre blanco: verde 3,5:1 (solo logo, íconos, titulares ≥ 24 px);
-   verde-oscuro 7:1 (enlaces, botones, texto verde normal); lima 1,8:1 (solo decorativo). */
+   verde-oscuro 7:1 (enlaces, botones, texto verde normal); lima 1,8:1 (solo decorativo).
+   Criterio visual (referencias Webuild / Heatherwick): blanco y carbón dominan, el verde es
+   acento puntual; la fotografía de obra es la protagonista. */
 :root {
 	--lols-verde: #029e4d;
 	--lols-verde-oscuro: #006739;
@@ -11,12 +13,15 @@
 	--lols-gris-claro: #f1f1f1;
 	--lols-blanco: #ffffff;
 
+	--linea: #dcdcdc;
+	--gris-medio: #6b6b6b; /* 5,3:1 sobre blanco */
+
 	--fuente-titulos: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
 	--fuente-texto: 'Inter Variable', 'Inter', system-ui, sans-serif;
 
-	--ancho: 72rem;
-	--gutter: clamp(1rem, 4vw, 2rem);
-	--radio: 6px;
+	--ancho: 80rem;
+	--gutter: clamp(1rem, 4vw, 2.5rem);
+	--seccion: clamp(4rem, 10vw, 8rem);
 }
 
 *,
@@ -37,26 +42,35 @@ body {
 	font-family: var(--fuente-texto);
 	font-size: 1.0625rem;
 	line-height: 1.6;
-	text-rendering: optimizeLegibility;
 }
 
 h1,
 h2,
 h3 {
 	font-family: var(--fuente-titulos);
-	line-height: 1.15;
-	letter-spacing: -0.02em;
+	font-weight: 700;
+	line-height: 1.05;
+	letter-spacing: -0.035em;
 	margin: 0 0 0.5em;
 	text-wrap: balance;
 }
 h1 {
-	font-size: clamp(2.25rem, 5vw, 3.5rem);
+	font-size: clamp(2.75rem, 7vw, 5.5rem);
 }
 h2 {
-	font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+	font-size: clamp(2rem, 4.5vw, 3.5rem);
 }
 h3 {
-	font-size: 1.25rem;
+	font-size: 1.35rem;
+	letter-spacing: -0.02em;
+	line-height: 1.2;
+}
+
+/* Frase de portada (patrón Heatherwick). */
+.display {
+	font-size: clamp(3rem, 9.5vw, 8.5rem);
+	line-height: 0.98;
+	letter-spacing: -0.045em;
 }
 
 p {
@@ -64,16 +78,24 @@ p {
 	text-wrap: pretty;
 }
 
+.bajada {
+	font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+	line-height: 1.5;
+	color: var(--lols-gris);
+	max-width: 40rem;
+}
+
 a {
 	color: var(--lols-verde-oscuro);
-	text-underline-offset: 0.15em;
+	text-underline-offset: 0.18em;
 }
 a[href^='tel:'] {
 	white-space: nowrap;
 }
 
 img,
-svg {
+svg,
+video {
 	display: block;
 	max-width: 100%;
 }
@@ -91,30 +113,81 @@ svg {
 }
 
 .seccion {
-	padding-block: clamp(3.5rem, 8vw, 6rem);
+	padding-block: var(--seccion);
+}
+.seccion + .seccion:not(.oscura, .gris) {
+	padding-top: 0;
 }
 .seccion.gris {
 	background: var(--lols-gris-claro);
 }
+.seccion.oscura {
+	background: var(--lols-carbon);
+	color: var(--lols-blanco);
+}
+.seccion.oscura .bajada {
+	color: #c8c8c8;
+}
+.seccion.oscura a {
+	color: var(--lols-lima);
+}
 
-/* Barra horizontal del logo como recurso gráfico sobre los títulos de sección. */
-.antetitulo {
+/* Etiqueta de sección: cuadro verde (del isotipo) + número + nombre. */
+.etiqueta {
 	display: flex;
 	align-items: center;
 	gap: 0.75rem;
-	margin: 0 0 1rem;
+	margin: 0 0 1.5rem;
 	font-family: var(--fuente-titulos);
 	font-size: 0.85rem;
 	font-weight: 700;
-	letter-spacing: 0.12em;
+	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	color: var(--lols-verde-oscuro);
+	color: var(--lols-carbon);
 }
-.antetitulo::before {
+.etiqueta::before {
 	content: '';
-	width: 2.5rem;
-	height: 4px;
+	width: 0.7rem;
+	height: 0.7rem;
 	background: var(--lols-verde);
+}
+.oscura .etiqueta {
+	color: var(--lols-blanco);
+}
+
+/* Cabecera de sección: título a la izquierda, enlace a la derecha, línea abajo. */
+.cabecera {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 1.5rem;
+	flex-wrap: wrap;
+	padding-bottom: 1.5rem;
+	margin-bottom: 2.5rem;
+	border-bottom: 1px solid var(--linea);
+}
+.cabecera h2 {
+	margin: 0;
+}
+.oscura .cabecera {
+	border-color: #333;
+}
+
+.enlace-flecha {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-family: var(--fuente-titulos);
+	font-weight: 700;
+	text-decoration: none;
+	white-space: nowrap;
+}
+.enlace-flecha::after {
+	content: '→';
+	transition: transform 0.2s;
+}
+.enlace-flecha:hover::after {
+	transform: translateX(4px);
 }
 
 .boton {
@@ -125,7 +198,7 @@ svg {
 	min-height: 3rem;
 	padding: 0.75rem 1.5rem;
 	border: 2px solid var(--lols-verde-oscuro);
-	border-radius: var(--radio);
+	border-radius: 0;
 	background: var(--lols-verde-oscuro);
 	color: var(--lols-blanco);
 	font-family: var(--fuente-titulos);
@@ -146,38 +219,60 @@ svg {
 	background: var(--lols-verde-oscuro);
 	color: var(--lols-blanco);
 }
-/* Sobre fondo verde oscuro. */
-.boton.claro {
+.oscura .boton {
 	background: var(--lols-blanco);
 	border-color: var(--lols-blanco);
-	color: var(--lols-verde-oscuro);
+	color: var(--lols-carbon);
 }
-.boton.claro:hover {
-	background: var(--lols-gris-claro);
-}
-.boton.contorno-claro {
-	background: transparent;
-	border-color: var(--lols-blanco);
-	color: var(--lols-blanco);
-}
-.boton.contorno-claro:hover {
-	background: var(--lols-blanco);
-	color: var(--lols-verde-oscuro);
+.oscura .boton:hover {
+	background: var(--lols-lima);
+	border-color: var(--lols-lima);
 }
 
-.encabezado-pagina {
-	padding-block: clamp(3rem, 7vw, 5rem) clamp(2rem, 5vw, 3rem);
-	border-bottom: 1px solid #e2e2e2;
+/* Encabezado de página interior. */
+.portadilla {
+	padding-block: clamp(3.5rem, 9vw, 7rem) clamp(2.5rem, 6vw, 4rem);
 }
-.encabezado-pagina p {
-	max-width: 42rem;
-	font-size: 1.15rem;
-	color: var(--lols-gris);
+.portadilla h1 {
+	max-width: 18ch;
 }
 
-/* Contenedor de foto con proporción fija: su contenido (img o marcador) lo llena entero. */
+/* Recuadro de datos (ficha de proyecto, patrón Mott MacDonald / Heatherwick). */
+.datos {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+	margin: 0;
+	border-top: 1px solid var(--linea);
+}
+.datos > div {
+	padding: 1rem 1.25rem 1rem 0;
+	border-bottom: 1px solid var(--linea);
+}
+.datos dt {
+	font-size: 0.8rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--gris-medio);
+}
+.datos dd {
+	margin: 0.3rem 0 0;
+	font-family: var(--fuente-titulos);
+	font-size: 1.1rem;
+	font-weight: 600;
+}
+
+/* Contenedor de foto con proporción fija: su contenido (img, video o marcador) lo llena. */
 .marco {
 	display: grid;
+	background: #e7e7e4;
+	overflow: hidden;
+}
+.marco > img,
+.marco > video {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 .sr-only {
@@ -195,5 +290,6 @@ svg {
 	}
 	* {
 		transition: none !important;
+		animation: none !important;
 	}
 }

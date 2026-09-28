@@ -1,0 +1,61 @@
+---
+// Tarjeta de proyecto: mismos campos, mismo orden en todas (patrón BIG).
+import Pendiente from './Pendiente.astro';
+import { servicioPorSlug } from '../data/empresa';
+import type { Proyecto } from '../data/proyectos';
+
+interface Props {
+	proyecto?: Proyecto; // sin proyecto = tarjeta de muestra con marcadores
+}
+const { proyecto } = Astro.props;
+const foto = proyecto?.fotos[0];
+const servicio = proyecto?.servicios[0] ? servicioPorSlug(proyecto.servicios[0]).nombre : null;
+const href = proyecto ? `/proyectos/${proyecto.slug}/` : undefined;
+const Tag = href ? 'a' : 'div';
+---
+
+<article class="tarjeta" data-servicios={proyecto?.servicios.join(' ')} data-estado={proyecto?.estado}>
+	<Tag href={href} class="vinculo">
+		<div class="foto marco">
+			{foto ? <img src={foto.src} alt={foto.alt} loading="lazy" /> : <Pendiente bloque texto="foto" />}
+		</div>
+		<h3>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto" />}</h3>
+		<p class="meta">
+			<span>{servicio ?? <Pendiente texto="servicio" />}</span>
+			<span>{proyecto?.comuna ?? <Pendiente texto="comuna" />}</span>
+			<span>{proyecto?.anio ?? <Pendiente texto="año" />}</span>
+		</p>
+	</Tag>
+</article>
+
+<style>
+	.vinculo {
+		display: block;
+		color: inherit;
+		text-decoration: none;
+	}
+	.foto {
+		aspect-ratio: 4 / 3;
+		margin-bottom: 1rem;
+	}
+	.foto :global(img) {
+		transition: transform 0.4s;
+	}
+	a.vinculo:hover .foto :global(img) {
+		transform: scale(1.03);
+	}
+	a.vinculo:hover h3 {
+		color: var(--lols-verde-oscuro);
+	}
+	h3 {
+		margin-bottom: 0.4rem;
+	}
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1rem;
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--gris-medio);
+	}
+</style>

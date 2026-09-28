@@ -1,0 +1,81 @@
+---
+// Cierre de página con una persona responsable (patrón Arup / Mott MacDonald / Ramboll).
+import Pendiente from './Pendiente.astro';
+import { empresa, telefonoHref } from '../data/empresa';
+
+interface Props {
+	titulo?: string;
+}
+const { titulo = 'Hablemos de su proyecto' } = Astro.props;
+---
+
+<section class="seccion oscura contacto">
+	<div class="contenedor grilla">
+		<div>
+			<p class="etiqueta">Contacto</p>
+			<h2>{titulo}</h2>
+			<a href="/contacto/" class="boton">Solicitar cotización</a>
+		</div>
+		<div class="persona">
+			<div class="retrato marco">
+				<Pendiente bloque texto="foto" />
+			</div>
+			<div>
+				<p class="nombre"><Pendiente texto="nombre y cargo de quien atiende cotizaciones" /></p>
+				<p>
+					<Pendiente revisar={empresa.telefono.revisar}>
+						<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
+					</Pendiente>
+				</p>
+				<p>
+					<Pendiente revisar={empresa.correo.revisar}>
+						<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
+					</Pendiente>
+				</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.grilla {
+		display: grid;
+		grid-template-columns: 1.3fr 1fr;
+		gap: clamp(2.5rem, 6vw, 6rem);
+		align-items: end;
+	}
+	h2 {
+		font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+		margin-bottom: 2rem;
+	}
+	.persona {
+		display: grid;
+		grid-template-columns: 7rem minmax(0, 1fr);
+		gap: 1.5rem;
+		align-items: center;
+		padding-top: 2rem;
+		border-top: 1px solid #333;
+	}
+	.retrato {
+		aspect-ratio: 1;
+		background: #262626;
+	}
+	.persona p {
+		margin: 0 0 0.35rem;
+	}
+	.nombre {
+		font-family: var(--fuente-titulos);
+		font-weight: 700;
+	}
+	@media (max-width: 860px) {
+		.grilla {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (max-width: 480px) {
+		.persona {
+			grid-template-columns: 4.5rem minmax(0, 1fr);
+			gap: 1rem;
+		}
+	}
+</style>
