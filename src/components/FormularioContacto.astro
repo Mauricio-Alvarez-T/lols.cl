@@ -1,0 +1,217 @@
+---
+// Formulario de cotización → /api/contacto.php (public/api/). Funciona sin JavaScript
+// (POST normal + redirección con ?enviado=1 o ?error=); con JavaScript envía por fetch y
+// muestra el resultado sin recargar. Consentimiento sin marcar por defecto (Ley 21.719).
+import { servicios } from '../data/empresa';
+---
+
+<form id="formulario" class="formulario" action="/api/contacto.php" method="post" novalidate>
+	<div class="fila">
+		<label for="f-nombre">
+			<span>Nombre <abbr title="obligatorio">*</abbr></span>
+			<input id="f-nombre" name="nombre" type="text" autocomplete="name" maxlength="120" required />
+		</label>
+		<label for="f-empresa">
+			<span>Empresa</span>
+			<input id="f-empresa" name="empresa" type="text" autocomplete="organization" maxlength="120" />
+		</label>
+	</div>
+	<div class="fila">
+		<label for="f-correo">
+			<span>Correo <abbr title="obligatorio">*</abbr></span>
+			<input id="f-correo" name="correo" type="email" autocomplete="email" maxlength="160" required />
+		</label>
+		<label for="f-telefono">
+			<span>Teléfono</span>
+			<input id="f-telefono" name="telefono" type="tel" autocomplete="tel" maxlength="40" />
+		</label>
+	</div>
+	<label for="f-servicio">
+		<span>Servicio</span>
+		<select id="f-servicio" name="servicio">
+			<option value="">Seleccione…</option>
+			{servicios.map((s) => <option value={s.slug}>{s.nombre}</option>)}
+			<option value="otro">Otro</option>
+		</select>
+	</label>
+	<label for="f-mensaje">
+		<span>Mensaje <abbr title="obligatorio">*</abbr></span>
+		<textarea id="f-mensaje" name="mensaje" rows="6" maxlength="5000" required placeholder="Cuéntenos qué necesita: tipo de obra, ubicación, plazos…"></textarea>
+	</label>
+
+	<!-- Trampa para bots: oculto a las personas y a los lectores de pantalla. -->
+	<div class="trampa" aria-hidden="true">
+		<label>Sitio web <input name="sitio_web" type="text" tabindex="-1" autocomplete="off" /></label>
+	</div>
+	<input type="hidden" name="t" value="" />
+
+	<label for="f-consentimiento" class="consentimiento">
+		<input id="f-consentimiento" name="consentimiento" type="checkbox" value="si" required />
+		<span>
+			Acepto que LOLS Ingeniería use estos datos para responder mi solicitud, según su
+			<a href="/privacidad/">política de privacidad</a>. <abbr title="obligatorio">*</abbr>
+		</span>
+	</label>
+
+	<div class="acciones">
+		<button type="submit" class="boton">Enviar solicitud</button>
+		<p class="estado" role="status" aria-live="polite"></p>
+	</div>
+</form>
+
+<script>
+	const form = document.querySelector<HTMLFormElement>('#formulario')!;
+	const estado = form.querySelector<HTMLParagraphElement>('.estado')!;
+	const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+	(form.elements.namedItem('t') as HTMLInputElement).value = String(Date.now());
+
+	const mensajes: Record<string, string> = {
+		enviado: 'Gracias. Recibimos su solicitud y le responderemos a la brevedad.',
+		datos: 'Revise los campos marcados: nombre, un correo válido y el mensaje son obligatorios.',
+		consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
+		limite: 'Recibimos varias solicitudes desde su conexión. Intente de nuevo en una hora.',
+		'no-configurado': 'El formulario aún no está habilitado. Escríbanos directamente por correo.',
+		red: 'No pudimos conectar con el servidor. Revise su conexión e intente de nuevo.',
+		otro: 'No pudimos enviar la solicitud. Intente de nuevo o escríbanos directamente por correo.',
+	};
+
+	function mostrar(clave: string, ok = false) {
+		estado.textContent = mensajes[clave] ?? mensajes.otro;
+		estado.dataset.tipo = ok ? 'ok' : 'error';
+	}
+
+	// Resultado del envío sin JavaScript (redirección con ?enviado / ?error).
+	const params = new URLSearchParams(location.search);
+	if (params.has('enviado')) mostrar('enviado', true);
+	else if (params.has('error')) mostrar(params.get('error')!);
+
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		for (const campo of form.querySelectorAll<HTMLInputElement>('[required]')) campo.removeAttribute('aria-invalid');
+		const invalidos = [...form.querySelectorAll<HTMLInputElement>('[required]')].filter((c) => !c.checkValidity());
+		if (invalidos.length) {
+			for (const c of invalidos) c.setAttribute('aria-invalid', 'true');
+			mostrar(invalidos.some((c) => c.name === 'consentimiento') && invalidos.length === 1 ? 'consentimiento' : 'datos');
+			invalidos[0].focus();
+			return;
+		}
+		boton.disabled = true;
+		estado.textContent = 'Enviando…';
+		delete estado.dataset.tipo;
+		try {
+			const r = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+			const datos = await r.json().catch(() => ({ ok: false, error: 'otro' }));
+			if (datos.ok) {
+				form.reset();
+				mostrar('enviado', true);
+			} else {
+				mostrar(datos.error ?? 'otro');
+			}
+		} catch {
+			mostrar('red');
+		} finally {
+			boton.disabled = false;
+		}
+	});
+</script>
+
+<style>
+	.formulario {
+		display: grid;
+		gap: 1.25rem;
+	}
+	.fila {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.25rem;
+	}
+	label {
+		display: grid;
+		gap: 0.4rem;
+	}
+	label > span {
+		font-family: var(--fuente-titulos);
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+	abbr {
+		color: var(--lols-verde-oscuro);
+		text-decoration: none;
+	}
+	input,
+	select,
+	textarea {
+		width: 100%;
+		min-height: 3rem;
+		padding: 0.7rem 0.85rem;
+		border: 1px solid #b5b5b5;
+		border-radius: 0;
+		background: var(--lols-blanco);
+		color: var(--lols-carbon);
+		font: inherit;
+	}
+	textarea {
+		resize: vertical;
+		min-height: 9rem;
+	}
+	input:focus-visible,
+	select:focus-visible,
+	textarea:focus-visible {
+		outline: 3px solid var(--lols-verde-oscuro);
+		outline-offset: 0;
+		border-color: var(--lols-verde-oscuro);
+	}
+	[aria-invalid='true'] {
+		border-color: #b3261e;
+		outline-color: #b3261e;
+	}
+	.consentimiento {
+		grid-template-columns: auto 1fr;
+		align-items: start;
+		gap: 0.75rem;
+		font-size: 0.95rem;
+		color: var(--lols-gris);
+	}
+	.consentimiento input {
+		width: 1.25rem;
+		height: 1.25rem;
+		min-height: 0;
+		margin-top: 0.15rem;
+		accent-color: var(--lols-verde-oscuro);
+	}
+	.consentimiento span {
+		font: inherit;
+	}
+	.trampa {
+		position: absolute;
+		left: -9999px;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+	}
+	.acciones {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		flex-wrap: wrap;
+	}
+	.boton:disabled {
+		opacity: 0.6;
+		cursor: wait;
+	}
+	.estado {
+		margin: 0;
+		font-weight: 600;
+	}
+	.estado[data-tipo='ok'] {
+		color: var(--lols-verde-oscuro);
+	}
+	.estado[data-tipo='error'] {
+		color: #b3261e;
+	}
+	@media (max-width: 560px) {
+		.fila {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

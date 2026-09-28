@@ -70,3 +70,30 @@ Plan de corte (se detalla cuando don Luis apruebe):
    exclusión de todas las carpetas de docroots (revisar cPanel → Dominios).
 4. Redirecciones 301 para URLs viejas que cambien.
 5. Borrar la BD y el usuario MySQL de WordPress.
+
+## Formulario de contacto (PHP)
+
+`public/api/contacto.php` recibe el formulario de `/contacto/` y envía un correo con `mail()`
+del servidor. No guarda datos personales (Ley 21.719); para el límite de 5 envíos por hora
+guarda un hash de la IP que se descarta a la hora.
+
+**Configuración (una vez, en File Manager).** Vive fuera del repo (que es público) y fuera
+del docroot:
+
+1. Crear la carpeta `/home/lolscl/lols-contacto/`.
+2. Dentro, crear `config.ini`:
+
+   ```ini
+   destinatario = "correo-que-recibe@lols.cl"
+   remitente = "no-responder@lols.cl"
+   ```
+
+   - `destinatario`: durante la revisión, un correo propio para probar; al lanzar, el de
+     cotizaciones de la empresa.
+   - `remitente`: una dirección del dominio lols.cl (así el correo pasa SPF). No hace falta
+     que el buzón exista, pero conviene que exista para ver rebotes.
+
+Sin `config.ini` el formulario responde "aún no está habilitado" y no envía nada.
+
+**Verificar:** `curl -s https://nuevo.lols.cl/api/contacto.php` → `{"ok":false,"error":"metodo"}`
+(PHP corre). Si responde el código fuente del PHP o un 404, el handler de PHP no está activo.

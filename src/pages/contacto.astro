@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
+import FormularioContacto from '../components/FormularioContacto.astro';
 import { empresa, telefonoHref } from '../data/empresa';
 ---
 
@@ -13,7 +14,7 @@ import { empresa, telefonoHref } from '../data/empresa';
 	<section class="seccion contenedor columnas">
 		<div>
 			<h2>Solicitar cotización</h2>
-			<Pendiente bloque texto="formulario: nombre, correo, teléfono, servicio, mensaje + casilla de consentimiento sin marcar (Ley 21.719)" />
+			<FormularioContacto />
 		</div>
 		<aside>
 			<dl class="datos vertical">

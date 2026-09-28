@@ -23,6 +23,10 @@ node scripts/extraer-wp.mjs     # re-extrae el contenido del WordPress viejo (so
 - **No se inventa contenido.** Lo que falta va con `<Pendiente texto="…" />` y lo que está sin confirmar con `<Pendiente revisar="…">dato</Pendiente>`; ambos se ven destacados en amarillo. **El build para `lols.cl` falla mientras quede alguno**, así que no se puede lanzar con huecos.
 - **Imágenes referenciales** (`src/data/referencia.ts`, componente `<Referencial>`): fotos de Unsplash en las bandas grandes y obras LOLS de 2018 recortadas (`public/referencia/`) en tarjetas, todas con etiqueta visible. También bloquean el build de producción: hay que reemplazarlas por fotos propias.
 
+## Formulario de contacto
+
+`src/components/FormularioContacto.astro` → `public/api/contacto.php` (PHP en el mismo hosting, `mail()`). El destinatario se configura en el servidor, fuera del repo: ver [docs/DEPLOY.md § Formulario de contacto](docs/DEPLOY.md#formulario-de-contacto-php).
+
 ## Contenido heredado
 
 `respaldo-wp/` es la copia del contenido del WordPress viejo (extraída 2026-09-28): 21 páginas (JSON de la API + HTML renderizado) y 95 imágenes originales. **Es la única copia fuera de WordPress: no borrar.**
