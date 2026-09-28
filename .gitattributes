@@ -1,0 +1,3 @@
+* text=auto
+# El cron del servidor ejecuta estos scripts: con CRLF falla el shebang (bad interpreter ^M).
+*.sh text eol=lf

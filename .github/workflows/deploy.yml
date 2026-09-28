@@ -1,0 +1,45 @@
+name: Deploy lols.cl
+
+# Pull-side: el FTP de cPanel bloquea las IPs de GitHub Actions (cPHulk). Este workflow
+# solo compila y publica dist/ + scripts/ en la rama `deploy`; un cron en el servidor la
+# baja con git y la copia al docroot (scripts/cpanel-deploy.sh, docs/DEPLOY.md).
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Publicar rama deploy
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f dist
+          git commit -m "build: dist de ${GITHUB_SHA::7} [skip ci]" || echo "dist sin cambios"
+          git push -f origin HEAD:deploy

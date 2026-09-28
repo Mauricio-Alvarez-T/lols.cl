@@ -1,10 +1,11 @@
-# lols-web
+# lols.cl
 
 Sitio corporativo de LOLS Ingeniería Limitada. Reemplaza el WordPress 4.9 (2018) de lols.cl.
 
 - **Stack**: Astro, salida 100% estática. Node solo para construir; en el servidor quedan HTML/CSS/imágenes (sin PHP, sin BD, sin Passenger).
-- **Staging**: https://nuevo.lols.cl (docroot `/home/lolscl/public_html/nuevo.lols.cl`; el hosting obliga a que cuelgue de `public_html`). `public/.htaccess` corta la herencia de las reglas de WordPress. `robots.txt` bloquea indexación.
+- **Revisión**: https://nuevo.lols.cl, provisorio mientras don Luis revisa (docroot `/home/lolscl/public_html/nuevo.lols.cl`; el hosting obliga a que cuelgue de `public_html`). `public/.htaccess` corta la herencia de las reglas de WordPress. `robots.txt` + meta `noindex` bloquean indexación.
 - **Producción**: https://lols.cl, cuando el rediseño esté aprobado.
+- **Deploy**: push a `main` → publica solo en ≤ 5 min. Detalle y configuración de cPanel en [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Comandos
 
@@ -27,11 +28,6 @@ Datos de contacto vigentes en el sitio viejo:
 
 Páginas: Inicio, Quiénes somos, Nuestros servicios (Construcción, Muebles, Montaje industrial, Mantención, Electricidad, Voz y datos), Proyectos terminados (8), Proyectos en construcción (7), Contacto.
 
-## Paso a producción (checklist)
+## Paso a producción
 
-1. Respaldo completo de cPanel (directorio home + base de datos de WordPress) descargado y verificado.
-2. `SITE=https://lols.cl npm run build`, reemplazar `robots.txt` por uno que permita indexar.
-3. Redirecciones 301 en `.htaccess` para URLs del sitio viejo que cambien.
-4. Vaciar `public_html` y subir `dist/`. **NO borrar** las carpetas de otros dominios que cuelgan de ahí (`nuevo.lols.cl/` y cualquier docroot de subdominio: revisar cPanel → Dominios antes).
-5. Eliminar la base de datos y el usuario MySQL de WordPress.
-6. DNS y correo no se tocan.
+Ver [docs/DEPLOY.md § Paso a producción](docs/DEPLOY.md#paso-a-producción). DNS y correo no se tocan.
