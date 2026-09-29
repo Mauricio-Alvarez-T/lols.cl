@@ -317,6 +317,17 @@ video {
 	}
 }
 
+/* Video de fondo del hero de la portada (ObraPortada): llena la sección entera y deja la
+   pausa arriba a la derecha, lejos del texto y del botón flotante de WhatsApp. */
+section.hero-obra .fondo-hero {
+	position: absolute;
+	inset: 0;
+	height: 100%;
+}
+section.hero-obra .fondo-hero .pausa {
+	align-self: start;
+}
+
 /* Contenedor de foto con proporción fija: su contenido (img, video o marcador) lo llena. */
 .marco {
 	display: grid;

@@ -4,27 +4,28 @@
    frontend-design). Solo opacity/transform. Todo cuelga de html.anim, que Base.astro pone
    solo si no se pidió reducir movimiento. */
 
-/* Portada: el título sube, el punto aparece y, sobre la obra, se trazan los ejes del plano
-   que luego quedan tenues. El poster de la obra está visible desde el inicio (no se retrasa
+/* Portada: sobre la obra, el título sube, el punto aparece y se trazan los ejes del plano,
+   que quedan muy tenues. El poster de la obra está visible desde el inicio (no se retrasa
    la carga principal); lo que se anima son las líneas encima. */
-.anim .hero .display {
+.anim .hero-obra .display {
 	animation: subir 0.9s var(--suave) both;
 }
-.anim .hero .punto {
+.anim .hero-obra .punto {
 	display: inline-block;
 	animation: aparecer-punto 0.5s 0.7s var(--suave) both;
 }
-.anim .hero .hero-pie {
+.anim .hero-obra .bajada,
+.anim .hero-obra .acciones {
 	animation: subir 0.9s 0.2s var(--suave) both;
+}
+.anim .hero-obra .acciones {
+	animation-delay: 0.3s;
 }
 .anim .trazo .eje-v {
 	animation: trazar-v 1s calc(0.35s + var(--i, 0) * 0.08s) var(--suave) both;
 }
 .anim .trazo .eje-h {
 	animation: trazar-h 1.1s calc(0.5s + var(--i, 0) * 0.1s) var(--suave) both;
-}
-.anim .trazo .rotulo-eje {
-	animation: aparecer 0.4s calc(0.9s + var(--i, 0) * 0.06s) ease-out both;
 }
 
 @keyframes subir {

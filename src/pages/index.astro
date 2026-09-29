@@ -30,18 +30,14 @@ const cifras = [
 ---
 
 <Base title="LOLS Ingeniería" description={`${empresa.razonSocial}. ${empresa.lema}.`}>
-	<section class="hero contenedor">
+	<ObraPortada video={videos.portada}>
 		<h1 class="display">{empresa.lema}<span class="punto">.</span></h1>
-		<div class="hero-pie">
-			<p class="bajada"><Pendiente texto="una frase: qué hace LOLS, para quién y dónde">{ejemploBajadaHero}</Pendiente></p>
-			<div class="acciones">
-				<a href="/proyectos/" class="boton">Ver proyectos</a>
-				<a href="/contacto/" class="boton secundario">Cotizar</a>
-			</div>
+		<p class="bajada"><Pendiente texto="una frase: qué hace LOLS, para quién y dónde">{ejemploBajadaHero}</Pendiente></p>
+		<div class="acciones">
+			<a href="/proyectos/" class="boton">Ver proyectos</a>
+			<a href="/contacto/" class="boton secundario">Cotizar</a>
 		</div>
-	</section>
-
-	<ObraPortada video={videos.portada} />
+	</ObraPortada>
 
 	<section class="cifras contenedor" aria-label="LOLS en cifras">
 		{
@@ -156,30 +152,8 @@ const cifras = [
 </Base>
 
 <style>
-	.hero {
-		padding-block: clamp(4rem, 12vw, 10rem) clamp(2.5rem, 6vw, 4.5rem);
-	}
-	.display {
-		max-width: 12ch;
-	}
 	.punto {
 		color: var(--lols-verde);
-	}
-	.hero-pie {
-		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		gap: 2rem;
-		flex-wrap: wrap;
-		margin-top: clamp(2rem, 5vw, 3.5rem);
-	}
-	.hero-pie .bajada {
-		margin: 0;
-	}
-	.acciones {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.75rem;
 	}
 
 	.banda {

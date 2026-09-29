@@ -1,7 +1,9 @@
 ---
-// Banda de obra de la portada con el trazo del plano encima: ejes verticales y horizontales
-// con sus rótulos, que se dibujan al cargar (animaciones.css) y quedan tenues. Es el único
-// gesto audaz de la página (docs/estructura.md § Dirección visual).
+// Hero de la portada: la obra en video ocupa la primera pantalla y el mensaje va encima,
+// abajo a la izquierda (lo primero que se ve es la obra, no un bloque de texto). Un velo
+// degradado desde abajo asegura la lectura sobre cualquier cuadro del video. Encima, los ejes
+// del plano se trazan al cargar y quedan muy tenues (animaciones.css).
+// El contenido (título, bajada, botones) llega por el slot desde la página.
 import VideoFondo from './VideoFondo.astro';
 import type { VideoReferencial } from '../data/referencia';
 
@@ -9,35 +11,49 @@ interface Props {
 	video: VideoReferencial;
 }
 const { video } = Astro.props;
-const verticales = [20, 40, 60, 80];
-const horizontales = [33, 66];
-const letras = ['A', 'B', 'C', 'D', 'E'];
+const verticales = [25, 50, 75];
+const horizontales = [40];
 ---
 
-<div class="obra">
-	<VideoFondo video={video} clase="banda" eager />
+<section class="hero-obra">
+	<VideoFondo video={video} clase="fondo-hero" eager />
+	<div class="velo" aria-hidden="true"></div>
 	<div class="trazo" aria-hidden="true">
 		{verticales.map((x, i) => <span class="eje-v" style={`left: ${x}%; --i: ${i}`} />)}
 		{horizontales.map((y, i) => <span class="eje-h" style={`top: ${y}%; --i: ${i}`} />)}
-		{letras.map((l, i) => <span class="rotulo-eje" style={`left: calc(${i * 20}% + 10px); --i: ${i}`}>{l}</span>)}
-		{horizontales.map((y, i) => <span class="rotulo-eje fila" style={`top: calc(${y}% + 6px); --i: ${i + 5}`}>{i + 2}</span>)}
 	</div>
-</div>
+	<div class="contenedor contenido">
+		<slot />
+	</div>
+</section>
 
 <style>
-	.obra {
+	.hero-obra {
 		position: relative;
+		display: flex;
+		align-items: flex-end;
+		min-height: clamp(34rem, calc(100svh - 4.5rem), 56rem);
+		overflow: hidden;
+		background: var(--lols-carbon);
+		color: var(--lols-blanco);
+	}
+	.velo {
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(to top, rgb(20 20 20 / 0.82) 0%, rgb(20 20 20 / 0.45) 38%, rgb(20 20 20 / 0.08) 70%),
+			linear-gradient(to right, rgb(20 20 20 / 0.35), transparent 60%);
+		pointer-events: none;
 	}
 	.trazo {
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
-		overflow: hidden;
 	}
 	.eje-v,
 	.eje-h {
 		position: absolute;
-		background: rgb(255 255 255 / 0.32);
+		background: rgb(255 255 255 / 0.14);
 	}
 	.eje-v {
 		top: 0;
@@ -51,19 +67,52 @@ const letras = ['A', 'B', 'C', 'D', 'E'];
 		height: 1px;
 		transform-origin: left;
 	}
-	.rotulo-eje {
-		position: absolute;
-		top: 10px;
-		padding: 0.1rem 0.35rem;
-		background: rgb(20 20 20 / 0.45);
-		color: rgb(255 255 255 / 0.85);
-		font: 500 0.72rem/1.3 var(--fuente-datos);
+
+	.contenido {
+		position: relative;
+		padding-block: clamp(3rem, 8vw, 5.5rem);
 	}
-	.rotulo-eje.fila {
-		left: 10px;
+	.contenido :global(.display) {
+		max-width: 12ch;
+		margin-bottom: 1.5rem;
+		font-size: clamp(3rem, 1.4rem + 6.5vw, 7.75rem);
+		color: var(--lols-blanco);
+		text-shadow: 0 2px 24px rgb(0 0 0 / 0.25);
 	}
+	.contenido :global(.bajada) {
+		max-width: 36rem;
+		margin-bottom: 2rem;
+		color: rgb(255 255 255 / 0.9);
+	}
+	.contenido :global(.acciones) {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+	/* Botones sobre la obra: primario blanco, secundario con contorno blanco. */
+	.contenido :global(.boton) {
+		background: var(--lols-blanco);
+		border-color: var(--lols-blanco);
+		color: var(--lols-carbon);
+	}
+	.contenido :global(.boton:hover) {
+		background: var(--lols-lima);
+		border-color: var(--lols-lima);
+	}
+	.contenido :global(.boton.secundario) {
+		background: transparent;
+		color: var(--lols-blanco);
+	}
+	.contenido :global(.boton.secundario:hover) {
+		background: var(--lols-blanco);
+		color: var(--lols-carbon);
+	}
+
 	@media (max-width: 640px) {
-		.rotulo-eje {
+		.hero-obra {
+			min-height: calc(88svh - 4.5rem);
+		}
+		.eje-v:nth-child(odd) {
 			display: none;
 		}
 	}
