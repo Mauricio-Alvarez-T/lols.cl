@@ -1,154 +1,301 @@
 ---
-// Portafolio: grilla con campos fijos (BIG) y filtro por servicio y estado (SalfaCorp /
-// Ingevec). Con 6–12 proyectos basta un filtro simple; más dimensiones se verían vacías.
-// Los filtros leen ?servicio= y ?estado= (las URLs viejas redirigen a ?estado=...).
+// Portafolio en tres bloques, en el orden que pidió don Luis (docs/reunion-inicial.md):
+//   1. En construcción: lo que LOLS está haciendo hoy, con tipo, superficie, comuna y dirección.
+//   2. Contratados: obras firmadas que aún no parten (muestran cartera y continuidad).
+//   3. Terminados: el portafolio de siempre.
+// Arriba, un índice con la cantidad de cada bloque. Las URLs viejas (?estado=...) saltan al
+// bloque que corresponde.
 import Base from '../../layouts/Base.astro';
 import Pendiente from '../../components/Pendiente.astro';
 import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
 import Contacto from '../../components/Contacto.astro';
-import { servicios } from '../../data/empresa';
-import { proyectos, estados } from '../../data/proyectos';
-import { obras2018 } from '../../data/referencia';
+import { proyectosPorEstado } from '../../data/proyectos';
+import { obras2018, obrasEnCurso } from '../../data/referencia';
+import { ejemplosContratados } from '../../data/ejemplos';
+
+const enCurso = proyectosPorEstado('en-curso');
+const contratados = proyectosPorEstado('contratado');
+const terminados = proyectosPorEstado('terminado');
+const hayReales = enCurso.length + contratados.length + terminados.length > 0;
+
+// Cantidades del índice: las reales, o las de las muestras mientras no haya proyectos.
+const cuenta = hayReales
+	? { enCurso: enCurso.length, contratados: contratados.length, terminados: terminados.length }
+	: { enCurso: obrasEnCurso.length, contratados: ejemplosContratados.length, terminados: obras2018.length };
+const bloques = [
+	{ id: 'en-construccion', estado: 'en-curso', titulo: 'En construcción', n: cuenta.enCurso },
+	{ id: 'contratados', estado: 'contratado', titulo: 'Contratados', n: cuenta.contratados },
+	{ id: 'terminados', estado: 'terminado', titulo: 'Terminados', n: cuenta.terminados },
+];
 ---
 
-<Base title="Proyectos" description="Proyectos de LOLS Ingeniería.">
+<Base title="Proyectos" description="Obras en construcción, contratadas y terminadas de LOLS Ingeniería.">
 	<header class="portadilla contenedor">
 		<p class="etiqueta">Proyectos</p>
 		<h1>Obras que hablan por nosotros</h1>
-		<p class="bajada"><Pendiente texto="una frase sobre el portafolio (tipos de obra, años, regiones)">Edificios comerciales, oficinas e instalaciones industriales en la Región Metropolitana.</Pendiente></p>
+		<p class="bajada"><Pendiente texto="una frase sobre el portafolio (tipos de obra, años, regiones)">Edificios de oficinas, centros de bodegas y obras industriales en la Región Metropolitana.</Pendiente></p>
 	</header>
 
-	<section class="contenedor filtros" aria-label="Filtrar proyectos">
-		<div class="grupo" role="group" aria-label="Servicio">
-			<button type="button" data-filtro="servicio" data-valor="" aria-pressed="true">Todos</button>
+	<nav class="contenedor" aria-label="Bloques de proyectos">
+		<div class="indice">
 			{
-				servicios.map((s) => (
-					<button type="button" data-filtro="servicio" data-valor={s.slug} aria-pressed="false">
-						{s.nombre}
-					</button>
+				bloques.map((b) => (
+					<a href={`#${b.id}`} data-estado={b.estado}>
+						<span class="n">{hayReales ? b.n : <Pendiente texto="cantidad">{b.n}</Pendiente>}</span>
+						<span>{b.titulo}</span>
+					</a>
 				))
 			}
 		</div>
-		<div class="grupo" role="group" aria-label="Estado">
-			<button type="button" data-filtro="estado" data-valor="" aria-pressed="true">Todos</button>
-			{
-				Object.entries(estados).map(([valor, texto]) => (
-					<button type="button" data-filtro="estado" data-valor={valor} aria-pressed="false">
-						{texto}
-					</button>
-				))
-			}
-		</div>
-	</section>
+	</nav>
 
-	<section class="seccion contenedor">
+	<section id="en-construccion" class="seccion contenedor bloque">
+		<div class="cabecera">
+			<h2>En construcción</h2>
+			<p class="nota">Obras en ejecución hoy.</p>
+		</div>
 		{
-			proyectos.length ? (
-				<div class="grilla" id="grilla">
-					{proyectos.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)}
+			hayReales ? (
+				<div class="grilla dos">
+					{enCurso.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)}
 				</div>
 			) : (
 				<>
-					<Pendiente texto="listado de 6 a 12 proyectos con ficha (docs/brief.md § 4); las tarjetas son de muestra" />
-					<div class="grilla">
-						{obras2018.map((f, i) => <TarjetaProyecto referencia={f} lamina={i + 1} destacada={i === 0} />)}
+					<Pendiente texto="obras en construcción con superficie, comuna, dirección y tipo; fotos y videos de Rodrigo" />
+					<div class="grilla dos">
+						{obrasEnCurso.map((f, i) => <TarjetaProyecto referencia={f} estado="en-curso" lamina={i + 1} destacada={i === 0} />)}
 					</div>
 				</>
 			)
 		}
-		<p class="vacio" id="vacio" hidden>No hay proyectos con esos filtros.</p>
+	</section>
+
+	<section id="contratados" class="seccion gris bloque">
+		<div class="contenedor">
+			<div class="cabecera">
+				<h2>Contratados</h2>
+				<p class="nota">Obras adjudicadas que parten en los próximos meses.</p>
+			</div>
+			{!hayReales && <Pendiente texto="obras contratadas que aún no parten (confirmar qué se puede publicar antes del inicio)" />}
+			<div class="tabla-envoltura">
+				<table class="cartera">
+					<thead>
+						<tr>
+							<th scope="col">Proyecto</th>
+							<th scope="col">Tipo</th>
+							<th scope="col">Comuna</th>
+							<th scope="col" class="num">Superficie</th>
+							<th scope="col">Inicio previsto</th>
+						</tr>
+					</thead>
+					<tbody>
+						{
+							hayReales
+								? contratados.map((p) => (
+										<tr>
+											<th scope="row">{p.nombre ?? <Pendiente texto="nombre" />}</th>
+											<td>{p.tipo ?? <Pendiente texto="tipo" />}</td>
+											<td>{p.comuna ?? <Pendiente texto="comuna" />}</td>
+											<td class="num">{p.superficie ?? <Pendiente texto="m²" />}</td>
+											<td class="inicio">{p.inicio ?? <Pendiente texto="inicio" />}</td>
+										</tr>
+									))
+								: ejemplosContratados.map((c) => (
+										<tr>
+											<th scope="row"><Pendiente texto="nombre">{c.nombre}</Pendiente></th>
+											<td><Pendiente texto="tipo">{c.tipo}</Pendiente></td>
+											<td><Pendiente texto="comuna">{c.comuna}</Pendiente></td>
+											<td class="num"><Pendiente texto="m²">{c.superficie}</Pendiente></td>
+											<td class="inicio"><Pendiente texto="inicio previsto">{c.inicio}</Pendiente></td>
+										</tr>
+									))
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+
+	<section id="terminados" class="seccion contenedor bloque">
+		<div class="cabecera">
+			<h2>Terminados</h2>
+		</div>
+		{
+			hayReales ? (
+				<div class="grilla">
+					{terminados.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)}
+				</div>
+			) : (
+				<>
+					<Pendiente texto="obras terminadas que elija don Luis, con fotos nuevas (las de 2018 salen del sitio)" />
+					<div class="grilla">
+						{obras2018.map((f, i) => <TarjetaProyecto referencia={f} estado="terminado" lamina={i + 1} destacada={i === 0} />)}
+					</div>
+				</>
+			)
+		}
 	</section>
 
 	<Contacto />
 </Base>
 
 <script>
-	const params = new URLSearchParams(location.search);
-	const filtros: Record<string, string> = { servicio: params.get('servicio') ?? '', estado: params.get('estado') ?? '' };
-	const botones = [...document.querySelectorAll<HTMLButtonElement>('[data-filtro]')];
-	const tarjetas = [...document.querySelectorAll<HTMLElement>('#grilla .tarjeta')];
-	const vacio = document.getElementById('vacio')!;
-
-	function aplicar() {
-		for (const b of botones) b.setAttribute('aria-pressed', String(filtros[b.dataset.filtro!] === b.dataset.valor));
-		let visibles = 0;
-		for (const t of tarjetas) {
-			const ok =
-				(!filtros.servicio || (t.dataset.servicios ?? '').split(' ').includes(filtros.servicio)) &&
-				(!filtros.estado || t.dataset.estado === filtros.estado);
-			t.hidden = !ok;
-			if (ok) visibles++;
-		}
-		vacio.hidden = !tarjetas.length || visibles > 0;
-		const url = new URL(location.href);
-		for (const [k, v] of Object.entries(filtros)) v ? url.searchParams.set(k, v) : url.searchParams.delete(k);
-		history.replaceState(null, '', url);
+	// URLs viejas del sitio de 2018 (/proyectos-en-construccion/ → ?estado=en-curso): saltar al bloque.
+	const estado = new URLSearchParams(location.search).get('estado');
+	const destino = estado ? document.querySelector<HTMLAnchorElement>(`.indice a[data-estado="${CSS.escape(estado)}"]`) : null;
+	if (destino) {
+		history.replaceState(null, '', location.pathname + destino.hash);
+		document.querySelector(destino.hash)?.scrollIntoView();
 	}
-
-	for (const b of botones) {
-		b.addEventListener('click', () => {
-			filtros[b.dataset.filtro!] = b.dataset.valor!;
-			aplicar();
-		});
-	}
-	aplicar();
 </script>
 
 <style>
-	.filtros {
+	.indice {
 		display: grid;
-		gap: 0.75rem;
-		padding-bottom: 2rem;
-		border-bottom: 1px solid var(--linea);
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		border-block: 1px solid var(--lols-carbon);
 	}
-	.grupo {
+	.indice a {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-	.grupo button {
-		min-height: 2.5rem;
-		padding: 0.4rem 1rem;
-		border: 1px solid var(--linea);
-		border-radius: 999px;
-		background: var(--lols-blanco);
+		align-items: baseline;
+		gap: 0.75rem;
+		padding: 1rem 1rem 1rem 0;
 		color: var(--lols-carbon);
-		font: 600 0.95rem var(--fuente-titulos);
-		cursor: pointer;
+		font-family: var(--fuente-titulos);
+		font-weight: 600;
+		text-decoration: none;
 	}
-	.grupo button:hover {
-		border-color: var(--lols-carbon);
+	.indice a + a {
+		padding-left: 1rem;
+		border-left: 1px solid var(--linea);
 	}
-	.grupo button[aria-pressed='true'] {
-		background: var(--lols-carbon);
-		border-color: var(--lols-carbon);
-		color: var(--lols-blanco);
+	.indice a:hover {
+		color: var(--lols-verde-oscuro);
 	}
-	.aviso {
-		margin-bottom: 2rem;
+	.indice .n {
+		font-size: clamp(1.75rem, 4vw, 2.75rem);
+		font-weight: 700;
+		letter-spacing: -0.04em;
+		font-variant-numeric: tabular-nums;
+	}
+	.bloque {
+		scroll-margin-top: 5rem;
+	}
+	.nota {
+		margin: 0;
+		color: var(--gris-medio);
+	}
+	.grilla {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
 	}
 	.grilla > :global(.destacada) {
 		grid-column: span 2;
 	}
-	.grilla {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
+	/* En construcción: pocas obras, más grandes; la primera ocupa el ancho completo. */
+	.grilla.dos {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
-	.vacio {
+	.grilla.dos > :global(.destacada) {
+		grid-column: 1 / -1;
+	}
+	.grilla.dos > :global(.destacada .foto) {
+		aspect-ratio: 21 / 9;
+	}
+
+	/* Cartera contratada: tabla tipo cuadro de obras de un plano (sin fotos: aún no hay obra). */
+	.tabla-envoltura {
+		overflow-x: auto;
+	}
+	.cartera {
+		width: 100%;
+		min-width: 40rem;
+		border-collapse: collapse;
+		border-top: 2px solid var(--lols-carbon);
+	}
+	.cartera th,
+	.cartera td {
+		padding: 0.9rem 1rem 0.9rem 0;
+		border-bottom: 1px solid var(--linea);
+		text-align: left;
+		vertical-align: baseline;
+	}
+	.cartera thead th {
+		font-family: var(--fuente-datos);
+		font-size: 0.78rem;
+		font-weight: 500;
 		color: var(--gris-medio);
 	}
+	.cartera tbody th {
+		font-family: var(--fuente-titulos);
+		font-size: 1.1rem;
+		font-weight: 700;
+	}
+	.cartera .num {
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+	.cartera .inicio {
+		color: var(--lols-verde-oscuro);
+		font-weight: 600;
+	}
+
 	@media (max-width: 960px) {
 		.grilla {
-			grid-template-columns: repeat(2, 1fr);
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 	}
-	@media (max-width: 560px) {
-		.grilla {
+	@media (max-width: 640px) {
+		.indice {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.indice a + a {
+			padding-left: 0;
+			border-left: 0;
+			border-top: 1px solid var(--linea);
+		}
+		.grilla,
+		.grilla.dos {
 			grid-template-columns: minmax(0, 1fr);
 		}
 		.grilla > :global(.destacada) {
 			grid-column: auto;
+		}
+		.grilla.dos > :global(.destacada .foto) {
+			aspect-ratio: 4 / 3;
+		}
+		/* En celular la tabla pasa a fichas apiladas (sin scroll lateral). */
+		.cartera {
+			min-width: 0;
+		}
+		.cartera thead {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+		}
+		.cartera tr {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 0.25rem 1rem;
+			padding: 1rem 0;
+			border-bottom: 1px solid var(--linea);
+		}
+		.cartera th,
+		.cartera td {
+			padding: 0;
+			border: 0;
+		}
+		.cartera tbody th {
+			grid-column: 1 / -1;
+		}
+		.cartera .num {
+			text-align: left;
+		}
+		.cartera .inicio::before {
+			content: 'Inicio: ';
 		}
 	}
 </style>

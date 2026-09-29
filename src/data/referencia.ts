@@ -15,7 +15,17 @@ export interface ImagenReferencial {
 	alt: string;
 	origen: Origen;
 	// Datos de ejemplo para la tarjeta de proyecto (modo propuesta).
-	ejemplo?: { nombre: string; servicio: string; comuna: string; anio: string };
+	ejemplo?: EjemploTarjeta;
+}
+
+export interface EjemploTarjeta {
+	nombre: string;
+	tipo: string;
+	comuna: string;
+	superficie: string;
+	anio?: string; // terminados
+	direccion?: string; // en construcción
+	inicio?: string; // en construcción: desde cuándo
 }
 
 const unsplash = (id: string, alt: string, extra = ''): ImagenReferencial => {
@@ -47,18 +57,44 @@ export const bandasServicio: Record<string, ImagenReferencial> = {
 
 export const destacado = lols('abate-vertical.jpg', 'Edificio de cinco pisos en esquina, obra LOLS');
 
-// Obras terminadas del sitio de 2018 (fotos reales).
-// El nombre, comuna y año de cada tarjeta son de EJEMPLO (modo propuesta), no datos reales.
+// Obras terminadas del sitio de 2018 (fotos reales). Don Luis pidió sacar lo antiguo: en el
+// sitio final van las obras terminadas que él elija, con fotos nuevas. Mientras tanto sirven
+// de muestra para la sección "Terminados".
+// El nombre, tipo, comuna, superficie y año de cada tarjeta son de EJEMPLO, no datos reales.
 export const obras2018 = [
-	lols('ventura_esp.jpg', 'Edificio comercial de tres pisos, obra LOLS', { nombre: 'Edificio comercial', servicio: 'Construcción', comuna: 'Santiago', anio: '2017' }),
-	lols('kolm_am.jpg', 'Edificio comercial con fachada gris y franja verde, obra LOLS', { nombre: 'Local y bodegas', servicio: 'Construcción', comuna: 'Santiago', anio: '2017' }),
-	lols('renacer_bas.jpg', 'Edificio con fachada roja, obra LOLS', { nombre: 'Edificio de locales', servicio: 'Construcción', comuna: 'Estación Central', anio: '2016' }),
-	lols('eiffel_am.jpg', 'Edificio de fachada blanca y azul, obra LOLS', { nombre: 'Oficinas y comercio', servicio: 'Construcción', comuna: 'Santiago', anio: '2018' }),
-	lols('mak_sa.jpg', 'Edificio de fachada naranja y amarilla, obra LOLS', { nombre: 'Edificio comercial', servicio: 'Electricidad', comuna: 'Santiago', anio: '2016' }),
-	lols('zhu_am.jpg', 'Edificio comercial de ladrillo, obra LOLS', { nombre: 'Centro comercial', servicio: 'Montaje industrial', comuna: 'Santiago', anio: '2015' }),
-	lols('kolm_sa.jpg', 'Edificio de dos cuerpos color café, obra LOLS', { nombre: 'Edificio de oficinas', servicio: 'Construcción', comuna: 'Santiago', anio: '2015' }),
-	lols('b_cam_esp.jpg', 'Edificio de fachada azul, obra LOLS', { nombre: 'Local comercial', servicio: 'Voz y datos', comuna: 'Estación Central', anio: '2014' }),
+	lols('ventura_esp.jpg', 'Edificio comercial de tres pisos, obra LOLS', { nombre: 'Edificio comercial', tipo: 'Edificio comercial', comuna: 'Santiago', superficie: '1.850 m²', anio: '2024' }),
+	lols('kolm_am.jpg', 'Edificio comercial con fachada gris y franja verde, obra LOLS', { nombre: 'Local y bodegas', tipo: 'Bodegaje', comuna: 'Santiago', superficie: '2.400 m²', anio: '2024' }),
+	lols('renacer_bas.jpg', 'Edificio con fachada roja, obra LOLS', { nombre: 'Edificio de locales', tipo: 'Edificio comercial', comuna: 'Estación Central', superficie: '1.200 m²', anio: '2023' }),
+	lols('eiffel_am.jpg', 'Edificio de fachada blanca y azul, obra LOLS', { nombre: 'Oficinas y comercio', tipo: 'Edificio y oficinas', comuna: 'Santiago', superficie: '3.100 m²', anio: '2023' }),
+	lols('mak_sa.jpg', 'Edificio de fachada naranja y amarilla, obra LOLS', { nombre: 'Edificio comercial', tipo: 'Edificio comercial', comuna: 'Santiago', superficie: '980 m²', anio: '2022' }),
+	lols('zhu_am.jpg', 'Edificio comercial de ladrillo, obra LOLS', { nombre: 'Centro comercial', tipo: 'Edificio comercial', comuna: 'Santiago', superficie: '4.300 m²', anio: '2022' }),
+	lols('kolm_sa.jpg', 'Edificio de dos cuerpos color café, obra LOLS', { nombre: 'Edificio de oficinas', tipo: 'Edificio de oficinas', comuna: 'Santiago', superficie: '2.750 m²', anio: '2021' }),
+	lols('b_cam_esp.jpg', 'Edificio de fachada azul, obra LOLS', { nombre: 'Local comercial', tipo: 'Habilitación', comuna: 'Estación Central', superficie: '640 m²', anio: '2021' }),
 ];
+
+// Obras en construcción (reunión con don Luis): fotos de stock hasta tener las de Rodrigo.
+// Nombre, tipo, comuna, dirección y superficie son de EJEMPLO.
+export const obrasEnCurso = [
+	{
+		...unsplash('1508450859948-4e04fabaa4ea', 'Edificio de hormigón en obra gruesa'),
+		ejemplo: { nombre: 'Edificio Los Conquistadores', tipo: 'Edificio y oficinas', comuna: 'Providencia', direccion: 'Av. Ejemplo 1234', superficie: '6.800 m²', inicio: 'Marzo 2026' },
+	},
+	{
+		...unsplash('1649587345666-0f4ad68aa723', 'Estructura metálica de una nave de bodegas en montaje'),
+		ejemplo: { nombre: 'Centro de bodegas Lo Espejo', tipo: 'Centro de bodegas', comuna: 'Lo Espejo', direccion: 'Camino Ejemplo 850', superficie: '12.500 m²', inicio: 'Enero 2026' },
+	},
+	{
+		...unsplash('1644221150167-fb4fafa7f411', 'Edificio en construcción con grúa'),
+		ejemplo: { nombre: 'Oficinas Quilicura', tipo: 'Edificio de oficinas', comuna: 'Quilicura', direccion: 'Calle Ejemplo 455', superficie: '3.900 m²', inicio: 'Junio 2026' },
+	},
+] satisfies ImagenReferencial[];
+
+// Equipamiento propio (reunión con don Luis): fotos de stock hasta tener las reales.
+export const fotosEquipamiento = {
+	vehiculos: unsplash('1628464682320-6a9ae020cb2b', 'Camioneta blanca de doble cabina'),
+	maquinaria: unsplash('1777181693263-2a333f0f808d', 'Trabajadores operando una hormigonera en obra'),
+	seguridad: unsplash('1662309376159-b95fb193d96b', 'Cascos y chalecos reflectantes colgados en una pared'),
+};
 
 // Retratos de stock para la persona de contacto y el equipo (nombres de ejemplo).
 const retrato = (id: string, alt: string) => unsplash(id, alt, '&crop=faces');

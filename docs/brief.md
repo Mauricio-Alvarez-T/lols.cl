@@ -185,7 +185,7 @@ Todos los ⚠️ se resuelven con estas seis preguntas:
 3. ¿La dirección, el teléfono (+56 652 710 609) y el correo lols@lols.cl siguen vigentes?
 4. ¿Cuáles son los proyectos que quiere mostrar hoy? Idealmente de 6 a 12.
 5. ¿Cuál de estas referencias le gusta más: Tecsa, Ingevec o SalfaCorp?
-6. ¿Cuántos años exactos tiene la empresa, para actualizar el "más de 20 años"?
+6. ~~¿Cuántos años exactos tiene la empresa?~~ Respondida: nace en 1995 (docs/reunion-inicial.md).
 
 ## Orden sugerido de trabajo
 

@@ -2,27 +2,30 @@
 // Portada. Estructura tomada de las referencias (docs/brief.md § 3):
 //   frase grande sobre blanco (Heatherwick) → video de obra a todo el ancho (BESIX / Ingevec) →
 //   cifras (Skanska) → servicios por necesidad del cliente (Ramboll) →
-//   proyecto destacado desafío/solución/resultado (Arup) → grilla de proyectos (BIG) →
-//   clientes (Tecsa) → seguridad y calidad → cómo trabajamos → contacto con persona.
+//   proyecto destacado desafío/solución/resultado (Arup) → obras en construcción hoy y cartera
+//   contratada (reunión con don Luis) → equipamiento propio (reunión) → clientes (Tecsa) →
+//   seguridad y calidad → cómo trabajamos → contacto con persona.
 // Orden y secciones validados con 31 sitios del rubro: docs/investigacion-secciones.md.
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
 import Pendiente from '../components/Pendiente.astro';
 import TarjetaProyecto from '../components/TarjetaProyecto.astro';
 import Contacto from '../components/Contacto.astro';
-import { empresa, necesidades, necesidadesRevisar, servicioPorSlug } from '../data/empresa';
-import { proyectos } from '../data/proyectos';
+import { empresa, necesidades, necesidadesRevisar, servicioPorSlug, aniosTrayectoria, fundacion } from '../data/empresa';
+import { proyectosPorEstado } from '../data/proyectos';
+import Equipamiento from '../components/Equipamiento.astro';
 import Referencial from '../components/Referencial.astro';
-import { destacado, obras2018, logosEjemplo, videos } from '../data/referencia';
+import { destacado, obrasEnCurso, logosEjemplo, videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
 import BloqueSeguridad from '../components/BloqueSeguridad.astro';
 import Proceso from '../components/Proceso.astro';
-import { ejemploBajadaHero } from '../data/ejemplos';
+import { ejemploBajadaHero, ejemplosContratados } from '../data/ejemplos';
 
-const recientes = proyectos.slice(0, 3);
-// Los valores son de ejemplo (modo propuesta) hasta tener los reales.
+const enObra = proyectosPorEstado('en-curso').slice(0, 3);
+const contratados = proyectosPorEstado('contratado');
+// Años: dato real (fundación 1995). El resto es de ejemplo hasta tener los reales.
 const cifras = [
-	{ etiqueta: 'años de trayectoria', pendiente: 'años exactos', ejemplo: '25+' },
+	{ etiqueta: `años de trayectoria, desde ${fundacion}`, valor: String(aniosTrayectoria) },
 	{ etiqueta: 'obras ejecutadas', pendiente: 'n.º de obras', ejemplo: '150+' },
 	{ etiqueta: 'm² construidos', pendiente: 'm²', ejemplo: '80.000' },
 	{ etiqueta: 'personas en el equipo', pendiente: 'dotación', ejemplo: '60' },
@@ -43,9 +46,7 @@ const cifras = [
 		{
 			cifras.map((c) => (
 				<div>
-					<p class="numero">
-						<Pendiente texto={c.pendiente}>{c.ejemplo}</Pendiente>
-					</p>
+					<p class="numero">{c.valor ?? <Pendiente texto={c.pendiente}>{c.ejemplo}</Pendiente>}</p>
 					<p>{c.etiqueta}</p>
 				</div>
 			))
@@ -111,16 +112,31 @@ const cifras = [
 	<section class="seccion">
 		<div class="contenedor">
 			<div class="cabecera">
-				<h2>Obras recientes</h2>
-				<a href="/proyectos/" class="enlace-flecha">Todos los proyectos</a>
+				<h2>En obra ahora</h2>
+				<a href="/proyectos/#en-construccion" class="enlace-flecha">Todos los proyectos</a>
 			</div>
 			<div class="grilla-proyectos">
 				{
-					recientes.length
-						? recientes.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)
-						: obras2018.slice(0, 3).map((f, i) => <TarjetaProyecto referencia={f} lamina={i + 1} destacada={i === 0} />)
+					enObra.length
+						? enObra.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)
+						: obrasEnCurso.map((f, i) => <TarjetaProyecto referencia={f} estado="en-curso" lamina={i + 1} destacada={i === 0} />)
 				}
 			</div>
+			<a href="/proyectos/#contratados" class="cartera">
+				<span class="cartera-n">
+					{contratados.length || <Pendiente texto="n.º de obras contratadas">{ejemplosContratados.length}</Pendiente>}
+				</span>
+				<span class="cartera-texto">
+					obras contratadas que parten en los próximos meses
+					<span class="enlace-flecha">Ver la cartera</span>
+				</span>
+			</a>
+		</div>
+	</section>
+
+	<section class="seccion gris">
+		<div class="contenedor">
+			<Equipamiento compacto />
 		</div>
 	</section>
 
@@ -280,6 +296,38 @@ const cifras = [
 	}
 	.grilla-proyectos > :global(.destacada) {
 		grid-row: span 2;
+	}
+
+	/* Cartera contratada: una línea que muestra continuidad, con su número grande. */
+	.cartera {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		margin-top: clamp(2rem, 4vw, 3rem);
+		padding-block: 1.25rem;
+		border-block: 1px solid var(--lols-carbon);
+		color: var(--lols-carbon);
+		text-decoration: none;
+	}
+	.cartera-n {
+		font-family: var(--fuente-titulos);
+		font-size: clamp(2.5rem, 5vw, 3.75rem);
+		font-weight: 700;
+		letter-spacing: -0.04em;
+		line-height: 1;
+		font-variant-numeric: tabular-nums;
+	}
+	.cartera-texto {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.25rem 1.25rem;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(1.1rem, 2vw, 1.35rem);
+		font-weight: 600;
+	}
+	.cartera-texto .enlace-flecha {
+		font-size: 1rem;
 	}
 
 	.clientes-titulo {

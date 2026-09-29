@@ -106,6 +106,8 @@ $empresa = unaLinea(campo('empresa', 120));
 $correo = unaLinea(campo('correo', 160));
 $telefono = unaLinea(campo('telefono', 40));
 $servicio = campo('servicio', 40);
+$direccion = unaLinea(campo('direccion', 200));
+$superficie = unaLinea(campo('superficie', 40));
 $mensaje = campo('mensaje', 5000);
 $consiente = ($_POST['consentimiento'] ?? '') === 'si';
 
@@ -156,9 +158,12 @@ $cuerpo = implode("\n", [
     'Empresa:   ' . ($empresa ?: '—'),
     'Correo:    ' . $correo,
     'Teléfono:  ' . ($telefono ?: '—'),
-    'Servicio:  ' . $servicioTexto,
     '',
-    'Mensaje:',
+    'Servicio:    ' . $servicioTexto,
+    'Dirección:   ' . ($direccion ?: '—'),
+    'Superficie:  ' . ($superficie !== '' ? $superficie . ' m² (aprox.)' : '—'),
+    '',
+    'Proyecto:',
     $mensaje,
     '',
     '—',

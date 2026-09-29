@@ -26,18 +26,33 @@ import { servicios } from '../data/empresa';
 			<input id="f-telefono" name="telefono" type="tel" autocomplete="tel" maxlength="40" />
 		</label>
 	</div>
-	<label for="f-servicio">
-		<span>Servicio</span>
-		<select id="f-servicio" name="servicio">
-			<option value="">Seleccione…</option>
-			{servicios.map((s) => <option value={s.slug}>{s.nombre}</option>)}
-			<option value="otro">Otro</option>
-		</select>
-	</label>
-	<label for="f-mensaje">
-		<span>Mensaje <abbr title="obligatorio">*</abbr></span>
-		<textarea id="f-mensaje" name="mensaje" rows="6" maxlength="5000" required placeholder="Cuéntenos qué necesita: tipo de obra, ubicación, plazos…"></textarea>
-	</label>
+	<!-- Su proyecto (reunión con don Luis): con dirección y m² ya se puede estimar el alcance
+	     y preparar la visita técnica sin una llamada previa. -->
+	<fieldset class="proyecto">
+		<legend>Su proyecto</legend>
+		<label for="f-servicio">
+			<span>Servicio</span>
+			<select id="f-servicio" name="servicio">
+				<option value="">Seleccione…</option>
+				{servicios.map((s) => <option value={s.slug}>{s.nombre}</option>)}
+				<option value="otro">Otro</option>
+			</select>
+		</label>
+		<div class="fila">
+			<label for="f-direccion">
+				<span>Dirección de la propiedad</span>
+				<input id="f-direccion" name="direccion" type="text" autocomplete="street-address" maxlength="200" placeholder="Calle, número y comuna" />
+			</label>
+			<label for="f-superficie">
+				<span>Superficie aproximada (m²)</span>
+				<input id="f-superficie" name="superficie" type="text" inputmode="decimal" maxlength="40" placeholder="Ej.: 1.500" />
+			</label>
+		</div>
+		<label for="f-mensaje">
+			<span>Cuéntenos su proyecto <abbr title="obligatorio">*</abbr></span>
+			<textarea id="f-mensaje" name="mensaje" rows="6" maxlength="5000" required placeholder="A grandes rasgos: qué quiere construir, instalar o mantener, para cuándo y en qué etapa está (terreno, permisos, diseño…)."></textarea>
+		</label>
+	</fieldset>
 
 	<!-- Trampa para bots: oculto a las personas y a los lectores de pantalla. -->
 	<div class="trampa" aria-hidden="true">
@@ -67,7 +82,7 @@ import { servicios } from '../data/empresa';
 
 	const mensajes: Record<string, string> = {
 		enviado: 'Gracias. Recibimos su solicitud y le responderemos a la brevedad.',
-		datos: 'Revise los campos marcados: nombre, un correo válido y el mensaje son obligatorios.',
+		datos: 'Revise los campos marcados: nombre, un correo válido y la descripción del proyecto son obligatorios.',
 		consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
 		limite: 'Recibimos varias solicitudes desde su conexión. Intente de nuevo en una hora.',
 		'no-configurado': 'El formulario aún no está habilitado. Escríbanos directamente por correo.',
@@ -136,6 +151,25 @@ import { servicios } from '../data/empresa';
 	label {
 		display: grid;
 		gap: 0.4rem;
+	}
+	.proyecto {
+		display: grid;
+		gap: 1.25rem;
+		margin: 0.5rem 0 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+	/* La leyenda lleva la línea de arriba (el borde del fieldset la cortaría). */
+	.proyecto legend {
+		width: 100%;
+		margin-bottom: 1.25rem;
+		padding: 1.25rem 0 0;
+		border-top: 1px solid var(--lols-carbon);
+		font-family: var(--fuente-titulos);
+		font-size: 1.25rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
 	}
 	label > span {
 		font-family: var(--fuente-titulos);

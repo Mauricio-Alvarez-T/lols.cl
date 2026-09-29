@@ -48,11 +48,14 @@ export const ejemplosServicio: Record<
 
 export const ejemploProyecto = {
 	nombre: 'Edificio comercial Esquina',
+	tipo: 'Edificio y oficinas',
+	direccion: 'Av. Ejemplo 1234',
+	inicio: 'Marzo 2017',
 	titular: 'Cinco pisos de comercio y oficinas en una esquina de alto tránsito',
 	mandante: 'Inmobiliaria Ejemplo',
 	comuna: 'Santiago',
 	anio: '2018',
-	magnitud: '3.200 m²',
+	superficie: '3.200 m²',
 	estado: 'Terminado',
 	desafio: 'Construir en una esquina con comercio funcionando, veredas angostas y horarios de carga restringidos.',
 	solucion: 'Obra gruesa, terminaciones e instalaciones con un solo equipo, planificadas por etapas para no cortar el tránsito peatonal.',
@@ -62,9 +65,10 @@ export const ejemploProyecto = {
 
 export const ejemplosEmpresa = {
 	hitos: [
-		{ anio: '1998', texto: 'Nace LOLS Ingeniería' },
-		{ anio: '2006', texto: 'Primeras obras industriales' },
-		{ anio: '2014', texto: 'Se suman montaje, electricidad y datos' },
+		// El primero (1995, fundación) es real y se toma de empresa.ts; estos son de ejemplo.
+		{ anio: '2003', texto: 'Primeras obras industriales y de bodegaje' },
+		{ anio: '2010', texto: 'Se suman montaje, electricidad y datos' },
+		{ anio: '2018', texto: 'Equipamiento propio: vehículos, alzaprimas y hormigoneras' },
 		{ anio: '2026', texto: 'Seis especialidades, un solo responsable' },
 	],
 	valores: {
@@ -143,4 +147,19 @@ export const ejemplosTrabaja = {
 export const ejemplosProveedores = {
 	bajada: 'Trabajamos con proveedores de materiales, equipos y servicios que cumplan plazos y estándares de seguridad.',
 	requisitos: ['Inicio de actividades y documentación tributaria al día', 'Certificado de la mutualidad (si presta servicios en obra)', 'Catálogo o lista de precios', 'Referencias de clientes'],
+};
+
+
+// Obras contratadas que aún no parten (reunión con don Luis: mostrar los proyectos futuros).
+export const ejemplosContratados = [
+	{ nombre: 'Bodegas Pudahuel Norte', tipo: 'Centro de bodegas', comuna: 'Pudahuel', superficie: '18.000 m²', inicio: 'Enero 2027' },
+	{ nombre: 'Edificio corporativo San Miguel', tipo: 'Edificio y oficinas', comuna: 'San Miguel', superficie: '5.400 m²', inicio: 'Marzo 2027' },
+	{ nombre: 'Planta de distribución Maipú', tipo: 'Industrial', comuna: 'Maipú', superficie: '9.200 m²', inicio: 'Segundo semestre 2027' },
+];
+
+// Cantidades del equipamiento propio (solo de muestra).
+export const ejemplosEquipamiento: Record<string, string> = {
+	vehiculos: '8 camionetas y 3 camiones',
+	maquinaria: 'Más de 600 alzaprimas, gatas y hormigoneras',
+	seguridad: 'EPP para todo el equipo, renovado en cada faena',
 };

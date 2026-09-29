@@ -15,7 +15,7 @@ referencia de docs/brief.md § 3.
 | Página | Secciones | Referencias |
 |---|---|---|
 | Portada | frase grande → banda de video/foto → 4 cifras → servicios por necesidad → proyecto destacado (desafío/solución/resultado) → 3 proyectos → logos de clientes → contacto con persona | Heatherwick, BESIX, Ingevec, Skanska, Ramboll, Arup, BIG, Tecsa, Mott MacDonald |
-| Proyectos | grilla de campos fijos (foto, nombre, servicio, comuna, año) + filtro por servicio y estado (`?servicio=`, `?estado=`) | BIG, SalfaCorp, Ingevec |
+| Proyectos | tres bloques según la reunión con don Luis (docs/reunion-inicial.md): en construcción (tipo, superficie, comuna, dirección), contratados (tabla) y terminados; tarjetas con campos fijos (BIG) | BIG, SalfaCorp, Ingevec, reunión |
 | Ficha de proyecto | titular con el resultado → recuadro de datos (mandante, ubicación, año, magnitud, servicios, estado) → foto → desafío / solución / resultado + una cifra → galería → otros proyectos | Mott MacDonald, Heatherwick, Arup, BIG |
 | Servicios | agrupados por necesidad (Construir / Instalar / Mantener, **propuesta a confirmar**), cada uno con el problema que resuelve | Ramboll, Arup |
 | Servicio | problema como titular → foto → qué hacemos / para quién → proyectos del servicio → contacto | Arup, Ramboll |

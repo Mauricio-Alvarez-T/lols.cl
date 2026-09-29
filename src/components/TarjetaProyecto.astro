@@ -1,46 +1,63 @@
 ---
 // Tarjeta de proyecto: foto + nombre + rótulo de lámina con los mismos campos en todas
-// (patrón BIG + convención del cuadro de rótulo de un plano). `destacada` la agranda para dar
-// jerarquía en la grilla. Al hacer clic, su foto viaja a la portada de la ficha (view transition).
+// (patrón BIG + convención del cuadro de rótulo de un plano). Campos según la reunión con
+// don Luis: tipo de obra, superficie, comuna y, en las obras en construcción, la dirección y
+// desde cuándo. `destacada` la agranda para dar jerarquía en la grilla. Al hacer clic, su
+// foto viaja a la portada de la ficha (view transition).
 import Pendiente from './Pendiente.astro';
-import { servicioPorSlug } from '../data/empresa';
-import { plantilla, type Proyecto } from '../data/proyectos';
+import { plantilla, estados, type Estado, type Proyecto } from '../data/proyectos';
 import type { ImagenReferencial } from '../data/referencia';
 import Referencial from './Referencial.astro';
 
 interface Props {
 	proyecto?: Proyecto; // sin proyecto = tarjeta de muestra
 	referencia?: ImagenReferencial; // foto y datos de ejemplo para la tarjeta de muestra
+	estado?: Estado; // estado de la tarjeta de muestra (las reales lo traen en el proyecto)
 	lamina?: number; // número correlativo en la grilla
 	destacada?: boolean;
 }
 const { proyecto, referencia, lamina, destacada = false } = Astro.props;
+const estado = proyecto?.estado ?? Astro.props.estado ?? 'terminado';
+const enObra = estado === 'en-curso';
 const foto = proyecto?.fotos[0];
-const servicio = proyecto?.servicios[0] ? servicioPorSlug(proyecto.servicios[0]).nombre : null;
 // Las tarjetas de muestra llevan a la ficha de ejemplo mientras no haya proyectos reales.
 const href = `/proyectos/${proyecto?.slug ?? plantilla.slug}/`;
 const ej = referencia?.ejemplo;
 const numero = lamina ? `L-${String(lamina).padStart(2, '0')}` : null;
+// Última celda: en una obra terminada importa el año; en una en construcción, desde cuándo.
+const fecha = enObra
+	? { titulo: 'Inicio', valor: proyecto?.inicio, pendiente: 'mes y año de inicio', ejemplo: ej?.inicio }
+	: { titulo: 'Año', valor: proyecto?.anio, pendiente: 'año de término', ejemplo: ej?.anio };
 ---
 
-<article class:list={['tarjeta', { destacada }]} data-servicios={proyecto?.servicios.join(' ')} data-estado={proyecto?.estado}>
+<article class:list={['tarjeta', { destacada, 'en-obra': enObra }]} data-estado={estado}>
 	<a href={href} class="vinculo">
 		<div class="foto marco">
 			{foto ? <img src={foto.src} alt={foto.alt} loading="lazy" /> : referencia ? <Referencial imagen={referencia} /> : <Pendiente bloque texto="foto" />}
+			{enObra && <span class="sello">{estados['en-curso']}</span>}
 		</div>
 		<h3>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto">{ej?.nombre}</Pendiente>}</h3>
+		<p class="ubicacion">
+			{proyecto?.comuna ?? <Pendiente texto="comuna">{ej?.comuna}</Pendiente>}
+			{enObra && (
+				<>
+					{' · '}
+					{proyecto?.direccion ?? <Pendiente texto="dirección (confirmar si se puede publicar)">{ej?.direccion}</Pendiente>}
+				</>
+			)}
+		</p>
 		<dl class="rotulo">
 			<div>
-				<dt>Servicio</dt>
-				<dd>{servicio ?? <Pendiente texto="servicio">{ej?.servicio}</Pendiente>}</dd>
+				<dt>Tipo</dt>
+				<dd>{proyecto?.tipo ?? <Pendiente texto="tipo de obra">{ej?.tipo}</Pendiente>}</dd>
 			</div>
 			<div>
-				<dt>Comuna</dt>
-				<dd>{proyecto?.comuna ?? <Pendiente texto="comuna">{ej?.comuna}</Pendiente>}</dd>
+				<dt>Superficie</dt>
+				<dd>{proyecto?.superficie ?? <Pendiente texto="m² construidos">{ej?.superficie}</Pendiente>}</dd>
 			</div>
 			<div>
-				<dt>Año</dt>
-				<dd>{proyecto?.anio ?? <Pendiente texto="año">{ej?.anio}</Pendiente>}</dd>
+				<dt>{fecha.titulo}</dt>
+				<dd>{fecha.valor ?? <Pendiente texto={fecha.pendiente}>{fecha.ejemplo}</Pendiente>}</dd>
 			</div>
 			{
 				numero && (
@@ -89,7 +106,7 @@ const numero = lamina ? `L-${String(lamina).padStart(2, '0')}` : null;
 		transform: scale(1.03);
 	}
 	h3 {
-		margin-bottom: 0.75rem;
+		margin-bottom: 0.25rem;
 		background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
 		width: fit-content;
 		transition: background-size 0.25s var(--suave);
@@ -97,6 +114,37 @@ const numero = lamina ? `L-${String(lamina).padStart(2, '0')}` : null;
 	.vinculo:hover h3 {
 		color: var(--lols-verde-oscuro);
 		background-size: 100% 2px;
+	}
+	.ubicacion {
+		margin: 0 0 0.75rem;
+		color: var(--gris-medio);
+		font-size: 0.95rem;
+	}
+	/* Sello "En construcción" sobre la foto: punto verde + texto, como el rótulo de estado de
+	   una lámina vigente. */
+	.foto {
+		position: relative;
+	}
+	.sello {
+		grid-area: 1 / 1;
+		align-self: start;
+		justify-self: start;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		margin: 0.75rem;
+		padding: 0.3rem 0.65rem 0.3rem 0.55rem;
+		background: var(--lols-blanco);
+		color: var(--lols-carbon);
+		font: 600 0.8rem/1.2 var(--fuente-datos);
+		z-index: 1;
+	}
+	.sello::before {
+		content: '';
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: var(--lols-verde);
 	}
 	.destacada h3 {
 		font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2rem);

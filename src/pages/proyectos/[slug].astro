@@ -38,11 +38,19 @@ const relato = [
 		<p class="nombre">{p.nombre ?? <Pendiente texto="nombre del proyecto">{ej.nombre}</Pendiente>}</p>
 		<h1>{p.titular ?? <Pendiente texto="el resultado en una frase (no el nombre de la obra)">{ej.titular}</Pendiente>}</h1>
 		<dl class="datos">
+			<div><dt>Tipo de obra</dt><dd>{p.tipo ?? <Pendiente texto="tipo de obra">{ej.tipo}</Pendiente>}</dd></div>
 			<div><dt>Mandante</dt><dd>{p.mandante ?? <Pendiente texto="mandante">{ej.mandante}</Pendiente>}</dd></div>
-			<div><dt>Ubicación</dt><dd>{p.comuna ?? <Pendiente texto="comuna">{ej.comuna}</Pendiente>}</dd></div>
-			<div><dt>Año</dt><dd>{p.anio ?? <Pendiente texto="año">{ej.anio}</Pendiente>}</dd></div>
-			<div><dt>Magnitud</dt><dd>{p.magnitud ?? <Pendiente texto="m² o plazo">{ej.magnitud}</Pendiente>}</dd></div>
-			<div><dt>Plazo</dt><dd><Pendiente texto="plazo de ejecución">{ejemploFichaExtra.plazo}</Pendiente></dd></div>
+			<div><dt>Comuna</dt><dd>{p.comuna ?? <Pendiente texto="comuna">{ej.comuna}</Pendiente>}</dd></div>
+			<div><dt>Dirección</dt><dd>{p.direccion ?? <Pendiente texto="dirección (confirmar si se puede publicar)">{ej.direccion}</Pendiente>}</dd></div>
+			<div><dt>Superficie construida</dt><dd>{p.superficie ?? <Pendiente texto="m² construidos">{ej.superficie}</Pendiente>}</dd></div>
+			{
+				p.estado === 'terminado' || (esEjemplo && !p.estado) ? (
+					<div><dt>Año de término</dt><dd>{p.anio ?? <Pendiente texto="año">{ej.anio}</Pendiente>}</dd></div>
+				) : (
+					<div><dt>{p.estado === 'contratado' ? 'Inicio previsto' : 'Inicio'}</dt><dd>{p.inicio ?? <Pendiente texto="mes y año de inicio">{ej.inicio}</Pendiente>}</dd></div>
+				)
+			}
+			<div><dt>Plazo</dt><dd>{p.plazo ?? <Pendiente texto="plazo de ejecución">{ejemploFichaExtra.plazo}</Pendiente>}</dd></div>
 			<div><dt>Rol de LOLS</dt><dd><Pendiente texto="contratista principal o subcontrato">{ejemploFichaExtra.rol}</Pendiente></dd></div>
 			<div><dt>Servicios</dt><dd>{p.servicios.map((s) => servicioPorSlug(s).nombre).join(', ')}</dd></div>
 			<div><dt>Estado</dt><dd>{p.estado ? estados[p.estado] : <Pendiente texto="estado">{ej.estado}</Pendiente>}</dd></div>
@@ -84,6 +92,15 @@ const relato = [
 			</figure>
 		</Pendiente>
 	</section>
+
+	{
+		p.video && (
+			<section class="seccion contenedor">
+				<h2 class="subtitulo">La obra en video</h2>
+				<video class="video-obra" src={p.video.src} poster={p.video.poster} controls playsinline preload="none" />
+			</section>
+		)
+	}
 
 	{
 		esEjemplo && (
@@ -208,8 +225,13 @@ const relato = [
 		letter-spacing: -0.02em;
 		margin-bottom: 1.25rem;
 	}
-	.contenedor :global(.timelapse) {
+	.contenedor :global(.timelapse),
+	.video-obra {
 		aspect-ratio: 16 / 9;
+	}
+	.video-obra {
+		width: 100%;
+		background: #000;
 	}
 	.galeria {
 		display: grid;

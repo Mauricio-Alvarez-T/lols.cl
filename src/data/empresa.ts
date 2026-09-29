@@ -13,6 +13,20 @@ export const empresa = {
 	whatsapp: null as string | null,
 };
 
+// Año de fundación (reunión con don Luis, 2026). Los años de trayectoria se calculan al
+// construir el sitio, así que se actualizan solos cada año con el siguiente deploy.
+export const fundacion = 1995;
+export const aniosTrayectoria = new Date().getFullYear() - fundacion;
+
+// Equipamiento propio (reunión con don Luis): LOLS no depende de arriendos para operar.
+// Categorías e ítems tal como se nombraron en la reunión (la lista seguía con "etc.");
+// faltan la lista completa, cantidades y fotos reales.
+export const equipamiento = [
+	{ clave: 'vehiculos', titulo: 'Vehículos', items: ['Camionetas', 'Camiones'] },
+	{ clave: 'maquinaria', titulo: 'Maquinaria', items: ['Alzaprimas', 'Gatas', 'Hormigoneras'] },
+	{ clave: 'seguridad', titulo: 'Seguridad', items: ['Elementos de protección personal (EPP)', 'Equipos de seguridad para faena'] },
+] as const;
+
 export const telefonoHref = (t: string) => 'tel:' + t.replace(/[^\d+]/g, '');
 
 export const whatsappHref = (mensaje = 'Hola, quisiera cotizar un proyecto con LOLS Ingeniería.') =>

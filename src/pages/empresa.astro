@@ -1,10 +1,12 @@
 ---
-// Empresa: propósito en grande (Heatherwick), línea de tiempo (Tecsa / Ingevec), valores,
-// seguridad y equipo con nombre (Mott MacDonald).
+// Empresa: propósito en grande (Heatherwick), línea de tiempo desde 1995 (Tecsa / Ingevec;
+// pedida en la reunión con don Luis), valores, equipamiento propio (reunión), seguridad y
+// equipo con nombre (Mott MacDonald).
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import Contacto from '../components/Contacto.astro';
-import { empresa, valores } from '../data/empresa';
+import { empresa, valores, fundacion, aniosTrayectoria } from '../data/empresa';
+import Equipamiento from '../components/Equipamiento.astro';
 import Referencial from '../components/Referencial.astro';
 import { bandas, retratos } from '../data/referencia';
 import { ejemplosEmpresa as ej } from '../data/ejemplos';
@@ -15,7 +17,7 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 		<p class="etiqueta">Empresa</p>
 		<h1>{empresa.directrices}</h1>
 		<p class="bajada">
-			<Pendiente revisar="recalcular: el texto es de 2018">Más de 20 años de experiencia</Pendiente> en el área de construcción,
+			{aniosTrayectoria} años de experiencia en el área de construcción,
 			con compromiso por las normas de seguridad y el respeto por el medio ambiente.
 		</p>
 	</header>
@@ -27,6 +29,10 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 	<section class="seccion contenedor">
 		<div class="cabecera"><h2>Nuestra trayectoria</h2></div>
 		<ol class="linea">
+			<li>
+				<p class="anio">{fundacion}</p>
+				<p>Nace LOLS Ingeniería</p>
+			</li>
 			{
 				ej.hitos.map((h) => (
 					<li>
@@ -56,13 +62,19 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 		</div>
 	</section>
 
-	<section class="seccion contenedor dos">
+	<section id="equipamiento" class="seccion contenedor ancla">
+		<Equipamiento />
+	</section>
+
+	<section class="seccion gris">
+		<div class="contenedor dos">
 		<div>
 			<h2>Compromiso con las normas de seguridad y el medio ambiente</h2>
 		</div>
 		<Pendiente bloque texto="políticas, certificaciones, mutualidad e indicadores de seguridad">
 			<ul class="lista">{ej.seguridad.map((x) => <li>{x}</li>)}</ul>
 		</Pendiente>
+		</div>
 	</section>
 
 	<section class="seccion contenedor">
@@ -93,12 +105,15 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 		aspect-ratio: 21 / 8;
 		background: #2a2a2a;
 	}
+	.ancla {
+		scroll-margin-top: 5rem;
+	}
 	.linea {
 		list-style: none;
 		margin: 0;
 		padding: 0;
 		display: grid;
-		grid-template-columns: repeat(4, 1fr);
+		grid-template-columns: repeat(5, minmax(0, 1fr));
 		gap: 1.5rem;
 	}
 	.linea li {
