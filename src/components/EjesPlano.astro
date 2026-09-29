@@ -1,0 +1,47 @@
+---
+// Rótulos de ejes para las secciones con grilla de plano (.plano en global.css): letras en
+// los ejes verticales (cada 25 % del ancho) y números en los horizontales (cada 12rem), como
+// en un plano de estructuras. Decorativo para lectores de pantalla.
+interface Props {
+	filas?: number;
+}
+const { filas = 4 } = Astro.props;
+const columnas = ['A', 'B', 'C', 'D'];
+---
+
+<div class="ejes" aria-hidden="true">
+	{columnas.map((c, i) => <span class="col" style={`left: calc(${i * 25}% + 6px)`}>{c}</span>)}
+	{Array.from({ length: filas }, (_, i) => <span class="fila" style={`top: calc(${i * 12}rem + 6px)`}>{i + 1}</span>)}
+</div>
+
+<style>
+	.ejes {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		overflow: hidden;
+		pointer-events: none;
+		font-family: var(--fuente-datos);
+		font-size: 0.72rem;
+		font-weight: 500;
+		color: rgb(255 255 255 / 0.28);
+	}
+	span {
+		position: absolute;
+		line-height: 1;
+	}
+	.col {
+		top: 6px;
+	}
+	.fila {
+		left: 6px;
+	}
+	.fila:first-of-type {
+		display: none; /* el 1 chocaría con la A en la esquina */
+	}
+	@media (max-width: 640px) {
+		.ejes {
+			display: none;
+		}
+	}
+</style>

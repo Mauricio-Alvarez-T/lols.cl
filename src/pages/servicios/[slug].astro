@@ -55,7 +55,7 @@ const ej = ejemplosServicio[s.slug];
 			<a href={`/proyectos/?servicio=${s.slug}`} class="enlace-flecha">Proyectos de {s.nombre.toLowerCase()}</a>
 		</div>
 		<div class="grilla">
-			{relacionados.length ? relacionados.map((p) => <TarjetaProyecto proyecto={p} />) : obras2018.slice(0, 3).map((f) => <TarjetaProyecto referencia={f} />)}
+			{relacionados.length ? relacionados.map((p) => <TarjetaProyecto proyecto={p} />) : obras2018.slice(0, 3).map((f, i) => <TarjetaProyecto referencia={f} lamina={i + 1} />)}
 		</div>
 	</section>
 

@@ -23,7 +23,6 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 	<VideoFondo video={videos.seguridad} clase="banda" eager />
 
 	<section class="seccion contenedor">
-		<p class="etiqueta">Indicadores</p>
 		<div class="cabecera"><h2>Nuestro desempeño en seguridad</h2></div>
 		<div class="indicadores">
 			{
@@ -42,7 +41,6 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 
 	<section class="seccion gris">
 		<div class="contenedor">
-			<p class="etiqueta">Certificaciones</p>
 			<div class="cabecera"><h2>Sistemas de gestión certificados</h2></div>
 			<ul class="certificaciones">
 				{
@@ -65,14 +63,12 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 
 	<section class="seccion contenedor dos">
 		<div>
-			<p class="etiqueta">Registros</p>
 			<h2>Inscritos donde nos buscan</h2>
 			<Pendiente bloque texto="registros de contratistas y mutualidad reales">
 				<ul class="lista">{ej.registros.map((r) => <li>{r}</li>)}</ul>
 			</Pendiente>
 		</div>
 		<div>
-			<p class="etiqueta">Prevención</p>
 			<h2>Cómo cuidamos cada obra</h2>
 			<Pendiente bloque texto="programa de prevención real">
 				<ul class="lista">{ej.programa.map((x) => <li>{x}</li>)}</ul>

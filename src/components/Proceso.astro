@@ -12,7 +12,6 @@ const { titulo = 'Cómo trabajamos', compacto = false } = Astro.props;
 ---
 
 <div class:list={['proceso', { compacto }]}>
-	{!compacto && <p class="etiqueta">Proceso</p>}
 	<h2>{titulo}</h2>
 	<ol class="pasos">
 		{

@@ -44,8 +44,9 @@ const ruta = Astro.url.pathname;
 		position: sticky;
 		top: 0;
 		z-index: 10;
-		background: var(--lols-blanco);
-		border-bottom: 1px solid #e2e2e2;
+		view-transition-name: encabezado;
+		background: var(--fondo);
+		border-bottom: 1px solid var(--linea);
 	}
 	.fila {
 		display: flex;
@@ -157,8 +158,8 @@ const ruta = Astro.url.pathname;
 			align-items: stretch;
 			gap: 1rem;
 			padding: 1rem var(--gutter) 1.5rem;
-			background: var(--lols-blanco);
-			border-bottom: 1px solid #e2e2e2;
+			background: var(--fondo);
+			border-bottom: 1px solid var(--linea);
 			box-shadow: 0 12px 24px rgb(0 0 0 / 0.08);
 		}
 		.menu-boton[aria-expanded='true'] + nav {

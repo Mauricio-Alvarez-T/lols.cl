@@ -1,89 +1,133 @@
 ---
-// Pie mínimo (patrón Heatherwick): marca, datos de contacto y lo legal.
+// Pie como sección diseñada (tendencia 2026: METRIC y Haven premiados por su pie): datos de
+// contacto en columnas, rutas del sitio y de otros públicos, certificaciones, datos legales
+// y la marca en grande al cierre. La frase de cierre la pone el bloque Contacto, justo antes.
 import Logo from './Logo.astro';
 import Pendiente from './Pendiente.astro';
-import { empresa, navegacion, otrosPublicos, telefonoHref } from '../data/empresa';
+import { empresa, navegacion, otrosPublicos, telefonoHref, whatsappHref } from '../data/empresa';
+import { ejemplosSeguridad } from '../data/ejemplos';
 
 const anio = new Date().getFullYear();
 ---
 
 <footer class="pie">
-	<div class="contenedor fila">
-		<a href="/" class="marca" aria-label="LOLS Ingeniería, inicio"><Logo class="logo" /></a>
-		<nav aria-label="Pie de página">
+	<div class="contenedor columnas">
+		<div>
+			<h2>Contacto</h2>
+			<address>
+				<p><Pendiente revisar={empresa.direccion.revisar}>{empresa.direccion.valor}</Pendiente></p>
+				<p>
+					<Pendiente revisar={empresa.telefono.revisar}>
+						<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
+					</Pendiente>
+				</p>
+				<p>
+					<Pendiente revisar={empresa.correo.revisar}>
+						<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
+					</Pendiente>
+				</p>
+				<p><a href={whatsappHref()} target="_blank" rel="noopener">WhatsApp</a></p>
+			</address>
+		</div>
+		<nav aria-label="Sitio">
+			<h2>Sitio</h2>
 			<ul>
 				{navegacion.map((n) => <li><a href={n.href}>{n.texto}</a></li>)}
 			</ul>
-			<ul class="secundario">
+		</nav>
+		<nav aria-label="Otros públicos">
+			<h2>También</h2>
+			<ul>
 				{otrosPublicos.map((n) => <li><a href={n.href}>{n.texto}</a></li>)}
+				<li><a href="/privacidad/">Política de privacidad</a></li>
 			</ul>
 		</nav>
-		<address>
-			<Pendiente revisar={empresa.direccion.revisar}>{empresa.direccion.valor}</Pendiente><br />
-			<Pendiente revisar={empresa.telefono.revisar}>
-				<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
-			</Pendiente>
-			·
-			<Pendiente revisar={empresa.correo.revisar}>
-				<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
-			</Pendiente>
-		</address>
+		<div>
+			<h2>Certificaciones</h2>
+			<ul class="sellos">
+				{
+					ejemplosSeguridad.certificaciones.map((c) => (
+						<li>
+							<Pendiente texto="certificación vigente (confirmar)">{c.nombre}</Pendiente>
+						</li>
+					))
+				}
+			</ul>
+		</div>
 	</div>
+
+	<div class="contenedor marca" aria-hidden="true">
+		<Logo class="logo-grande" />
+	</div>
+
 	<div class="contenedor legal">
 		<p>© {anio} {empresa.razonSocial}</p>
-		<a href="/privacidad/">Política de privacidad</a>
+		<p><Pendiente texto="RUT de la empresa">RUT 76.000.000-0</Pendiente></p>
 	</div>
 </footer>
 
 <style>
 	.pie {
-		border-top: 1px solid var(--linea);
+		border-top: 1px solid var(--lols-carbon);
 		font-size: 0.95rem;
 	}
-	.fila {
+	.columnas {
 		display: grid;
-		grid-template-columns: auto 1fr auto;
-		align-items: start;
+		grid-template-columns: 1.4fr 1fr 1fr 1fr;
 		gap: 2.5rem;
-		padding-block: 3rem;
+		padding-block: clamp(3rem, 6vw, 4.5rem) 2.5rem;
 	}
-	.marca {
-		color: var(--lols-verde);
+	h2 {
+		margin-bottom: 1rem;
+		font-family: var(--fuente-datos);
+		font-size: 0.85rem;
+		font-weight: 600;
+		letter-spacing: 0;
+		color: var(--gris-medio);
 	}
-	.marca :global(.logo) {
-		width: 8rem;
-		height: auto;
+	address {
+		font-style: normal;
+	}
+	address p {
+		margin: 0 0 0.4rem;
 	}
 	ul {
 		list-style: none;
 		margin: 0;
 		padding: 0;
+		display: grid;
+		gap: 0.45rem;
+	}
+	a {
+		color: var(--lols-carbon);
+		text-decoration: none;
+		background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+		transition: background-size 0.25s var(--suave);
+	}
+	a:hover {
+		color: var(--lols-verde-oscuro);
+		background-size: 100% 1px;
+	}
+	.sellos {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.5rem 2rem;
+		gap: 0.4rem;
 	}
-	nav a {
-		color: var(--lols-carbon);
-		font-family: var(--fuente-titulos);
+	.sellos li {
+		padding: 0.25rem 0.6rem;
+		border: 1px solid var(--linea);
+		font-family: var(--fuente-datos);
 		font-weight: 600;
-		text-decoration: none;
+		font-size: 0.85rem;
 	}
-	nav a:hover {
-		color: var(--lols-verde-oscuro);
+	/* Marca en grande: el logo a todo el ancho, en el tono de la línea de dibujo. */
+	.marca {
+		color: #dde2da;
+		padding-block: 0.5rem 0;
 	}
-	.secundario {
-		margin-top: 0.75rem;
-	}
-	.secundario a {
-		font-family: var(--fuente-texto);
-		font-weight: 500;
-		color: var(--lols-gris);
-	}
-	address {
-		font-style: normal;
-		text-align: right;
-		line-height: 1.8;
-		color: var(--lols-gris);
+	.marca :global(.logo-grande) {
+		width: 100%;
+		height: auto;
 	}
 	.legal {
 		display: flex;
@@ -91,23 +135,20 @@ const anio = new Date().getFullYear();
 		gap: 1rem;
 		flex-wrap: wrap;
 		padding-block: 1.25rem;
-		border-top: 1px solid var(--linea);
 		font-size: 0.85rem;
 		color: var(--gris-medio);
 	}
 	.legal p {
 		margin: 0;
 	}
-	.legal a {
-		color: var(--gris-medio);
-	}
 	@media (max-width: 860px) {
-		.fila {
-			grid-template-columns: minmax(0, 1fr);
-			gap: 1.75rem;
+		.columnas {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
-		address {
-			text-align: left;
+	}
+	@media (max-width: 480px) {
+		.columnas {
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 </style>

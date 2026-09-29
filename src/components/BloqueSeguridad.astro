@@ -3,9 +3,11 @@
 // rubro muestra y que el mandante revisa primero (docs/investigacion-secciones.md).
 import Pendiente from './Pendiente.astro';
 import { ejemplosSeguridad as ej } from '../data/ejemplos';
+import EjesPlano from './EjesPlano.astro';
 ---
 
-<section class="seccion oscura seguridad">
+<section class="seccion oscura plano seguridad">
+	<EjesPlano />
 	<div class="contenedor">
 		<p class="etiqueta">Seguridad y calidad</p>
 		<div class="cabecera">
@@ -79,8 +81,8 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 	}
 	.sellos li {
 		padding: 0.5rem 0.9rem;
-		border: 1px solid #3a3a3a;
-		border-radius: 999px;
+		border: 1px solid #3a423c;
+		background: var(--carbon-2);
 		font-size: 0.9rem;
 		color: #d6d6d6;
 	}

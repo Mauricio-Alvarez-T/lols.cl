@@ -25,7 +25,6 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 	</div>
 
 	<section class="seccion contenedor">
-		<p class="etiqueta">Historia</p>
 		<div class="cabecera"><h2>Nuestra trayectoria</h2></div>
 		<ol class="linea">
 			{
@@ -41,15 +40,13 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 
 	<section class="seccion gris">
 		<div class="contenedor">
-			<p class="etiqueta">Cómo trabajamos</p>
 			<div class="cabecera">
 				<h2>Un esquema basado en el esfuerzo, la creatividad y la responsabilidad</h2>
 			</div>
 			<div class="valores">
 				{
-					valores.map((v, i) => (
+					valores.map((v) => (
 						<div>
-							<p class="indice">0{i + 1}</p>
 							<h3>{v.titulo}</h3>
 							<p>{v.texto ?? <Pendiente texto="qué significa en la práctica">{ej.valores[v.titulo]}</Pendiente>}</p>
 						</div>
@@ -61,7 +58,6 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 
 	<section class="seccion contenedor dos">
 		<div>
-			<p class="etiqueta">Seguridad y medio ambiente</p>
 			<h2>Compromiso con las normas de seguridad y el medio ambiente</h2>
 		</div>
 		<Pendiente bloque texto="políticas, certificaciones, mutualidad e indicadores de seguridad">
@@ -70,7 +66,6 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 	</section>
 
 	<section class="seccion contenedor">
-		<p class="etiqueta">Equipo</p>
 		<div class="cabecera"><h2>Las personas a cargo</h2></div>
 		<div class="equipo">
 			{

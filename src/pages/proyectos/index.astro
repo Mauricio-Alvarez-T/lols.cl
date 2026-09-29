@@ -45,13 +45,13 @@ import { obras2018 } from '../../data/referencia';
 		{
 			proyectos.length ? (
 				<div class="grilla" id="grilla">
-					{proyectos.map((p) => <TarjetaProyecto proyecto={p} />)}
+					{proyectos.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)}
 				</div>
 			) : (
 				<>
 					<Pendiente texto="listado de 6 a 12 proyectos con ficha (docs/brief.md § 4); las tarjetas son de muestra" />
 					<div class="grilla">
-						{obras2018.map((f) => <TarjetaProyecto referencia={f} />)}
+						{obras2018.map((f, i) => <TarjetaProyecto referencia={f} lamina={i + 1} destacada={i === 0} />)}
 					</div>
 				</>
 			)
@@ -127,6 +127,9 @@ import { obras2018 } from '../../data/referencia';
 	.aviso {
 		margin-bottom: 2rem;
 	}
+	.grilla > :global(.destacada) {
+		grid-column: span 2;
+	}
 	.grilla {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
@@ -143,6 +146,9 @@ import { obras2018 } from '../../data/referencia';
 	@media (max-width: 560px) {
 		.grilla {
 			grid-template-columns: minmax(0, 1fr);
+		}
+		.grilla > :global(.destacada) {
+			grid-column: auto;
 		}
 	}
 </style>

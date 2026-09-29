@@ -42,3 +42,28 @@ Tras revisar 31 sitios de construcción y guías de UX B2B (docs/investigacion-s
 | Ficha de proyecto: plazo, rol de LOLS, testimonio con nombre y cargo, timelapse | Los compradores miran proyectos similares con datos, no solo fotos |
 | **Videos** (Mixkit): loop con botón de pausa en portada, seguridad y trabaja con nosotros; timelapse al hacer clic en la ficha | Donde el video suma ambiente o prueba; el poster carga primero, 360p en celular, solo poster con ahorro de datos o "reducir movimiento" |
 | Sin blog ni noticias | En una empresa chica se desactualizan y restan credibilidad |
+
+## Dirección visual "lámina de proyecto" (29-sep-2026)
+
+Fuentes: skill `frontend-design` de Anthropic (actualizado 3-sep-2026), blog "Improving frontend
+design through Skills" (nov-2025), cookbook de estética frontend; sitios de construcción
+premiados en Awwwards 2025–2026 (Berch, Modus, Haven, METRIC, Spence); NN/G State of UX 2026;
+WebKit/Chrome sobre view transitions.
+
+- **Un solo gesto audaz: el lenguaje del plano, como información.** Rótulo de lámina (cuadro de
+  datos con celdas y línea de dibujo) en tarjetas, ficha y proyecto destacado, con número de
+  lámina correlativo; grilla de plano con ejes A–D / 1–3 en las secciones oscuras
+  (`.plano` + `EjesPlano`); ejes que se trazan sobre la obra de la portada (`ObraPortada`).
+- **Tipografía:** DM Sans (la del logo) pesada y con tamaño óptico para títulos; IBM Plex Sans
+  para texto (reemplaza Inter, marcada por Anthropic como fuente "por defecto"); IBM Plex Sans
+  Condensed para rótulos y datos, como la rotulación de planos.
+- **Color:** blanco roto con leve sesgo verde (`--fondo`), grises de hormigón, carbón; el verde
+  solo como acento. Las fotos llevan un tratamiento común (menos saturación, algo más de contraste).
+- **Fuera el "template chrome":** rótulos en mayúsculas espaciadas sobre cada sección (ahora un
+  rótulo discreto solo donde informa), flechas "→" en enlaces (ahora subrayado que crece),
+  numeración 01/02/03 donde no hay secuencia (queda en el proceso y la línea de tiempo).
+- **Movimiento:** un solo momento al cargar la portada; sin revelado al hacer scroll (el
+  contenido está completo en reposo); transiciones entre páginas con CSS nativo (la foto de la
+  tarjeta viaja a la ficha; el encabezado queda fijo). Respeta "reducir movimiento".
+- **Jerarquía:** la primera obra de cada grilla es más grande.
+- **Pie:** columnas de contacto, sitio, otros públicos y certificaciones; marca en grande; RUT.

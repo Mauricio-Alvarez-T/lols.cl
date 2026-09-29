@@ -1,10 +1,7 @@
 ---
-// Animaciones livianas, sin librerías (estilos en src/styles/animaciones.css):
-//   - revelado al hacer scroll con IntersectionObserver (una sola vez por elemento);
-//   - cifras que cuentan hasta su valor al aparecer;
-//   - sombra del encabezado al bajar de la parte superior.
-// Solo corre si Base.astro puso html.anim (no se activa con "reducir movimiento"). Si este
-// script no llega a ejecutarse, Base.astro quita html.anim a los 3 s y todo se ve estático.
+// Movimiento con JS mínimo (estilos en src/styles/animaciones.css): solo la sombra del
+// encabezado al bajar. El momento de carga de la portada y las transiciones entre páginas
+// son CSS puro. Si este script no corre, Base.astro quita html.anim a los 3 s.
 ---
 
 <script>
@@ -14,86 +11,6 @@
 		}
 	}
 	window.__animaciones = true;
-	const raiz = document.documentElement;
-
-	if (raiz.classList.contains('anim')) {
-		// Mismos selectores que .anim :is(...) en animaciones.css.
-		const selectores = [
-			'.portadilla > *',
-			'.etiqueta',
-			'.cabecera',
-			'.cifras > div',
-			'.necesidad',
-			'.tarjeta',
-			'.logos li',
-			'.destacado > *',
-			'.bloque',
-			'.paso',
-			'.cifra',
-			'.linea li',
-			'.valores > div',
-			'.equipo > div',
-			'.dos > *',
-			'.columnas > *',
-			'.contacto .grilla > *',
-			'.banda',
-			'.portada',
-			'.galeria > *',
-			'.indicadores > div',
-			'.pasos li',
-			'.certificaciones li',
-			'.motivos > div',
-			'.sellos li',
-			'.testimonio',
-			'.postular',
-		].join(',');
-
-		const contar = (el: HTMLElement) => {
-			// "80.000" → 80000, "150+" → 150 con sufijo "+". Si no es número, no se toca.
-			const original = el.textContent?.trim() ?? '';
-			const m = original.match(/^([\d.]+)(.*)$/);
-			if (!m) return;
-			const destino = Number(m[1].replace(/\./g, ''));
-			if (!Number.isFinite(destino) || destino === 0) return;
-			const sufijo = m[2];
-			const duracion = 1400;
-			const inicio = performance.now();
-			const paso = (t: number) => {
-				const avance = Math.min(1, (t - inicio) / duracion);
-				const valor = Math.round(destino * (1 - Math.pow(1 - avance, 3)));
-				el.textContent = valor.toLocaleString('es-CL') + sufijo;
-				if (avance < 1) requestAnimationFrame(paso);
-				else el.textContent = original;
-			};
-			requestAnimationFrame(paso);
-		};
-
-		// En orden de documento. Al revelar uno se revelan también los anteriores: con un scroll
-		// rápido (o un salto a un ancla) el observador puede no ver nunca un elemento que quedó
-		// arriba, y quedaría oculto.
-		const elementos = [...document.querySelectorAll<HTMLElement>(selectores)];
-		let revelados = 0;
-		const revelar = (el: HTMLElement) => {
-			el.classList.add('visible');
-			observador.unobserve(el);
-			const numero = el.querySelector<HTMLElement>('.numero .ejemplo') ?? el.querySelector<HTMLElement>('.numero');
-			if (numero && (el.closest('.cifras') || el.closest('.indicadores'))) contar(numero);
-		};
-		const observador = new IntersectionObserver(
-			(entradas) => {
-				for (const e of entradas) {
-					if (!e.isIntersecting) continue;
-					const hasta = elementos.indexOf(e.target as HTMLElement);
-					for (let i = revelados; i <= hasta; i++) {
-						if (!elementos[i].classList.contains('visible')) revelar(elementos[i]);
-					}
-					revelados = Math.max(revelados, hasta + 1);
-				}
-			},
-			{ rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
-		);
-		for (const el of elementos) observador.observe(el);
-	}
 
 	// Sombra del encabezado: un solo listener pasivo, sin trabajo por cada píxel.
 	const encabezado = document.querySelector('.encabezado');

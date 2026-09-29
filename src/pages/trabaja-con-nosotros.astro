@@ -21,13 +21,11 @@ const asunto = encodeURIComponent('Postulación: [cargo]');
 	<VideoFondo video={videos.trabaja} clase="banda" eager />
 
 	<section class="seccion contenedor">
-		<p class="etiqueta">Por qué LOLS</p>
 		<div class="cabecera"><h2>Lo que ofrecemos</h2></div>
 		<div class="motivos">
 			{
-				ej.motivos.map((m, i) => (
+				ej.motivos.map((m) => (
 					<div>
-						<p class="indice">0{i + 1}</p>
 						<h3><Pendiente texto="beneficio real">{m.titulo}</Pendiente></h3>
 						<p><Pendiente texto="descripción del beneficio">{m.texto}</Pendiente></p>
 					</div>
@@ -39,7 +37,6 @@ const asunto = encodeURIComponent('Postulación: [cargo]');
 	<section class="seccion gris">
 		<div class="contenedor dos">
 			<div>
-				<p class="etiqueta">Perfiles</p>
 				<h2>A quiénes buscamos</h2>
 				<Pendiente bloque texto="cargos que la empresa busca habitualmente">
 					<ul class="perfiles">{ej.perfiles.map((p) => <li>{p}</li>)}</ul>

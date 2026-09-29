@@ -14,7 +14,7 @@ import { empresa, necesidades, necesidadesRevisar, servicioPorSlug } from '../da
 import { proyectos } from '../data/proyectos';
 import Referencial from '../components/Referencial.astro';
 import { destacado, obras2018, logosEjemplo, videos } from '../data/referencia';
-import VideoFondo from '../components/VideoFondo.astro';
+import ObraPortada from '../components/ObraPortada.astro';
 import BloqueSeguridad from '../components/BloqueSeguridad.astro';
 import Proceso from '../components/Proceso.astro';
 import { ejemploBajadaHero } from '../data/ejemplos';
@@ -41,7 +41,7 @@ const cifras = [
 		</div>
 	</section>
 
-	<VideoFondo video={videos.portada} clase="banda" eager />
+	<ObraPortada video={videos.portada} />
 
 	<section class="cifras contenedor" aria-label="LOLS en cifras">
 		{
@@ -66,9 +66,8 @@ const cifras = [
 			<Pendiente texto={`servicios agrupados por necesidad: ${necesidadesRevisar}`} />
 			<div class="necesidades">
 				{
-					necesidades.map((n, i) => (
+					necesidades.map((n) => (
 						<div class="necesidad">
-							<p class="indice">0{i + 1}</p>
 							<h3>{n.titulo}</h3>
 							<ul>
 								{n.servicios.map((slug) => {
@@ -115,20 +114,22 @@ const cifras = [
 
 	<section class="seccion">
 		<div class="contenedor">
-			<p class="etiqueta">Proyectos</p>
 			<div class="cabecera">
 				<h2>Obras recientes</h2>
 				<a href="/proyectos/" class="enlace-flecha">Todos los proyectos</a>
 			</div>
 			<div class="grilla-proyectos">
-				{recientes.length ? recientes.map((p) => <TarjetaProyecto proyecto={p} />) : obras2018.slice(0, 3).map((f) => <TarjetaProyecto referencia={f} />)}
+				{
+					recientes.length
+						? recientes.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)
+						: obras2018.slice(0, 3).map((f, i) => <TarjetaProyecto referencia={f} lamina={i + 1} destacada={i === 0} />)
+				}
 			</div>
 		</div>
 	</section>
 
 	<section class="seccion clientes">
 		<div class="contenedor">
-			<p class="etiqueta">Clientes</p>
 			<h2 class="clientes-titulo">Han confiado en nosotros</h2>
 			<Pendiente texto="logos reales de clientes (con su autorización); los actuales son genéricos" />
 			<ul class="logos">
@@ -254,17 +255,12 @@ const cifras = [
 		font-size: 1.1rem;
 		text-decoration: none;
 	}
-	.necesidad a::after {
-		content: '→';
-		margin-left: auto;
-		color: var(--lols-verde-oscuro);
-		transition: transform 0.2s;
+	.necesidad a {
+		transition: padding-left 0.2s var(--suave), color 0.15s;
 	}
 	.necesidad a:hover {
 		color: var(--lols-verde-oscuro);
-	}
-	.necesidad a:hover::after {
-		transform: translateX(4px);
+		padding-left: 0.4rem;
 	}
 	.necesidad :global(.icono) {
 		width: 1.5rem;
@@ -301,10 +297,15 @@ const cifras = [
 		font-family: var(--fuente-titulos);
 	}
 
+	/* Jerarquía: la primera obra ocupa dos columnas y dos filas; las otras dos, apiladas. */
 	.grilla-proyectos {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: 2fr 1fr;
 		gap: clamp(1.5rem, 3vw, 2.5rem);
+		align-items: start;
+	}
+	.grilla-proyectos > :global(.destacada) {
+		grid-row: span 2;
 	}
 
 	.clientes-titulo {

@@ -4,6 +4,7 @@ import Pendiente from './Pendiente.astro';
 import { empresa, telefonoHref } from '../data/empresa';
 import Referencial from './Referencial.astro';
 import { retratos } from '../data/referencia';
+import EjesPlano from './EjesPlano.astro';
 
 interface Props {
 	titulo?: string;
@@ -11,10 +12,10 @@ interface Props {
 const { titulo = 'Hablemos de su proyecto' } = Astro.props;
 ---
 
-<section class="seccion oscura contacto">
+<section class="seccion oscura plano contacto">
+	<EjesPlano filas={3} />
 	<div class="contenedor grilla">
 		<div>
-			<p class="etiqueta">Contacto</p>
 			<h2>{titulo}</h2>
 			<a href="/contacto/" class="boton">Solicitar cotización</a>
 		</div>
