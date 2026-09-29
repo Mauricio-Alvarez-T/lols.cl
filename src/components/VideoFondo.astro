@@ -39,9 +39,9 @@ const decorativo = modo === 'fondo';
 				<span class="icono-pausa" aria-hidden="true" />
 			</button>
 		) : (
-			<button class="reproducir" type="button" data-etiqueta={etiqueta}>
+			<button class="reproducir" type="button">
 				<span class="triangulo" aria-hidden="true" />
-				<span class="texto" aria-live="polite">{etiqueta}</span>
+				{etiqueta}
 			</button>
 		)
 	}
@@ -66,34 +66,21 @@ const decorativo = modo === 'fondo';
 
 		if (cont.dataset.video === 'clic') {
 			const boton = cont.querySelector<HTMLButtonElement>('.reproducir')!;
-			const texto = boton.querySelector('.texto')!;
-			// El botón queda a la vista diciendo "Cargando…" hasta que el video de verdad arranca;
-			// si desapareciera al tiro, el poster quieto parece que no pasó nada.
-			video.addEventListener(
-				'playing',
-				() => {
-					boton.hidden = true;
-					video.controls = true;
-					video.focus();
-				},
-				{ once: true },
-			);
-			video.addEventListener('error', () => {
-				boton.disabled = false;
-				boton.removeAttribute('aria-busy');
-				texto.textContent = 'No se pudo cargar el video. Reintentar';
-			});
+			const poster = cont.querySelector<HTMLImageElement>('.poster')!;
+			// Al hacer clic el video pasa a la vista de inmediato con los controles del navegador
+			// (que traen su propio indicador de carga). No se espera al evento "playing" para
+			// mostrarlo: si el navegador no arranca solo, la persona igual ve el reproductor y
+			// puede darle play. Parte silenciado porque así ningún navegador bloquea el autoplay
+			// (los timelapse no traen audio; si otro video lo trae, se activa en los controles).
 			boton.addEventListener('click', () => {
-				boton.disabled = true;
-				boton.setAttribute('aria-busy', 'true');
-				texto.textContent = 'Cargando…';
+				video.poster = poster.currentSrc || poster.src;
 				video.src = fuente(cont);
-				video.muted = false;
-				video.play().catch(() => {
-					boton.disabled = false;
-					boton.removeAttribute('aria-busy');
-					texto.textContent = boton.dataset.etiqueta!;
-				});
+				video.muted = true;
+				video.controls = true;
+				cont.classList.add('activo');
+				boton.hidden = true;
+				video.play().catch(() => {});
+				video.focus();
 			});
 			continue;
 		}
@@ -218,29 +205,19 @@ const decorativo = modo === 'fondo';
 		z-index: 1;
 		transition: transform 0.15s;
 	}
-	.reproducir:hover:not(:disabled) {
+	.reproducir:hover {
 		transform: scale(1.04);
 	}
-	.reproducir[aria-busy='true'] {
-		cursor: progress;
+	/* Modo clic ya activado: el reproductor manda (visible sin esperar a "playing"). */
+	.activo video {
+		opacity: 1;
+		transition: none;
+		filter: none;
+		background: #000;
 	}
-	.reproducir[aria-busy='true'] .triangulo {
-		width: 1rem;
-		height: 1rem;
-		border: 2px solid var(--lols-linea, #d3d8d1);
-		border-top-color: var(--lols-verde-oscuro);
-		border-radius: 50%;
-		animation: girar 0.8s linear infinite;
-	}
-	@keyframes girar {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.reproducir[aria-busy='true'] .triangulo {
-			animation: none;
-		}
+	.activo .poster,
+	.activo .etiqueta-ref {
+		visibility: hidden;
 	}
 	.triangulo {
 		width: 0;
