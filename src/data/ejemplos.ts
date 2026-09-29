@@ -85,3 +85,62 @@ export const ejemplosEmpresa = {
 		{ nombre: 'Nombre Apellido', cargo: 'Administración de obras' },
 	],
 };
+
+// Frase del hero: qué hace, para quién y dónde (NN/G: el hero debe responder eso en 5 s).
+export const ejemploBajadaHero =
+	'Construcción, montaje industrial, electricidad y mantención para empresas e industria en la Región Metropolitana.';
+
+// Seguridad y calidad: lo que un mandante revisa para precalificar a un contratista
+// (tasas certificadas por la mutualidad, ISO, registros de contratistas).
+export const ejemplosSeguridad = {
+	indicadores: [
+		{ valor: '0', etiqueta: 'accidentes con tiempo perdido en 2025' },
+		{ valor: '1,2', etiqueta: 'tasa de accidentabilidad (%)' },
+		{ valor: '850', etiqueta: 'días sin accidentes' },
+	],
+	fuenteIndicadores: 'Certificado por la mutualidad, período enero–diciembre 2025.',
+	certificaciones: [
+		{ nombre: 'ISO 9001', alcance: 'Gestión de calidad', emisor: 'Organismo certificador', vigencia: '2027' },
+		{ nombre: 'ISO 45001', alcance: 'Seguridad y salud en el trabajo', emisor: 'Organismo certificador', vigencia: '2027' },
+		{ nombre: 'ISO 14001', alcance: 'Gestión ambiental', emisor: 'Organismo certificador', vigencia: '2027' },
+	],
+	registros: ['Mutualidad de seguridad', 'Registro de contratistas REGIC', 'SICEP', 'ChileProveedores'],
+	programa: [
+		'Plan de prevención de riesgos y análisis de riesgos por faena',
+		'Charlas diarias de seguridad y capacitación permanente',
+		'Comité paritario y experto en prevención en obra',
+		'Gestión y reciclaje de residuos de construcción',
+	],
+};
+
+// Cómo trabajamos: qué pasa después de pedir una cotización (claridad del proceso, NN/G B2B).
+export const ejemploProceso = [
+	{ titulo: 'Visita técnica', texto: 'Conocemos la obra o la instalación y levantamos lo que necesita.' },
+	{ titulo: 'Cotización', texto: 'Propuesta con alcance, plazo y valor, sin letra chica.' },
+	{ titulo: 'Ejecución', texto: 'Un jefe de proyecto a cargo, con reportes de avance.' },
+	{ titulo: 'Entrega y mantención', texto: 'Recepción conforme y, si lo necesita, plan de mantención.' },
+];
+
+export const ejemploTestimonio = {
+	cita: 'Cumplieron el plazo sin interrumpir la operación de nuestras tiendas. Volveríamos a trabajar con ellos.',
+	nombre: 'Nombre Apellido',
+	cargo: 'Gerente de proyectos',
+	empresa: 'Empresa cliente',
+};
+
+export const ejemploFichaExtra = { rol: 'Contratista principal', plazo: '14 meses' };
+
+export const ejemplosTrabaja = {
+	bajada: 'Buscamos personas que quieran construir bien, con seguridad y en equipo.',
+	motivos: [
+		{ titulo: 'Seguridad primero', texto: 'Capacitación permanente y los elementos de protección que cada faena requiere.' },
+		{ titulo: 'Estabilidad', texto: 'Obras continuas para empresas e industria, con contrato y pagos al día.' },
+		{ titulo: 'Crecimiento', texto: 'Aprende de varias especialidades: construcción, montaje, electricidad y datos.' },
+	],
+	perfiles: ['Maestros de obra y jornales', 'Soldadores y montajistas', 'Electricistas con licencia SEC', 'Técnicos en redes', 'Carpinteros', 'Prevencionistas de riesgos'],
+};
+
+export const ejemplosProveedores = {
+	bajada: 'Trabajamos con proveedores de materiales, equipos y servicios que cumplan plazos y estándares de seguridad.',
+	requisitos: ['Inicio de actividades y documentación tributaria al día', 'Certificado de la mutualidad (si presta servicios en obra)', 'Catálogo o lista de precios', 'Referencias de clientes'],
+};

@@ -10,7 +10,9 @@ import { servicioPorSlug } from '../../data/empresa';
 import { proyectos, plantilla, estados, type Proyecto } from '../../data/proyectos';
 import Referencial from '../../components/Referencial.astro';
 import { bandas, obras2018 } from '../../data/referencia';
-import { ejemploProyecto as ej } from '../../data/ejemplos';
+import { ejemploProyecto as ej, ejemploFichaExtra, ejemploTestimonio as testimonio } from '../../data/ejemplos';
+import VideoFondo from '../../components/VideoFondo.astro';
+import { videos } from '../../data/referencia';
 
 export function getStaticPaths() {
 	// La plantilla de ejemplo solo existe fuera de producción.
@@ -40,6 +42,8 @@ const relato = [
 			<div><dt>Ubicación</dt><dd>{p.comuna ?? <Pendiente texto="comuna">{ej.comuna}</Pendiente>}</dd></div>
 			<div><dt>Año</dt><dd>{p.anio ?? <Pendiente texto="año">{ej.anio}</Pendiente>}</dd></div>
 			<div><dt>Magnitud</dt><dd>{p.magnitud ?? <Pendiente texto="m² o plazo">{ej.magnitud}</Pendiente>}</dd></div>
+			<div><dt>Plazo</dt><dd><Pendiente texto="plazo de ejecución">{ejemploFichaExtra.plazo}</Pendiente></dd></div>
+			<div><dt>Rol de LOLS</dt><dd><Pendiente texto="contratista principal o subcontrato">{ejemploFichaExtra.rol}</Pendiente></dd></div>
 			<div><dt>Servicios</dt><dd>{p.servicios.map((s) => servicioPorSlug(s).nombre).join(', ')}</dd></div>
 			<div><dt>Estado</dt><dd>{p.estado ? estados[p.estado] : <Pendiente texto="estado">{ej.estado}</Pendiente>}</dd></div>
 		</dl>
@@ -71,6 +75,24 @@ const relato = [
 			<p>{p.cifra?.etiqueta ?? <Pendiente texto="qué mide (plazo, m², ahorro…)">{ej.cifra.etiqueta}</Pendiente>}</p>
 		</div>
 	</section>
+
+	<section class="seccion contenedor testimonio-bloque">
+		<Pendiente bloque texto="testimonio real del mandante, con nombre, cargo y empresa">
+			<figure class="testimonio">
+				<blockquote>“{testimonio.cita}”</blockquote>
+				<figcaption><strong>{testimonio.nombre}</strong> · {testimonio.cargo}, {testimonio.empresa}</figcaption>
+			</figure>
+		</Pendiente>
+	</section>
+
+	{
+		esEjemplo && (
+			<section class="seccion contenedor">
+				<h2 class="subtitulo">La obra en un minuto</h2>
+				<VideoFondo video={videos.timelapse} modo="clic" clase="timelapse" etiqueta="Ver timelapse de la obra" />
+			</section>
+		)
+	}
 
 	<section class="seccion contenedor">
 		<h2 class="sr-only">Galería</h2>
@@ -163,6 +185,31 @@ const relato = [
 	}
 	.cifra p:last-child {
 		color: var(--gris-medio);
+	}
+	.testimonio {
+		margin: 0;
+		max-width: 52rem;
+		padding-left: 1.5rem;
+		border-left: 4px solid var(--lols-verde);
+	}
+	.testimonio blockquote {
+		margin: 0 0 1rem;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(1.4rem, 3vw, 2.1rem);
+		font-weight: 600;
+		line-height: 1.3;
+		letter-spacing: -0.02em;
+	}
+	.testimonio figcaption {
+		color: var(--gris-medio);
+	}
+	.subtitulo {
+		font-size: 1.5rem;
+		letter-spacing: -0.02em;
+		margin-bottom: 1.25rem;
+	}
+	.contenedor :global(.timelapse) {
+		aspect-ratio: 16 / 9;
 	}
 	.galeria {
 		display: grid;

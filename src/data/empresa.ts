@@ -8,9 +8,15 @@ export const empresa = {
 	direccion: { valor: 'El Mirador 112-150, Cerrillos, Santiago', revisar: 'confirmar vigencia' },
 	telefono: { valor: '+56 652 710 609', revisar: 'el prefijo 65 es de Osorno' },
 	correo: { valor: 'lols@lols.cl', revisar: 'confirmar; ¿un correo por área?' },
+	// Número de WhatsApp comercial (móvil, formato 569XXXXXXXX). Mientras sea null, los botones
+	// abren WhatsApp sin destinatario y el build de producción falla (marcador en BarraContacto).
+	whatsapp: null as string | null,
 };
 
 export const telefonoHref = (t: string) => 'tel:' + t.replace(/[^\d+]/g, '');
+
+export const whatsappHref = (mensaje = 'Hola, quisiera cotizar un proyecto con LOLS Ingeniería.') =>
+	`https://wa.me/${empresa.whatsapp ?? ''}?text=${encodeURIComponent(mensaje)}`;
 
 // Textos institucionales del sitio de 2018 (brief § 4).
 export const valores = [
@@ -48,9 +54,18 @@ export const necesidades = [
 ];
 export const necesidadesRevisar = 'agrupación propuesta; confirmar';
 
+// Menú principal: las 4 secciones que tienen casi todos los sitios del rubro + Seguridad,
+// que casi ninguno muestra y es lo primero que revisa un mandante (docs/investigacion-secciones.md).
 export const navegacion = [
 	{ href: '/proyectos/', texto: 'Proyectos' },
 	{ href: '/servicios/', texto: 'Servicios' },
+	{ href: '/seguridad/', texto: 'Seguridad' },
 	{ href: '/empresa/', texto: 'Empresa' },
 	{ href: '/contacto/', texto: 'Contacto' },
+];
+
+// Rutas para públicos que no son clientes: van en el pie para no saturar el canal comercial.
+export const otrosPublicos = [
+	{ href: '/trabaja-con-nosotros/', texto: 'Trabaja con nosotros' },
+	{ href: '/proveedores/', texto: 'Proveedores' },
 ];

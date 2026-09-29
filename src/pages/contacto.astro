@@ -2,13 +2,19 @@
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import FormularioContacto from '../components/FormularioContacto.astro';
-import { empresa, telefonoHref } from '../data/empresa';
+import { empresa, telefonoHref, whatsappHref } from '../data/empresa';
+import Proceso from '../components/Proceso.astro';
 ---
 
 <Base title="Contacto" description="Solicite una cotización a LOLS Ingeniería.">
 	<header class="portadilla contenedor">
 		<p class="etiqueta">Contacto</p>
 		<h1>Hablemos de su proyecto</h1>
+		<p class="bajada">Cuéntenos qué necesita y le respondemos con una propuesta. Si prefiere, escríbanos por WhatsApp.</p>
+		<p class="canales">
+			<a class="boton" href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a>
+			<a class="boton secundario" href={telefonoHref(empresa.telefono.valor)}>Llamar</a>
+		</p>
 	</header>
 
 	<section class="seccion contenedor columnas">
@@ -43,6 +49,9 @@ import { empresa, telefonoHref } from '../data/empresa';
 					<dd><Pendiente revisar={empresa.direccion.revisar}>{empresa.direccion.valor}</Pendiente></dd>
 				</div>
 			</dl>
+			<div class="despues">
+				<Proceso titulo="Qué pasa después" compacto />
+			</div>
 			<div class="mapa marco">
 				<iframe
 					title="Mapa: El Mirador 112-150, Cerrillos"
@@ -52,6 +61,11 @@ import { empresa, telefonoHref } from '../data/empresa';
 			</div>
 			<a class="ver-mapa" href="https://www.openstreetmap.org/?mlat=-33.50535&mlon=-70.71567#map=17/-33.50535/-70.71567">Ver en el mapa</a>
 		</aside>
+	</section>
+
+	<section class="contenedor derivar">
+		<p>¿Busca trabajo? <a href="/trabaja-con-nosotros/">Trabaja con nosotros</a></p>
+		<p>¿Es proveedor? <a href="/proveedores/">Inscríbase como proveedor</a></p>
 	</section>
 </Base>
 
@@ -69,6 +83,28 @@ import { empresa, telefonoHref } from '../data/empresa';
 	.vertical {
 		grid-template-columns: minmax(0, 1fr);
 		margin-bottom: 2rem;
+	}
+	.canales {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 1.5rem;
+	}
+	.despues {
+		margin-bottom: 2rem;
+	}
+	.derivar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 2.5rem;
+		padding-block: 0 var(--seccion);
+		color: var(--lols-gris);
+	}
+	.derivar p {
+		margin: 0;
+	}
+	.derivar a {
+		font-weight: 600;
 	}
 	.mapa {
 		aspect-ratio: 4 / 3;

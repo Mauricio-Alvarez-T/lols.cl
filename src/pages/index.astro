@@ -1,9 +1,10 @@
 ---
 // Portada. Estructura tomada de las referencias (docs/brief.md § 3):
-//   frase grande sobre blanco (Heatherwick) → obra a todo el ancho (BESIX / Ingevec) →
+//   frase grande sobre blanco (Heatherwick) → video de obra a todo el ancho (BESIX / Ingevec) →
 //   cifras (Skanska) → servicios por necesidad del cliente (Ramboll) →
 //   proyecto destacado desafío/solución/resultado (Arup) → grilla de proyectos (BIG) →
-//   clientes (Tecsa) → contacto con persona (Arup / Mott MacDonald).
+//   clientes (Tecsa) → seguridad y calidad → cómo trabajamos → contacto con persona.
+// Orden y secciones validados con 31 sitios del rubro: docs/investigacion-secciones.md.
 import Base from '../layouts/Base.astro';
 import Icono from '../components/Icono.astro';
 import Pendiente from '../components/Pendiente.astro';
@@ -12,7 +13,11 @@ import Contacto from '../components/Contacto.astro';
 import { empresa, necesidades, necesidadesRevisar, servicioPorSlug } from '../data/empresa';
 import { proyectos } from '../data/proyectos';
 import Referencial from '../components/Referencial.astro';
-import { bandas, destacado, obras2018, logosEjemplo } from '../data/referencia';
+import { destacado, obras2018, logosEjemplo, videos } from '../data/referencia';
+import VideoFondo from '../components/VideoFondo.astro';
+import BloqueSeguridad from '../components/BloqueSeguridad.astro';
+import Proceso from '../components/Proceso.astro';
+import { ejemploBajadaHero } from '../data/ejemplos';
 
 const recientes = proyectos.slice(0, 3);
 // Los valores son de ejemplo (modo propuesta) hasta tener los reales.
@@ -28,7 +33,7 @@ const cifras = [
 	<section class="hero contenedor">
 		<h1 class="display">{empresa.lema}<span class="punto">.</span></h1>
 		<div class="hero-pie">
-			<p class="bajada"><Pendiente texto="una frase: qué hace LOLS y para quién">Construimos, montamos y mantenemos instalaciones para empresas e industria.</Pendiente></p>
+			<p class="bajada"><Pendiente texto="una frase: qué hace LOLS, para quién y dónde">{ejemploBajadaHero}</Pendiente></p>
 			<div class="acciones">
 				<a href="/proyectos/" class="boton">Ver proyectos</a>
 				<a href="/contacto/" class="boton secundario">Cotizar</a>
@@ -36,9 +41,7 @@ const cifras = [
 		</div>
 	</section>
 
-	<div class="banda marco">
-		<Referencial imagen={bandas.portada} carga="eager" />
-	</div>
+	<VideoFondo video={videos.portada} clase="banda" eager />
 
 	<section class="cifras contenedor" aria-label="LOLS en cifras">
 		{
@@ -137,6 +140,14 @@ const cifras = [
 					))
 				}
 			</ul>
+		</div>
+	</section>
+
+	<BloqueSeguridad />
+
+	<section class="seccion">
+		<div class="contenedor">
+			<Proceso />
 		</div>
 	</section>
 

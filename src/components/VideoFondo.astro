@@ -1,0 +1,210 @@
+---
+// Video de stock (src/data/referencia.ts) con las prácticas de docs/investigacion-secciones.md:
+//   modo "fondo": loop decorativo, sin sonido. El poster es lo que carga primero (LCP); el
+//     video se pide recién cuando la página terminó de cargar y el bloque está en pantalla,
+//     se pausa al salir de ella y tiene botón de pausa (WCAG 2.2.2). Con "reducir movimiento"
+//     o ahorro de datos se queda en el poster. En celular usa la versión 360p.
+//   modo "clic": poster con botón de reproducir; el video solo se descarga si la persona lo pide.
+// Es contenido referencial: el build de producción falla mientras quede alguno.
+import type { VideoReferencial } from '../data/referencia';
+
+interface Props {
+	video: VideoReferencial;
+	modo?: 'fondo' | 'clic';
+	clase?: string;
+	eager?: boolean; // poster con prioridad alta (cuando está arriba en la página)
+	etiqueta?: string; // texto del botón en modo clic
+}
+const { video, modo = 'fondo', clase, eager = false, etiqueta = 'Ver video' } = Astro.props;
+
+if (Astro.site?.hostname === 'lols.cl') {
+	throw new Error(`Video referencial sin reemplazar en ${Astro.url.pathname}: ${video.src720}`);
+}
+const decorativo = modo === 'fondo';
+---
+
+<div class:list={['video marco', clase]} data-video={modo} data-src720={video.src720} data-src360={video.src360}>
+	<img
+		class="poster"
+		src={video.poster}
+		alt={decorativo ? '' : video.alt}
+		loading={eager ? 'eager' : 'lazy'}
+		fetchpriority={eager ? 'high' : undefined}
+		decoding="async"
+	/>
+	<video muted loop={decorativo} playsinline preload="none" aria-hidden={decorativo ? 'true' : undefined} aria-label={decorativo ? undefined : video.alt}></video>
+	{
+		decorativo ? (
+			<button class="pausa" type="button" aria-label="Pausar video" hidden>
+				<span class="icono-pausa" aria-hidden="true" />
+			</button>
+		) : (
+			<button class="reproducir" type="button">
+				<span class="triangulo" aria-hidden="true" />
+				{etiqueta}
+			</button>
+		)
+	}
+	<span class="etiqueta-ref">Video referencial · Mixkit</span>
+</div>
+
+<script>
+	type Conexion = { saveData?: boolean; effectiveType?: string };
+	const conexion = (navigator as Navigator & { connection?: Conexion }).connection;
+	const reducir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const ahorro = Boolean(conexion?.saveData) || /(^|-)2g$/.test(conexion?.effectiveType ?? '');
+	const movil = matchMedia('(max-width: 767px)').matches;
+
+	const fuente = (el: HTMLElement) => (movil ? el.dataset.src360 : el.dataset.src720)!;
+
+	const cuandoCargue = (fn: () => void) =>
+		document.readyState === 'complete' ? fn() : addEventListener('load', fn, { once: true });
+
+	for (const cont of document.querySelectorAll<HTMLElement>('[data-video]')) {
+		const video = cont.querySelector('video')!;
+		video.addEventListener('playing', () => cont.classList.add('reproduciendo'));
+
+		if (cont.dataset.video === 'clic') {
+			const boton = cont.querySelector<HTMLButtonElement>('.reproducir')!;
+			boton.addEventListener('click', () => {
+				video.src = fuente(cont);
+				video.controls = true;
+				video.muted = false;
+				boton.hidden = true;
+				video.play().catch(() => {});
+				video.focus();
+			});
+			continue;
+		}
+
+		// Modo fondo.
+		if (reducir || ahorro) continue;
+		const pausa = cont.querySelector<HTMLButtonElement>('.pausa')!;
+		let pausadoPorUsuario = false;
+
+		pausa.addEventListener('click', () => {
+			pausadoPorUsuario = !video.paused;
+			if (pausadoPorUsuario) video.pause();
+			else video.play().catch(() => {});
+			pausa.setAttribute('aria-label', pausadoPorUsuario ? 'Reproducir video' : 'Pausar video');
+			pausa.classList.toggle('pausado', pausadoPorUsuario);
+		});
+
+		cuandoCargue(() => {
+			const obs = new IntersectionObserver(
+				([e]) => {
+					if (e.isIntersecting) {
+						if (!video.src) {
+							video.src = fuente(cont);
+							pausa.hidden = false;
+						}
+						if (!pausadoPorUsuario) video.play().catch(() => {});
+					} else if (video.src) {
+						video.pause(); // no gastar CPU ni batería fuera de pantalla
+					}
+				},
+				{ threshold: 0.25 },
+			);
+			obs.observe(cont);
+		});
+	}
+</script>
+
+<style>
+	.video {
+		position: relative;
+		background: #1c1c1c;
+	}
+	.poster,
+	video {
+		grid-area: 1 / 1;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	video {
+		opacity: 0;
+		transition: opacity 0.6s;
+	}
+	.reproduciendo video {
+		opacity: 1;
+	}
+	.etiqueta-ref {
+		grid-area: 1 / 1;
+		align-self: end;
+		justify-self: start;
+		margin: 0.6rem;
+		padding: 0.15rem 0.5rem;
+		background: rgb(20 20 20 / 0.75);
+		color: #fff;
+		font: 600 0.72rem/1.4 var(--fuente-texto);
+		border-radius: 3px;
+		pointer-events: none;
+	}
+
+	/* display: grid/inline-flex de abajo le ganaría al [hidden] del navegador. */
+	.pausa[hidden],
+	.reproducir[hidden] {
+		display: none;
+	}
+	.pausa {
+		grid-area: 1 / 1;
+		align-self: end;
+		justify-self: end;
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		margin: 1rem;
+		border: 0;
+		border-radius: 50%;
+		background: rgb(20 20 20 / 0.6);
+		cursor: pointer;
+		z-index: 1;
+	}
+	.pausa:hover {
+		background: rgb(20 20 20 / 0.85);
+	}
+	.icono-pausa {
+		width: 0.8rem;
+		height: 0.9rem;
+		border-left: 3px solid #fff;
+		border-right: 3px solid #fff;
+	}
+	.pausado .icono-pausa {
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 0.5rem 0 0.5rem 0.8rem;
+		border-color: transparent transparent transparent #fff;
+		margin-left: 0.2rem;
+	}
+
+	.reproducir {
+		grid-area: 1 / 1;
+		place-self: center;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.9rem 1.4rem 0.9rem 1.1rem;
+		border: 0;
+		border-radius: 999px;
+		background: rgb(255 255 255 / 0.95);
+		color: var(--lols-carbon);
+		font: 700 1rem var(--fuente-titulos);
+		cursor: pointer;
+		box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+		z-index: 1;
+		transition: transform 0.15s;
+	}
+	.reproducir:hover {
+		transform: scale(1.04);
+	}
+	.triangulo {
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 0.5rem 0 0.5rem 0.8rem;
+		border-color: transparent transparent transparent var(--lols-verde-oscuro);
+	}
+</style>

@@ -1,0 +1,218 @@
+---
+// Seguridad y calidad: responde lo que pregunta un mandante al precalificar a un contratista
+// (indicadores certificados por la mutualidad, ISO, registros, programa de prevención).
+// Casi ningún sitio del rubro lo muestra: es el diferenciador (docs/investigacion-secciones.md).
+import Base from '../layouts/Base.astro';
+import Pendiente from '../components/Pendiente.astro';
+import VideoFondo from '../components/VideoFondo.astro';
+import Contacto from '../components/Contacto.astro';
+import { videos } from '../data/referencia';
+import { ejemplosSeguridad as ej } from '../data/ejemplos';
+---
+
+<Base title="Seguridad y calidad" description="Indicadores de seguridad, certificaciones y registros de LOLS Ingeniería.">
+	<header class="portadilla contenedor">
+		<p class="etiqueta">Seguridad y calidad</p>
+		<h1>Cada faena, con las personas primero</h1>
+		<p class="bajada">
+			Indicadores, certificaciones y registros para que su área de contratos precalifique a LOLS sin
+			perseguir documentos.
+		</p>
+	</header>
+
+	<VideoFondo video={videos.seguridad} clase="banda" eager />
+
+	<section class="seccion contenedor">
+		<p class="etiqueta">Indicadores</p>
+		<div class="cabecera"><h2>Nuestro desempeño en seguridad</h2></div>
+		<div class="indicadores">
+			{
+				ej.indicadores.map((i) => (
+					<div>
+						<p class="numero">
+							<Pendiente texto="indicador real certificado por la mutualidad">{i.valor}</Pendiente>
+						</p>
+						<p>{i.etiqueta}</p>
+					</div>
+				))
+			}
+		</div>
+		<p class="fuente"><Pendiente texto="período y fuente de los indicadores">{ej.fuenteIndicadores}</Pendiente></p>
+	</section>
+
+	<section class="seccion gris">
+		<div class="contenedor">
+			<p class="etiqueta">Certificaciones</p>
+			<div class="cabecera"><h2>Sistemas de gestión certificados</h2></div>
+			<ul class="certificaciones">
+				{
+					ej.certificaciones.map((c) => (
+						<li>
+							<Pendiente bloque texto="certificación real: emisor, alcance y vigencia (y PDF)">
+								<p class="sello">{c.nombre}</p>
+								<p class="alcance">{c.alcance}</p>
+								<dl>
+									<div><dt>Emisor</dt><dd>{c.emisor}</dd></div>
+									<div><dt>Vigente hasta</dt><dd>{c.vigencia}</dd></div>
+								</dl>
+							</Pendiente>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<section class="seccion contenedor dos">
+		<div>
+			<p class="etiqueta">Registros</p>
+			<h2>Inscritos donde nos buscan</h2>
+			<Pendiente bloque texto="registros de contratistas y mutualidad reales">
+				<ul class="lista">{ej.registros.map((r) => <li>{r}</li>)}</ul>
+			</Pendiente>
+		</div>
+		<div>
+			<p class="etiqueta">Prevención</p>
+			<h2>Cómo cuidamos cada obra</h2>
+			<Pendiente bloque texto="programa de prevención real">
+				<ul class="lista">{ej.programa.map((x) => <li>{x}</li>)}</ul>
+			</Pendiente>
+		</div>
+	</section>
+
+	<section class="seccion contenedor documentos">
+		<div>
+			<h2>¿Necesita la documentación para precalificar?</h2>
+			<p>Le enviamos certificados, indicadores de la mutualidad y antecedentes de la empresa.</p>
+		</div>
+		<a href="/contacto/?asunto=precalificacion#formulario" class="boton">Solicitar documentación</a>
+	</section>
+
+	<Contacto />
+</Base>
+
+<style>
+	.indicadores {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1.5rem;
+	}
+	.indicadores > div {
+		padding-top: 1.25rem;
+		border-top: 3px solid var(--lols-verde);
+	}
+	.indicadores p {
+		margin: 0;
+		color: var(--gris-medio);
+	}
+	.indicadores .numero {
+		margin-bottom: 0.35rem;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(2.75rem, 6vw, 4.5rem);
+		font-weight: 700;
+		letter-spacing: -0.04em;
+		line-height: 1;
+		color: var(--lols-carbon);
+	}
+	.fuente {
+		margin: 1.5rem 0 0;
+		font-size: 0.9rem;
+		color: var(--gris-medio);
+	}
+	.certificaciones {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1.25rem;
+	}
+	.certificaciones li {
+		padding: 1.75rem;
+		background: var(--lols-blanco);
+		border-top: 4px solid var(--lols-verde);
+	}
+	.sello {
+		margin: 0 0 0.25rem;
+		font-family: var(--fuente-titulos);
+		font-size: 1.75rem;
+		font-weight: 700;
+		letter-spacing: -0.03em;
+	}
+	.alcance {
+		color: var(--lols-gris);
+	}
+	.certificaciones dl {
+		display: flex;
+		gap: 1.5rem;
+		margin: 1rem 0 0;
+		font-size: 0.9rem;
+	}
+	.certificaciones dt {
+		color: var(--gris-medio);
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+	}
+	.certificaciones dd {
+		margin: 0.2rem 0 0;
+		font-weight: 600;
+	}
+	.dos {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: clamp(2rem, 5vw, 4rem);
+	}
+	.dos h2 {
+		font-size: clamp(1.6rem, 3vw, 2.25rem);
+	}
+	.lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid var(--linea);
+	}
+	.lista li {
+		position: relative;
+		padding: 0.85rem 0 0.85rem 1.5rem;
+		border-bottom: 1px solid var(--linea);
+		font-size: 1.05rem;
+	}
+	.lista li::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 1.3rem;
+		width: 0.55rem;
+		height: 0.55rem;
+		background: var(--lols-verde);
+	}
+	.documentos {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem;
+		flex-wrap: wrap;
+		padding-block: clamp(2rem, 5vw, 3rem);
+		border-top: 1px solid var(--linea);
+	}
+	.documentos h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin-bottom: 0.4rem;
+	}
+	.documentos p {
+		margin: 0;
+		color: var(--lols-gris);
+	}
+	@media (max-width: 860px) {
+		.certificaciones,
+		.dos {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (max-width: 640px) {
+		.indicadores {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

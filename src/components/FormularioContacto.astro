@@ -80,8 +80,16 @@ import { servicios } from '../data/empresa';
 		estado.dataset.tipo = ok ? 'ok' : 'error';
 	}
 
-	// Resultado del envío sin JavaScript (redirección con ?enviado / ?error).
 	const params = new URLSearchParams(location.search);
+	if (params.get('asunto') === 'precalificacion') {
+		const mensaje = form.elements.namedItem('mensaje') as HTMLTextAreaElement;
+		if (!mensaje.value) {
+			mensaje.value =
+				'Solicito la documentación de precalificación de LOLS Ingeniería (certificados, indicadores de la mutualidad y antecedentes de la empresa).';
+		}
+	}
+
+	// Resultado del envío sin JavaScript (redirección con ?enviado / ?error).
 	if (params.has('enviado')) mostrar('enviado', true);
 	else if (params.has('error')) mostrar(params.get('error')!);
 

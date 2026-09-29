@@ -27,3 +27,18 @@ referencia de docs/brief.md § 3.
 - Filtros de muchas dimensiones (Ramboll, Skanska): con 6–12 proyectos se verían vacíos.
 - Noticias, inversionistas, gobierno corporativo: se quedarían desactualizados o no aplican.
 - Ficha de proyecto delgada de Tecsa (solo título, mandante y fotos).
+
+## Ajuste por investigación del rubro (29-sep-2026)
+
+Tras revisar 31 sitios de construcción y guías de UX B2B (docs/investigacion-secciones.md):
+
+| Cambio | Por qué |
+|---|---|
+| Página **Seguridad y calidad** (menú + bloque en portada): indicadores de la mutualidad, ISO, registros REGIC/SICEP, programa de prevención, "Solicitar documentación" | Es lo primero que revisa un mandante al precalificar y casi ningún sitio lo muestra (0/15 en LATAM) |
+| **Barra fija en celular** (Llamar · WhatsApp · Cotizar) y botón flotante de WhatsApp en escritorio | WhatsApp es el canal principal en Chile; la mayoría de las visitas es móvil |
+| **Trabaja con nosotros** y **Proveedores** (en el pie, y derivación desde Contacto) | Rutas propias para no saturar el canal comercial |
+| **Cómo trabajamos** (4 pasos) en portada y "Qué pasa después" en Contacto | Claridad del proceso cuando no hay precios publicados |
+| Frase del hero: qué hace, para quién y dónde | El hero debe responder eso en 5 segundos |
+| Ficha de proyecto: plazo, rol de LOLS, testimonio con nombre y cargo, timelapse | Los compradores miran proyectos similares con datos, no solo fotos |
+| **Videos** (Mixkit): loop con botón de pausa en portada, seguridad y trabaja con nosotros; timelapse al hacer clic en la ficha | Donde el video suma ambiente o prueba; el poster carga primero, 360p en celular, solo poster con ahorro de datos o "reducir movimiento" |
+| Sin blog ni noticias | En una empresa chica se desactualizan y restan credibilidad |

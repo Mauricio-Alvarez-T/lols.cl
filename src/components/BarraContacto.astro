@@ -1,0 +1,113 @@
+---
+// Contacto siempre a mano (docs/investigacion-secciones.md: WhatsApp es clave en Chile y la
+// mayoría de las visitas llega por celular):
+//   celular  → barra fija abajo con Llamar · WhatsApp · Cotizar
+//   escritorio → botón flotante de WhatsApp
+import Pendiente from './Pendiente.astro';
+import { empresa, telefonoHref, whatsappHref } from '../data/empresa';
+
+const wa = whatsappHref();
+---
+
+{empresa.whatsapp === null && <Pendiente texto="número de WhatsApp comercial (empresa.whatsapp en src/data/empresa.ts)" />}
+
+<nav class="barra" aria-label="Contacto rápido">
+	<a href={telefonoHref(empresa.telefono.valor)}>
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1z" /></svg>
+		Llamar
+	</a>
+	<a href={wa} target="_blank" rel="noopener">
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z" /></svg>
+		WhatsApp
+	</a>
+	<a href="/contacto/" class="cotizar">Cotizar</a>
+</nav>
+
+<a class="flotante" href={wa} target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+	<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2z" /></svg>
+	<span>WhatsApp</span>
+</a>
+
+<style>
+	svg {
+		width: 1.25rem;
+		height: 1.25rem;
+		fill: currentColor;
+		flex-shrink: 0;
+	}
+
+	/* Celular: barra fija. */
+	.barra {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 25;
+		display: none;
+		grid-template-columns: 1fr 1fr 1.2fr;
+		background: var(--lols-blanco);
+		border-top: 1px solid var(--linea);
+		box-shadow: 0 -6px 18px rgb(0 0 0 / 0.06);
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+	.barra a {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.45rem;
+		min-height: 3.5rem;
+		color: var(--lols-carbon);
+		font: 700 0.95rem var(--fuente-titulos);
+		text-decoration: none;
+	}
+	.barra a + a {
+		border-left: 1px solid var(--linea);
+	}
+	.barra .cotizar {
+		background: var(--lols-verde-oscuro);
+		color: var(--lols-blanco);
+		border-left: 0;
+	}
+
+	/* Escritorio: botón flotante. */
+	.flotante {
+		position: fixed;
+		right: 1.25rem;
+		bottom: 1.25rem;
+		z-index: 25;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1.1rem 0.75rem 0.9rem;
+		border-radius: 999px;
+		background: var(--lols-verde-oscuro);
+		color: var(--lols-blanco);
+		font: 700 0.95rem var(--fuente-titulos);
+		text-decoration: none;
+		box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+		transition: transform 0.15s, background-color 0.15s;
+	}
+	.flotante:hover {
+		background: #004d2b;
+		transform: translateY(-2px);
+	}
+
+	@media (max-width: 767px) {
+		.barra {
+			display: grid;
+		}
+		.flotante {
+			display: none;
+		}
+		/* Que la barra no tape el final de la página. */
+		:global(body) {
+			padding-bottom: calc(3.5rem + env(safe-area-inset-bottom));
+		}
+	}
+	@media print {
+		.barra,
+		.flotante {
+			display: none;
+		}
+	}
+</style>

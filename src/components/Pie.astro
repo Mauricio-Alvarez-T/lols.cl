@@ -2,7 +2,7 @@
 // Pie mínimo (patrón Heatherwick): marca, datos de contacto y lo legal.
 import Logo from './Logo.astro';
 import Pendiente from './Pendiente.astro';
-import { empresa, navegacion, telefonoHref } from '../data/empresa';
+import { empresa, navegacion, otrosPublicos, telefonoHref } from '../data/empresa';
 
 const anio = new Date().getFullYear();
 ---
@@ -13,6 +13,9 @@ const anio = new Date().getFullYear();
 		<nav aria-label="Pie de página">
 			<ul>
 				{navegacion.map((n) => <li><a href={n.href}>{n.texto}</a></li>)}
+			</ul>
+			<ul class="secundario">
+				{otrosPublicos.map((n) => <li><a href={n.href}>{n.texto}</a></li>)}
 			</ul>
 		</nav>
 		<address>
@@ -67,6 +70,14 @@ const anio = new Date().getFullYear();
 	}
 	nav a:hover {
 		color: var(--lols-verde-oscuro);
+	}
+	.secundario {
+		margin-top: 0.75rem;
+	}
+	.secundario a {
+		font-family: var(--fuente-texto);
+		font-weight: 500;
+		color: var(--lols-gris);
 	}
 	address {
 		font-style: normal;

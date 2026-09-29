@@ -76,3 +76,30 @@ export const retratos = {
 export const logosEjemplo = ['constructora', 'inmobiliaria', 'retail', 'industrial', 'logistica', 'energia'].map(
 	(n) => `/referencia/logos/${n}.svg`,
 );
+
+// Videos de stock (Mixkit, licencia libre, enlazados desde su CDN). Uso según
+// docs/investigacion-secciones.md: loops decorativos donde suman ambiente (portada, seguridad,
+// trabaja con nosotros) y un timelapse que se reproduce al hacer clic en la ficha de proyecto.
+// Peso: 720p ≤ 5 MB en los loops; 360p (< 1 MB) en celular. Componente VideoFondo.
+export interface VideoReferencial {
+	id: number;
+	alt: string;
+	poster: string;
+	src720: string;
+	src360: string;
+}
+
+const mixkit = (id: number, alt: string): VideoReferencial => ({
+	id,
+	alt,
+	poster: `https://assets.mixkit.co/videos/${id}/${id}-thumb-720-0.jpg`,
+	src720: `https://assets.mixkit.co/videos/${id}/${id}-720.mp4`,
+	src360: `https://assets.mixkit.co/videos/${id}/${id}-360.mp4`,
+});
+
+export const videos = {
+	portada: mixkit(4010, 'Vista aérea de edificios en construcción con grúas'),
+	seguridad: mixkit(23170, 'Dos profesionales con casco revisan planos en obra'),
+	trabaja: mixkit(31473, 'Trabajadores en obra gruesa de un edificio'),
+	timelapse: mixkit(9686, 'Timelapse de la construcción de un edificio'),
+};

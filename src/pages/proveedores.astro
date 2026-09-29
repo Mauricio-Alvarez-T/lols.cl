@@ -1,0 +1,83 @@
+---
+// Ruta propia para proveedores: no pasan por el canal comercial (docs/investigacion-secciones.md).
+import Base from '../layouts/Base.astro';
+import Pendiente from '../components/Pendiente.astro';
+import { empresa } from '../data/empresa';
+import { ejemplosProveedores as ej } from '../data/ejemplos';
+
+const asunto = encodeURIComponent('Proveedor: [rubro]');
+---
+
+<Base title="Proveedores" description="Cómo ser proveedor de LOLS Ingeniería.">
+	<header class="portadilla contenedor">
+		<p class="etiqueta">Proveedores</p>
+		<h1>Trabajemos juntos</h1>
+		<p class="bajada"><Pendiente texto="frase para proveedores">{ej.bajada}</Pendiente></p>
+	</header>
+
+	<section class="seccion contenedor dos">
+		<div>
+			<h2>Qué le pedimos</h2>
+			<Pendiente bloque texto="requisitos reales para proveedores">
+				<ul class="lista">{ej.requisitos.map((r) => <li>{r}</li>)}</ul>
+			</Pendiente>
+		</div>
+		<div class="postular">
+			<h2>Cómo inscribirse</h2>
+			<p>Envíenos su presentación y antecedentes indicando su rubro en el asunto. Le contactaremos cuando haya una obra que lo requiera.</p>
+			<a class="boton" href={`mailto:${empresa.correo.valor}?subject=${asunto}`}>Enviar antecedentes</a>
+			<p class="nota"><Pendiente texto="correo de adquisiciones (¿compras@lols.cl?)" /></p>
+		</div>
+	</section>
+</Base>
+
+<style>
+	.dos {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: clamp(2rem, 5vw, 4rem);
+		align-items: start;
+		padding-top: 0;
+	}
+	.dos h2 {
+		font-size: clamp(1.6rem, 3vw, 2.25rem);
+	}
+	.lista {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid var(--linea);
+	}
+	.lista li {
+		position: relative;
+		padding: 0.85rem 0 0.85rem 1.5rem;
+		border-bottom: 1px solid var(--linea);
+		font-size: 1.05rem;
+	}
+	.lista li::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 1.3rem;
+		width: 0.55rem;
+		height: 0.55rem;
+		background: var(--lols-verde);
+	}
+	.postular {
+		padding: clamp(1.5rem, 4vw, 2.5rem);
+		background: var(--lols-gris-claro);
+		border-top: 4px solid var(--lols-verde);
+	}
+	.postular p {
+		color: var(--lols-gris);
+	}
+	.nota {
+		margin: 1rem 0 0;
+		font-size: 0.85rem;
+	}
+	@media (max-width: 860px) {
+		.dos {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

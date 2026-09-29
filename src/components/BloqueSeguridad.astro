@@ -1,0 +1,96 @@
+---
+// Resumen de seguridad y calidad para la portada: el diferenciador que casi ningún sitio del
+// rubro muestra y que el mandante revisa primero (docs/investigacion-secciones.md).
+import Pendiente from './Pendiente.astro';
+import { ejemplosSeguridad as ej } from '../data/ejemplos';
+---
+
+<section class="seccion oscura seguridad">
+	<div class="contenedor">
+		<p class="etiqueta">Seguridad y calidad</p>
+		<div class="cabecera">
+			<h2>Listos para su precalificación</h2>
+			<a href="/seguridad/" class="enlace-flecha">Ver indicadores y certificaciones</a>
+		</div>
+		<div class="indicadores">
+			{
+				ej.indicadores.map((i) => (
+					<div>
+						<p class="numero">
+							<Pendiente texto="indicador real certificado por la mutualidad">{i.valor}</Pendiente>
+						</p>
+						<p>{i.etiqueta}</p>
+					</div>
+				))
+			}
+		</div>
+		<ul class="sellos" aria-label="Certificaciones y registros">
+			{
+				ej.certificaciones.map((c) => (
+					<li>
+						<Pendiente texto="certificación vigente (confirmar)">
+							<strong>{c.nombre}</strong> {c.alcance}
+						</Pendiente>
+					</li>
+				))
+			}
+			{
+				ej.registros.slice(0, 2).map((r) => (
+					<li>
+						<Pendiente texto="registro vigente (confirmar)">{r}</Pendiente>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.indicadores {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1.5rem;
+		margin-bottom: 2.5rem;
+	}
+	.indicadores > div {
+		padding-top: 1.25rem;
+		border-top: 2px solid var(--lols-verde);
+	}
+	.indicadores p {
+		margin: 0;
+		color: #c8c8c8;
+	}
+	.indicadores .numero {
+		margin-bottom: 0.35rem;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(2.5rem, 5vw, 4rem);
+		font-weight: 700;
+		letter-spacing: -0.04em;
+		line-height: 1;
+		color: var(--lols-blanco);
+	}
+	.sellos {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+	}
+	.sellos li {
+		padding: 0.5rem 0.9rem;
+		border: 1px solid #3a3a3a;
+		border-radius: 999px;
+		font-size: 0.9rem;
+		color: #d6d6d6;
+	}
+	.sellos strong {
+		color: var(--lols-blanco);
+		font-family: var(--fuente-titulos);
+	}
+	@media (max-width: 640px) {
+		.indicadores {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

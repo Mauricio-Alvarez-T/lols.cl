@@ -51,7 +51,14 @@
 		.equipo > div,
 		.dos > *,
 		.columnas > *,
-		.contacto .grilla > *
+		.contacto .grilla > *,
+		.indicadores > div,
+		.pasos li,
+		.certificaciones li,
+		.motivos > div,
+		.sellos li,
+		.testimonio,
+		.postular
 	) {
 	opacity: 0;
 	transform: translateY(24px);
@@ -59,25 +66,25 @@
 		opacity 0.7s var(--suave),
 		transform 0.7s var(--suave);
 }
-.anim :is(.portadilla > *, .etiqueta, .cabecera, .cifras > div, .necesidad, .tarjeta, .logos li, .destacado > *, .bloque, .paso, .cifra, .linea li, .valores > div, .equipo > div, .dos > *, .columnas > *, .contacto .grilla > *).visible {
+.anim :is(.portadilla > *, .etiqueta, .cabecera, .cifras > div, .necesidad, .tarjeta, .logos li, .destacado > *, .bloque, .paso, .cifra, .linea li, .valores > div, .equipo > div, .dos > *, .columnas > *, .contacto .grilla > *, .indicadores > div, .pasos li, .certificaciones li, .motivos > div, .sellos li, .testimonio, .postular).visible {
 	opacity: 1;
 	transform: none;
 }
 
 /* Desfase entre hermanos (tarjetas, cifras, columnas…). */
-.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(2) {
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *, .indicadores > div, .pasos li, .certificaciones li, .motivos > div, .sellos li):nth-child(2) {
 	transition-delay: 0.08s;
 }
-.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(3) {
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *, .indicadores > div, .pasos li, .certificaciones li, .motivos > div, .sellos li):nth-child(3) {
 	transition-delay: 0.16s;
 }
-.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(4) {
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *, .indicadores > div, .pasos li, .certificaciones li, .motivos > div, .sellos li):nth-child(4) {
 	transition-delay: 0.24s;
 }
-.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(5) {
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *, .indicadores > div, .pasos li, .certificaciones li, .motivos > div, .sellos li):nth-child(5) {
 	transition-delay: 0.32s;
 }
-.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *):nth-child(n + 6) {
+.anim :is(.cifras > div, .necesidad, .tarjeta, .logos li, .paso, .cifra, .linea li, .valores > div, .equipo > div, .galeria > *, .portadilla > *, .indicadores > div, .pasos li, .certificaciones li, .motivos > div, .sellos li):nth-child(n + 6) {
 	transition-delay: 0.4s;
 }
 
@@ -86,14 +93,14 @@
 	opacity: 0;
 	transition: opacity 0.9s var(--suave);
 }
-.anim :is(.banda, .portada, .galeria > *) > img {
+.anim :is(.banda, .portada, .galeria > *) > :is(img, video) {
 	transform: scale(1.08);
 	transition: transform 1.6s var(--suave);
 }
 .anim :is(.banda, .portada, .galeria > *).visible {
 	opacity: 1;
 }
-.anim :is(.banda, .portada, .galeria > *).visible > img {
+.anim :is(.banda, .portada, .galeria > *).visible > :is(img, video) {
 	transform: none;
 }
 

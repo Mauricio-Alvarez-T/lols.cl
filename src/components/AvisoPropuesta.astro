@@ -62,6 +62,14 @@
 		background: #fff4d6;
 		color: #7a4a00;
 	}
+	/* En celular, sobre la barra de contacto fija. */
+	@media (max-width: 767px) {
+		.aviso {
+			left: 0.5rem;
+			bottom: calc(4.1rem + env(safe-area-inset-bottom));
+			font-size: 0.72rem;
+		}
+	}
 	@media print {
 		.aviso {
 			display: none;

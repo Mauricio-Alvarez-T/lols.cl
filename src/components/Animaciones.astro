@@ -39,6 +39,13 @@
 			'.banda',
 			'.portada',
 			'.galeria > *',
+			'.indicadores > div',
+			'.pasos li',
+			'.certificaciones li',
+			'.motivos > div',
+			'.sellos li',
+			'.testimonio',
+			'.postular',
 		].join(',');
 
 		const contar = (el: HTMLElement) => {
@@ -70,7 +77,7 @@
 			el.classList.add('visible');
 			observador.unobserve(el);
 			const numero = el.querySelector<HTMLElement>('.numero .ejemplo') ?? el.querySelector<HTMLElement>('.numero');
-			if (numero && el.closest('.cifras')) contar(numero);
+			if (numero && (el.closest('.cifras') || el.closest('.indicadores'))) contar(numero);
 		};
 		const observador = new IntersectionObserver(
 			(entradas) => {

@@ -7,6 +7,7 @@ import Encabezado from '../components/Encabezado.astro';
 import Pie from '../components/Pie.astro';
 import AvisoPropuesta from '../components/AvisoPropuesta.astro';
 import Animaciones from '../components/Animaciones.astro';
+import BarraContacto from '../components/BarraContacto.astro';
 
 interface Props {
 	title: string;
@@ -45,6 +46,7 @@ const titulo = title === 'LOLS Ingeniería' ? title : `${title} · LOLS Ingenier
 			<slot />
 		</main>
 		<Pie />
+		<BarraContacto />
 		<Animaciones />
 		{!indexable && <AvisoPropuesta />}
 	</body>
