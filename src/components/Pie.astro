@@ -1,10 +1,11 @@
 ---
-// Pie como sección diseñada (tendencia 2026: METRIC y Haven premiados por su pie): datos de
-// contacto en columnas, rutas del sitio y de otros públicos, certificaciones, datos legales
-// y la marca en grande al cierre. La frase de cierre la pone el bloque Contacto, justo antes.
+// Pie como sección diseñada: datos de contacto en columnas, rutas del sitio y de otros
+// públicos, certificaciones, datos legales y la marca en grande al cierre. Todo sobre el verde
+// de LOLS, para que cada página termine con la marca (como el pie rojo de Arup). La frase de
+// cierre la pone el bloque Contacto, justo antes.
 import Logo from './Logo.astro';
 import Pendiente from './Pendiente.astro';
-import { empresa, navegacion, otrosPublicos, telefonoHref, whatsappHref } from '../data/empresa';
+import { empresa, navegacion, otrosPublicos, telefonoHref, whatsappHref, fundacion } from '../data/empresa';
 import { ejemplosSeguridad } from '../data/ejemplos';
 
 const anio = new Date().getFullYear();
@@ -61,14 +62,15 @@ const anio = new Date().getFullYear();
 	</div>
 
 	<div class="contenedor legal">
-		<p>© {anio} {empresa.razonSocial}</p>
+		<p>© {anio} {empresa.razonSocial} · Desde {fundacion}</p>
 		<p><Pendiente texto="RUT de la empresa">RUT 76.000.000-0</Pendiente></p>
 	</div>
 </footer>
 
 <style>
 	.pie {
-		border-top: 1px solid var(--lols-carbon);
+		background: var(--lols-verde-oscuro);
+		color: var(--lols-blanco);
 		font-size: 0.95rem;
 	}
 	.columnas {
@@ -83,7 +85,7 @@ const anio = new Date().getFullYear();
 		font-size: 0.85rem;
 		font-weight: 600;
 		letter-spacing: 0;
-		color: var(--gris-medio);
+		color: rgb(255 255 255 / 0.8);
 	}
 	address {
 		font-style: normal;
@@ -99,13 +101,13 @@ const anio = new Date().getFullYear();
 		gap: 0.45rem;
 	}
 	a {
-		color: var(--lols-carbon);
+		color: var(--lols-blanco);
 		text-decoration: none;
 		background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
 		transition: background-size 0.25s var(--suave);
 	}
 	a:hover {
-		color: var(--lols-verde-oscuro);
+		color: var(--lols-lima);
 		background-size: 100% 1px;
 	}
 	.sellos {
@@ -115,14 +117,14 @@ const anio = new Date().getFullYear();
 	}
 	.sellos li {
 		padding: 0.25rem 0.6rem;
-		border: 1px solid var(--linea);
+		border: 1px solid rgb(255 255 255 / 0.4);
 		font-family: var(--fuente-datos);
 		font-weight: 600;
 		font-size: 0.85rem;
 	}
-	/* Marca en grande: el logo a todo el ancho, en el tono de la línea de dibujo. */
+	/* Marca en grande: el logo a todo el ancho, un tono sobre el verde. */
 	.marca {
-		color: #dde2da;
+		color: rgb(255 255 255 / 0.13);
 		padding-block: 0.5rem 0;
 	}
 	.marca :global(.logo-grande) {
@@ -136,7 +138,8 @@ const anio = new Date().getFullYear();
 		flex-wrap: wrap;
 		padding-block: 1.25rem;
 		font-size: 0.85rem;
-		color: var(--gris-medio);
+		color: rgb(255 255 255 / 0.8);
+		border-top: 1px solid rgb(255 255 255 / 0.18);
 	}
 	.legal p {
 		margin: 0;

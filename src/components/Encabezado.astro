@@ -1,14 +1,15 @@
 ---
 import Logo from './Logo.astro';
-import { navegacion } from '../data/empresa';
+import { navegacion, fundacion } from '../data/empresa';
 
 const ruta = Astro.url.pathname;
 ---
 
 <header class="encabezado">
 	<div class="contenedor fila">
-		<a href="/" class="marca" aria-label="LOLS Ingeniería, inicio">
+		<a href="/" class="marca" aria-label={`LOLS Ingeniería, desde ${fundacion}, inicio`}>
 			<Logo class="logo" />
+			<span class="desde" aria-hidden="true">desde<br />{fundacion}</span>
 		</a>
 		<button class="menu-boton" type="button" aria-expanded="false" aria-controls="menu">
 			<span class="sr-only">Menú</span>
@@ -46,6 +47,8 @@ const ruta = Astro.url.pathname;
 		z-index: 10;
 		view-transition-name: encabezado;
 		background: var(--fondo);
+		/* La losa de arriba del logo, a todo el ancho. */
+		border-top: 4px solid var(--lols-verde);
 		border-bottom: 1px solid var(--linea);
 	}
 	.fila {
@@ -56,8 +59,24 @@ const ruta = Astro.url.pathname;
 		min-height: 4.5rem;
 	}
 	.marca {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
 		color: var(--lols-verde);
+		text-decoration: none;
 		flex-shrink: 0;
+	}
+	/* Trayectoria junto a la marca (como el "80 years" de Arup bajo su logo). */
+	.desde {
+		padding-left: 0.85rem;
+		border-left: 1px solid var(--linea);
+		color: var(--lols-carbon);
+		font-family: var(--fuente-datos);
+		font-size: 0.78rem;
+		font-weight: 600;
+		line-height: 1.15;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
 	}
 	.marca :global(.logo) {
 		width: 8.5rem;
@@ -103,6 +122,11 @@ const ruta = Astro.url.pathname;
 		display: none;
 	}
 
+	@media (max-width: 360px) {
+		.desde {
+			display: none;
+		}
+	}
 	@media (max-width: 860px) {
 		.menu-boton {
 			display: grid;

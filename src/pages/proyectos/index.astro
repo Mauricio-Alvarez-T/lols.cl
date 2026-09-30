@@ -9,7 +9,8 @@ import Base from '../../layouts/Base.astro';
 import Pendiente from '../../components/Pendiente.astro';
 import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
 import Contacto from '../../components/Contacto.astro';
-import { proyectosPorEstado } from '../../data/proyectos';
+import Pictograma from '../../components/Pictograma.astro';
+import { proyectosPorEstado, pictogramaDeTipo } from '../../data/proyectos';
 import { obras2018, obrasEnCurso } from '../../data/referencia';
 import { ejemplosContratados } from '../../data/ejemplos';
 
@@ -93,7 +94,12 @@ const bloques = [
 							hayReales
 								? contratados.map((p) => (
 										<tr>
-											<th scope="row">{p.nombre ?? <Pendiente texto="nombre" />}</th>
+											<th scope="row">
+												<span class="obra">
+													<span class="picto"><Pictograma nombre={pictogramaDeTipo(p.tipo)} /></span>
+													{p.nombre ?? <Pendiente texto="nombre" />}
+												</span>
+											</th>
 											<td>{p.tipo ?? <Pendiente texto="tipo" />}</td>
 											<td>{p.comuna ?? <Pendiente texto="comuna" />}</td>
 											<td class="num">{p.superficie ?? <Pendiente texto="m²" />}</td>
@@ -102,7 +108,12 @@ const bloques = [
 									))
 								: ejemplosContratados.map((c) => (
 										<tr>
-											<th scope="row"><Pendiente texto="nombre">{c.nombre}</Pendiente></th>
+											<th scope="row">
+												<span class="obra">
+													<span class="picto"><Pictograma nombre={pictogramaDeTipo(c.tipo)} /></span>
+													<Pendiente texto="nombre">{c.nombre}</Pendiente>
+												</span>
+											</th>
 											<td><Pendiente texto="tipo">{c.tipo}</Pendiente></td>
 											<td><Pendiente texto="comuna">{c.comuna}</Pendiente></td>
 											<td class="num"><Pendiente texto="m²">{c.superficie}</Pendiente></td>
@@ -231,6 +242,24 @@ const bloques = [
 		font-family: var(--fuente-titulos);
 		font-size: 1.1rem;
 		font-weight: 700;
+	}
+	.obra {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+	.cartera .picto {
+		display: grid;
+		place-items: center;
+		flex-shrink: 0;
+		width: 2.25rem;
+		height: 2.25rem;
+		border: 1.5px solid var(--lols-verde);
+		color: var(--lols-verde);
+	}
+	.cartera .picto :global(.pictograma) {
+		width: 1.4rem;
+		height: 1.4rem;
 	}
 	.cartera .num {
 		text-align: right;

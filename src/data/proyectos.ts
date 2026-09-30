@@ -8,6 +8,8 @@
 // Fotos en public/proyectos/<slug>/ (la primera es la portada). Cuando una obra termina, basta
 // cambiar su `estado` a 'terminado' y completar el año y el relato.
 
+import type { NombrePictograma } from './pictogramas';
+
 // 'en-curso' conserva el valor de las URLs viejas (/proyectos-en-construccion/ → ?estado=en-curso).
 export type Estado = 'en-curso' | 'contratado' | 'terminado';
 
@@ -29,6 +31,20 @@ export const tiposObra = [
 	'Habilitación',
 ] as const;
 export type TipoObra = (typeof tiposObra)[number];
+
+// Pictograma de cada tipo de obra (src/components/Pictograma.astro). Acepta texto libre
+// porque las tarjetas de muestra traen el tipo como string; lo desconocido cae en "edificio".
+const pictogramas: Record<TipoObra, NombrePictograma> = {
+	'Edificio de oficinas': 'edificio',
+	'Edificio y oficinas': 'edificio-oficinas',
+	'Edificio comercial': 'comercial',
+	Bodegaje: 'bodegaje',
+	'Centro de bodegas': 'centro-bodegas',
+	Industrial: 'industrial',
+	Habilitación: 'habilitacion',
+};
+export const pictogramaDeTipo = (tipo: string | null | undefined): NombrePictograma =>
+	(tipo && pictogramas[tipo as TipoObra]) || 'edificio';
 
 export interface Proyecto {
 	slug: string;

@@ -146,15 +146,30 @@ video {
 	color: var(--lols-lima);
 }
 
+/* Identidad (docs/estructura.md § Identidad, 30-sep-2026): el isotipo como sistema. Sus
+   piezas (losa, muro, ventana, zócalo) se repiten en todo el sitio: losa verde sobre cada
+   título de sección, el zócalo como marcador ■, pictogramas con la misma geometría
+   (Pictograma.astro), el pie en verde y la cinta de especialidades bajo la portada. */
+
 /* Rótulo de ubicación (en qué sección está uno): pequeño, en la condensada de datos, en
-   minúsculas de oración. Sin mayúsculas espaciadas ni cuadro de color (Anthropic lo marca como
-   "template chrome"). Solo donde informa; las secciones cuyo título ya lo dice no lo llevan. */
+   minúsculas de oración, precedido por el zócalo del isotipo (■ verde, como el punto de color
+   de Mott MacDonald). Solo donde informa; las secciones cuyo título ya lo dice no lo llevan. */
 .etiqueta {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
 	margin: 0 0 1rem;
 	font-family: var(--fuente-datos);
 	font-size: 0.95rem;
-	font-weight: 500;
-	color: var(--gris-medio);
+	font-weight: 600;
+	color: var(--lols-carbon);
+}
+.etiqueta::before {
+	content: '';
+	flex-shrink: 0;
+	width: 0.6rem;
+	height: 0.6rem;
+	background: var(--lols-verde);
 }
 .etiqueta a {
 	color: inherit;
@@ -165,40 +180,52 @@ video {
 	text-decoration: underline;
 }
 .oscura .etiqueta {
-	color: #a9b1ab;
+	color: #d7ddd8;
 }
 
-/* Cabecera de sección: título a la izquierda, enlace a la derecha, línea de dibujo abajo. */
+/* Cabecera de sección: entre losas, como el logotipo (barra gruesa arriba, línea abajo). La
+   losa mide lo mismo que en el logo respecto de su alto (≈5 %). Título a la izquierda, enlace
+   a la derecha. */
 .cabecera {
 	display: flex;
 	align-items: flex-end;
 	justify-content: space-between;
 	gap: 1.5rem;
 	flex-wrap: wrap;
-	padding-bottom: 1.5rem;
+	padding-block: 1.5rem;
 	margin-bottom: 2.5rem;
+	border-top: 6px solid var(--lols-verde);
 	border-bottom: 1px solid var(--linea);
 }
 .cabecera h2 {
 	margin: 0;
 }
 .oscura .cabecera {
-	border-color: #343b36;
+	border-bottom-color: #343b36;
 }
 
-/* Enlace de sección: subrayado que crece desde la izquierda (sin flecha agregada). */
+/* Enlace de sección: termina en el zócalo del isotipo (■), que al pasar el mouse se estira
+   hasta ser una losa. Es la firma de los enlaces (como la flecha en círculo de Skanska). */
 .enlace-flecha {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	max-width: 100%;
 	font-family: var(--fuente-titulos);
 	font-weight: 700;
 	text-decoration: none;
-	white-space: nowrap;
-	background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
-	padding-bottom: 2px;
-	transition: background-size 0.25s var(--suave);
 }
-.enlace-flecha:hover,
-.enlace-flecha:focus-visible {
-	background-size: 100% 2px;
+.enlace-flecha::after {
+	content: '';
+	flex-shrink: 0;
+	width: 0.6rem;
+	height: 0.6rem;
+	background: currentColor;
+	transition: width 0.25s var(--suave);
+}
+.enlace-flecha:hover::after,
+.enlace-flecha:focus-visible::after {
+	width: 1.75rem;
 }
 
 .boton {
@@ -237,11 +264,14 @@ video {
 	background: var(--lols-verde-oscuro);
 	color: var(--lols-blanco);
 }
+/* a.boton: le gana a ".seccion.oscura a" (enlaces lima), que dejaba el texto ilegible. */
+.oscura a.boton,
 .oscura .boton {
 	background: var(--lols-blanco);
 	border-color: var(--lols-blanco);
 	color: var(--lols-carbon);
 }
+.oscura a.boton:hover,
 .oscura .boton:hover {
 	background: var(--lols-lima);
 	border-color: var(--lols-lima);

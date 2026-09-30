@@ -7,7 +7,8 @@ import Pendiente from '../../components/Pendiente.astro';
 import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
 import Contacto from '../../components/Contacto.astro';
 import { servicioPorSlug } from '../../data/empresa';
-import { proyectos, plantilla, estados, type Proyecto } from '../../data/proyectos';
+import { proyectos, plantilla, estados, pictogramaDeTipo, type Proyecto } from '../../data/proyectos';
+import Pictograma from '../../components/Pictograma.astro';
 import Referencial from '../../components/Referencial.astro';
 import { bandas, obras2018 } from '../../data/referencia';
 import { ejemploProyecto as ej, ejemploFichaExtra, ejemploTestimonio as testimonio } from '../../data/ejemplos';
@@ -38,7 +39,13 @@ const relato = [
 		<p class="nombre">{p.nombre ?? <Pendiente texto="nombre del proyecto">{ej.nombre}</Pendiente>}</p>
 		<h1>{p.titular ?? <Pendiente texto="el resultado en una frase (no el nombre de la obra)">{ej.titular}</Pendiente>}</h1>
 		<dl class="datos">
-			<div><dt>Tipo de obra</dt><dd>{p.tipo ?? <Pendiente texto="tipo de obra">{ej.tipo}</Pendiente>}</dd></div>
+			<div>
+				<dt>Tipo de obra</dt>
+				<dd class="con-picto">
+					<Pictograma nombre={pictogramaDeTipo(p.tipo ?? ej.tipo)} />
+					{p.tipo ?? <Pendiente texto="tipo de obra">{ej.tipo}</Pendiente>}
+				</dd>
+			</div>
 			<div><dt>Mandante</dt><dd>{p.mandante ?? <Pendiente texto="mandante">{ej.mandante}</Pendiente>}</dd></div>
 			<div><dt>Comuna</dt><dd>{p.comuna ?? <Pendiente texto="comuna">{ej.comuna}</Pendiente>}</dd></div>
 			<div><dt>Dirección</dt><dd>{p.direccion ?? <Pendiente texto="dirección (confirmar si se puede publicar)">{ej.direccion}</Pendiente>}</dd></div>
@@ -164,6 +171,17 @@ const relato = [
 		font-weight: 700;
 		font-size: 1.15rem;
 		color: var(--lols-verde-oscuro);
+	}
+	.con-picto {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.con-picto :global(.pictograma) {
+		flex-shrink: 0;
+		width: 1.35rem;
+		height: 1.35rem;
+		color: var(--lols-verde);
 	}
 	.portadilla h1 {
 		max-width: 20ch;

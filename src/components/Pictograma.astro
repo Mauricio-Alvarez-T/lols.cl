@@ -1,0 +1,95 @@
+---
+// Pictogramas LOLS: servicios y tipos de obra dibujados con la gramática del isotipo (losas
+// horizontales, muro macizo, ventanas en contorno, zócalo). Solo ángulos rectos, como el logo.
+// Idea tomada de BIG (un pictograma por proyecto) y de Mott MacDonald (todo el sistema gráfico
+// sale de la forma del logo). Grilla de 24; macizos en `fill`, contornos con trazo de 1,5.
+import type { NombrePictograma } from '../data/pictogramas';
+
+interface Props {
+	nombre: NombrePictograma;
+	class?: string;
+}
+const { nombre, class: clase } = Astro.props;
+
+// m = macizo [x, y, ancho, alto]; c = contorno [x0, y0, x1, y1] (bordes exteriores).
+type Forma = { m?: number[][]; c?: number[][]; trazo?: string };
+const suelo = [1, 20, 22, 2]; // la losa de abajo del logo
+const dibujos: Record<NombrePictograma, Forma> = {
+	// El isotipo mismo: construir es lo que hace LOLS.
+	construccion: {
+		m: [[3, 1.75, 18, 1.5], [3, 20.75, 18, 1.5], [3, 4.75, 7.5, 14.5], [12.25, 15.25, 8.75, 4]],
+		c: [[12.5, 5, 21, 8.75], [12.5, 10.25, 21, 14]],
+	},
+	// Pórtico con viga reticulada izando una carga.
+	montaje: {
+		m: [[7.4, 3, 1.2, 4], [11.4, 3, 1.2, 4], [15.4, 3, 1.2, 4], [3, 7, 2, 13], [19, 7, 2, 13], [11.4, 7, 1.2, 4], [8.5, 11, 7, 4], suelo],
+		c: [[3, 3, 21, 7]],
+	},
+	// Plan de mantención: tablilla con ítems marcados.
+	mantencion: {
+		m: [[9, 2, 6, 3.5], [7, 8.5, 2.25, 2.25], [11, 8.9, 6, 1.5], [7, 12.5, 2.25, 2.25], [11, 12.9, 6, 1.5], [7, 16.5, 2.25, 2.25], [11, 16.9, 4, 1.5]],
+		c: [[4.5, 4, 19.5, 22]],
+	},
+	// Tablero eléctrico con dos filas de automáticos.
+	electricidad: {
+		m: [[6.5, 5.5, 2, 4.5], [9.5, 5.5, 2, 4.5], [12.5, 5.5, 2, 4.5], [15.5, 5.5, 2, 4.5], [6.5, 13, 2, 4.5], [9.5, 13, 2, 4.5], [12.5, 13, 2, 4.5], [15.5, 13, 2, 4.5]],
+		c: [[4, 2, 20, 22]],
+	},
+	// Red: un nodo central que baja a tres puntos.
+	datos: {
+		m: [[9, 2, 6, 5], [11.25, 7, 1.5, 4], [4, 11, 16, 1.5], [4.25, 12.5, 1.5, 3.5], [11.25, 12.5, 1.5, 3.5], [18.25, 12.5, 1.5, 3.5]],
+		c: [[2, 16, 8, 22], [9, 16, 15, 22], [16, 16, 22, 22]],
+	},
+	// Escritorio con cajonera.
+	muebles: {
+		m: [[2, 8, 20, 2.5], [5.5, 13.5, 3, 1.2], [5.5, 17, 3, 1.2], [19, 10.5, 2, 10.5]],
+		c: [[3, 10.5, 11, 21]],
+	},
+	// Torre de oficinas: losa de techo, cuerpo en contorno y pisos.
+	edificio: {
+		m: [[6, 2, 12, 2], [9.5, 7, 5, 1.5], [9.5, 10, 5, 1.5], [9.5, 13, 5, 1.5], [9.5, 16, 5, 1.5], suelo],
+		c: [[7, 4, 17, 20]],
+	},
+	// Torre y cuerpo bajo macizo (edificio y oficinas).
+	'edificio-oficinas': {
+		m: [[5.5, 6.5, 4, 1.5], [5.5, 9.5, 4, 1.5], [5.5, 12.5, 4, 1.5], [5.5, 15.5, 4, 1.5], [13, 10, 8, 10], suelo],
+		c: [[3, 3, 12, 20]],
+	},
+	// Comercio: cornisa, piso alto con ventanas y vitrinas con acceso al centro.
+	comercial: {
+		m: [[2, 4, 20, 2], [5.5, 8.25, 3, 2.5], [10.5, 8.25, 3, 2.5], [15.5, 8.25, 3, 2.5], [3, 14.5, 7, 5.5], [14, 14.5, 7, 5.5], suelo],
+		c: [[3, 6, 21, 13.5]],
+	},
+	// Bodega: losa de techo y portón grande.
+	bodegaje: {
+		m: [[2, 6, 20, 2.5], [8, 12, 8, 8], suelo],
+		c: [[3, 8.5, 21, 20]],
+	},
+	// Centro de bodegas: tres módulos bajo una misma losa.
+	'centro-bodegas': {
+		m: [[1, 6, 22, 2], [3.5, 13, 3, 7], [10.5, 13, 3, 7], [17.5, 13, 3, 7], suelo],
+		c: [[2, 8, 8, 20], [9, 8, 15, 20], [16, 8, 22, 20]],
+	},
+	// Planta industrial con chimenea.
+	industrial: {
+		m: [[17, 3, 3, 17], [2, 8, 15, 2], [5.5, 13, 3, 3], [10.5, 13, 3, 3], suelo],
+		c: [[3, 10, 17, 20]],
+	},
+	// Habilitación: planta de un recinto (muros, tabique y mesón), como en un plano.
+	habilitacion: {
+		m: [[3, 11, 9, 1.5], [15, 6, 4, 3]],
+		trazo: 'M14 21H21V3H3V21H10',
+	},
+};
+const d = dibujos[nombre];
+---
+
+<svg class:list={['pictograma', clase]} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+	<g fill="currentColor">
+		{d.m?.map(([x, y, w, h]) => <rect x={x} y={y} width={w} height={h} />)}
+	</g>
+	<g fill="none" stroke="currentColor" stroke-width="1.5">
+		{d.c?.map(([x0, y0, x1, y1]) => <rect x={x0 + 0.75} y={y0 + 0.75} width={x1 - x0 - 1.5} height={y1 - y0 - 1.5} />)}
+		{d.trazo && <path d={d.trazo} stroke-width="2" stroke-linecap="square" />}
+	</g>
+</svg>

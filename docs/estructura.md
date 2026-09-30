@@ -67,3 +67,37 @@ WebKit/Chrome sobre view transitions.
   tarjeta viaja a la ficha; el encabezado queda fijo). Respeta "reducir movimiento".
 - **Jerarquía:** la primera obra de cada grilla es más grande.
 - **Pie:** columnas de contacto, sitio, otros públicos y certificaciones; marca en grande; RUT.
+
+## Identidad: el isotipo como sistema (30-sep-2026)
+
+Pedido: "la web se siente sosa, le falta identidad", con elementos livianos. Se revisaron de
+nuevo las 11 referencias del brief, esta vez buscando qué las hace reconocibles (capturas del
+30-sep; SalfaCorp bloquea el acceso automatizado). Las que tienen más identidad repiten uno o
+dos recursos propios en todo el sitio: Mott MacDonald saca máscaras, íconos y separadores de la
+forma de su logo; BIG pone un pictograma a cada proyecto; Skanska termina cada enlace con su
+flecha en círculo verde y usa un bloque azul para las cifras; Arup cierra con un pie rojo y
+lleva "80 years" bajo el logo; BESIX pone una barra roja en cada título; Tecsa usa su rojo en
+grande. La propuesta anterior usaba el verde solo en detalles y ninguna pieza propia.
+
+Sistema: las piezas del isotipo (losa, muro, ventana en contorno, zócalo) son un edificio en
+elevación, y se repiten en todo el sitio:
+
+- **Pictogramas LOLS** (`Pictograma.astro`): servicios y tipos de obra dibujados con esa
+  geometría, solo ángulos rectos. En tarjetas de proyecto (macizo = obra en curso o terminada),
+  en la tabla de contratados (contorno = obra que aún no parte), en la ficha y en servicios.
+  Reemplazan íconos genéricos. (BIG, Mott MacDonald)
+- **Losa sobre cada título de sección**: barra verde de 6 px, la misma proporción que las losas
+  del logo; y una losa de 4 px arriba del encabezado. (BESIX, logo)
+- **Zócalo ■** como marcador de rótulos y como remate de los enlaces, que al pasar el mouse se
+  estira hasta ser una losa. (Mott MacDonald, Skanska)
+- **Verde en grande**: cinta verde bajo la portada y pie verde con el logo gigante. (Arup, Skanska)
+- **Cinta de especialidades** bajo la portada, en letra de letrero con el isotipo como
+  separador. Se desplaza con el scroll, no sola (sin movimiento automático que pausar, WCAG
+  2.2.2); sin soporte, queda fija. (Mott MacDonald)
+- **"Desde 1995"** junto al logo y en el pie. (Arup, "80 years")
+- **Letrero de obra** en el cierre de contacto: el letrero que tiene toda faena en Chile, con
+  la obra del visitante, quién construye, el profesional a cargo y cómo ubicarlo. Es el detalle
+  local que ninguna referencia extranjera tiene.
+
+Todo es CSS y SVG en línea: sin imágenes, fuentes ni librerías nuevas. La tipografía de letrero
+es la IBM Plex Sans Condensed que ya se cargaba.

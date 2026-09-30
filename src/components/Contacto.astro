@@ -1,9 +1,10 @@
 ---
-// Cierre de página con una persona responsable (patrón Arup / Mott MacDonald / Ramboll).
+// Cierre de página con una persona responsable (patrón Arup / Mott MacDonald / Ramboll),
+// presentado como el letrero de obra que tiene toda faena en Chile: obra, quién construye,
+// profesional a cargo y cómo ubicarlo. La obra, en este caso, es la del visitante.
 import Pendiente from './Pendiente.astro';
-import { empresa, telefonoHref } from '../data/empresa';
-import Referencial from './Referencial.astro';
-import { retratos } from '../data/referencia';
+import Logo from './Logo.astro';
+import { empresa, telefonoHref, fundacion } from '../data/empresa';
 import EjesPlano from './EjesPlano.astro';
 
 interface Props {
@@ -19,23 +20,44 @@ const { titulo = 'Hablemos de su proyecto' } = Astro.props;
 			<h2>{titulo}</h2>
 			<a href="/contacto/" class="boton">Solicitar cotización</a>
 		</div>
-		<div class="persona">
-			<div class="retrato marco">
-				<Referencial imagen={retratos.contacto} sizes="7rem" />
-			</div>
-			<div>
-				<p class="nombre"><Pendiente texto="nombre y cargo de quien atiende cotizaciones">Nombre Apellido</Pendiente></p>
-				<p class="cargo"><Pendiente texto="cargo">Jefe de proyectos</Pendiente></p>
-				<p>
-					<Pendiente revisar={empresa.telefono.revisar}>
-						<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
-					</Pendiente>
-				</p>
-				<p>
-					<Pendiente revisar={empresa.correo.revisar}>
-						<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
-					</Pendiente>
-				</p>
+		<div class="letrero">
+			<div class="tablero">
+				<div class="cabeza">
+					<Logo class="logo-letrero" />
+				</div>
+				<dl>
+					<div>
+						<dt>Obra</dt>
+						<dd>Su proyecto</dd>
+					</div>
+					<div>
+						<dt>Construye</dt>
+						<dd>{empresa.razonSocial} · desde {fundacion}</dd>
+					</div>
+					<div>
+						<dt>A cargo</dt>
+						<dd>
+							<Pendiente texto="nombre de quien atiende cotizaciones">Nombre Apellido</Pendiente>,{' '}
+							<Pendiente texto="cargo">jefe de proyectos</Pendiente>
+						</dd>
+					</div>
+					<div>
+						<dt>Teléfono</dt>
+						<dd>
+							<Pendiente revisar={empresa.telefono.revisar}>
+								<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
+							</Pendiente>
+						</dd>
+					</div>
+					<div>
+						<dt>Correo</dt>
+						<dd>
+							<Pendiente revisar={empresa.correo.revisar}>
+								<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
+							</Pendiente>
+						</dd>
+					</div>
+				</dl>
 			</div>
 		</div>
 	</div>
@@ -44,46 +66,100 @@ const { titulo = 'Hablemos de su proyecto' } = Astro.props;
 <style>
 	.grilla {
 		display: grid;
-		grid-template-columns: 1.3fr 1fr;
+		grid-template-columns: 1.1fr 1fr;
 		gap: clamp(2.5rem, 6vw, 6rem);
-		align-items: end;
+		align-items: center;
 	}
 	h2 {
 		font-size: clamp(2.25rem, 5.5vw, 4.5rem);
 		margin-bottom: 2rem;
 	}
-	.persona {
-		display: grid;
-		grid-template-columns: 7rem minmax(0, 1fr);
-		gap: 1.5rem;
+
+	/* Letrero de obra: tablero blanco con franja de la empresa, datos en letra de letrero
+	   (condensada, mayúsculas) y dos pies derechos que lo sostienen. */
+	.letrero {
+		position: relative;
+		padding-bottom: 2.5rem;
+	}
+	.letrero::before,
+	.letrero::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		width: 0.6rem;
+		height: 2.5rem;
+		background: #9aa39d;
+	}
+	.letrero::before {
+		left: 18%;
+	}
+	.letrero::after {
+		right: 18%;
+	}
+	.tablero {
+		position: relative;
+		background: var(--lols-blanco);
+		color: var(--lols-carbon);
+		border: 6px solid var(--lols-blanco);
+		outline: 1px solid #c9cfca;
+		outline-offset: -3px;
+	}
+	.cabeza {
+		display: flex;
 		align-items: center;
-		padding-top: 2rem;
-		border-top: 1px solid #333;
+		padding: 0.9rem 1.1rem;
+		background: var(--lols-verde);
+		color: var(--lols-blanco);
 	}
-	.retrato {
-		aspect-ratio: 1;
-		background: #262626;
+	.cabeza :global(.logo-letrero) {
+		width: 8.5rem;
+		height: auto;
 	}
-	.persona p {
-		margin: 0 0 0.35rem;
+	dl {
+		margin: 0;
 	}
-	.nombre {
-		font-family: var(--fuente-titulos);
-		font-weight: 700;
+	dl > div {
+		display: grid;
+		grid-template-columns: 6.5rem minmax(0, 1fr);
+		gap: 1rem;
+		align-items: baseline;
+		padding: 0.7rem 1.1rem;
+		border-bottom: 1px solid #dfe3dd;
 	}
-	.cargo {
-		color: #b5b5b5;
-		margin-bottom: 0.75rem !important;
+	dl > div:last-child {
+		border-bottom: 0;
+	}
+	dt {
+		font-family: var(--fuente-datos);
+		font-size: 0.8rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--gris-medio);
+	}
+	dd {
+		margin: 0;
+		font-family: var(--fuente-datos);
+		font-size: 1.05rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.01em;
+		overflow-wrap: anywhere;
+	}
+	/* Correo y teléfono se escriben como son (el correo no va en mayúsculas). */
+	dd a {
+		color: var(--lols-verde-oscuro);
+		text-transform: none;
 	}
 	@media (max-width: 860px) {
 		.grilla {
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}
-	@media (max-width: 480px) {
-		.persona {
-			grid-template-columns: 4.5rem minmax(0, 1fr);
-			gap: 1rem;
+	@media (max-width: 420px) {
+		dl > div {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.1rem;
 		}
 	}
 </style>

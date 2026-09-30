@@ -17,6 +17,7 @@ import Equipamiento from '../components/Equipamiento.astro';
 import Referencial from '../components/Referencial.astro';
 import { destacado, obrasEnCurso, logosEjemplo, videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
+import CintaObra from '../components/CintaObra.astro';
 import BloqueSeguridad from '../components/BloqueSeguridad.astro';
 import Proceso from '../components/Proceso.astro';
 import { ejemploBajadaHero, ejemplosContratados } from '../data/ejemplos';
@@ -42,6 +43,8 @@ const cifras = [
 		</div>
 	</ObraPortada>
 
+	<CintaObra />
+
 	<section class="cifras contenedor" aria-label="LOLS en cifras">
 		{
 			cifras.map((c) => (
@@ -55,9 +58,11 @@ const cifras = [
 
 	<section class="seccion">
 		<div class="contenedor">
-			<p class="etiqueta">Servicios</p>
 			<div class="cabecera">
-				<h2>¿Qué necesita?</h2>
+				<div>
+					<p class="etiqueta">Servicios</p>
+					<h2>¿Qué necesita?</h2>
+				</div>
 				<a href="/servicios/" class="enlace-flecha">Todos los servicios</a>
 			</div>
 			<Pendiente texto={`servicios agrupados por necesidad: ${necesidadesRevisar}`} />

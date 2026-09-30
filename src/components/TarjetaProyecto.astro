@@ -2,10 +2,12 @@
 // Tarjeta de proyecto: foto + nombre + rótulo de lámina con los mismos campos en todas
 // (patrón BIG + convención del cuadro de rótulo de un plano). Campos según la reunión con
 // don Luis: tipo de obra, superficie, comuna y, en las obras en construcción, la dirección y
-// desde cuándo. `destacada` la agranda para dar jerarquía en la grilla. Al hacer clic, su
-// foto viaja a la portada de la ficha (view transition).
+// desde cuándo. Junto al nombre, el pictograma LOLS del tipo de obra (como los íconos de
+// proyecto de BIG). `destacada` la agranda para dar jerarquía en la grilla. Al hacer clic,
+// su foto viaja a la portada de la ficha (view transition).
 import Pendiente from './Pendiente.astro';
-import { plantilla, estados, type Estado, type Proyecto } from '../data/proyectos';
+import Pictograma from './Pictograma.astro';
+import { plantilla, estados, pictogramaDeTipo, type Estado, type Proyecto } from '../data/proyectos';
 import type { ImagenReferencial } from '../data/referencia';
 import Referencial from './Referencial.astro';
 
@@ -23,6 +25,7 @@ const foto = proyecto?.fotos[0];
 // Las tarjetas de muestra llevan a la ficha de ejemplo mientras no haya proyectos reales.
 const href = `/proyectos/${proyecto?.slug ?? plantilla.slug}/`;
 const ej = referencia?.ejemplo;
+const tipo = proyecto?.tipo ?? ej?.tipo;
 const numero = lamina ? `L-${String(lamina).padStart(2, '0')}` : null;
 // Última celda: en una obra terminada importa el año; en una en construcción, desde cuándo.
 const fecha = enObra
@@ -36,16 +39,23 @@ const fecha = enObra
 			{foto ? <img src={foto.src} alt={foto.alt} loading="lazy" /> : referencia ? <Referencial imagen={referencia} /> : <Pendiente bloque texto="foto" />}
 			{enObra && <span class="sello">{estados['en-curso']}</span>}
 		</div>
-		<h3>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto">{ej?.nombre}</Pendiente>}</h3>
-		<p class="ubicacion">
-			{proyecto?.comuna ?? <Pendiente texto="comuna">{ej?.comuna}</Pendiente>}
-			{enObra && (
-				<>
-					{' · '}
-					{proyecto?.direccion ?? <Pendiente texto="dirección (confirmar si se puede publicar)">{ej?.direccion}</Pendiente>}
-				</>
-			)}
-		</p>
+		<div class="titulo">
+			<span class="picto" title={tipo ?? undefined}>
+				<Pictograma nombre={pictogramaDeTipo(tipo)} />
+			</span>
+			<div>
+				<h3>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto">{ej?.nombre}</Pendiente>}</h3>
+				<p class="ubicacion">
+					{proyecto?.comuna ?? <Pendiente texto="comuna">{ej?.comuna}</Pendiente>}
+					{enObra && (
+						<>
+							{' · '}
+							{proyecto?.direccion ?? <Pendiente texto="dirección (confirmar si se puede publicar)">{ej?.direccion}</Pendiente>}
+						</>
+					)}
+				</p>
+			</div>
+		</div>
 		<dl class="rotulo">
 			<div>
 				<dt>Tipo</dt>
@@ -114,6 +124,37 @@ const fecha = enObra
 	.vinculo:hover h3 {
 		color: var(--lols-verde-oscuro);
 		background-size: 100% 2px;
+	}
+	.titulo {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: 0.85rem;
+		align-items: start;
+	}
+	/* Pictograma del tipo de obra: zócalo verde del isotipo con el dibujo en blanco. */
+	.picto {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		background: var(--lols-verde);
+		color: var(--lols-blanco);
+		transition: background-color 0.2s;
+	}
+	.picto :global(.pictograma) {
+		width: 1.7rem;
+		height: 1.7rem;
+	}
+	.vinculo:hover .picto {
+		background: var(--lols-verde-oscuro);
+	}
+	.destacada .picto {
+		width: 3.25rem;
+		height: 3.25rem;
+	}
+	.destacada .picto :global(.pictograma) {
+		width: 2rem;
+		height: 2rem;
 	}
 	.ubicacion {
 		margin: 0 0 0.75rem;
