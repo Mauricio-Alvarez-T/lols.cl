@@ -90,14 +90,11 @@ elevación, y se repiten en todo el sitio:
   del logo; y una losa de 4 px arriba del encabezado. (BESIX, logo)
 - **Zócalo ■** como marcador de rótulos y como remate de los enlaces, que al pasar el mouse se
   estira hasta ser una losa. (Mott MacDonald, Skanska)
-- **Verde en grande**: cinta verde bajo la portada y pie verde con el logo gigante. (Arup, Skanska)
-- **Cinta de especialidades** bajo la portada, en letra de letrero con el isotipo como
-  separador. Se desplaza con el scroll, no sola (sin movimiento automático que pausar, WCAG
-  2.2.2); sin soporte, queda fija. (Mott MacDonald)
+- **Pie verde**, para que cada página cierre con la marca. (Arup)
 - **"Desde 1995"** junto al logo y en el pie. (Arup, "80 years")
-- **Letrero de obra** en el cierre de contacto: el letrero que tiene toda faena en Chile, con
-  la obra del visitante, quién construye, el profesional a cargo y cómo ubicarlo. Es el detalle
-  local que ninguna referencia extranjera tiene.
 
-Todo es CSS y SVG en línea: sin imágenes, fuentes ni librerías nuevas. La tipografía de letrero
-es la IBM Plex Sans Condensed que ya se cargaba.
+Revisión del usuario (30-sep): se sacaron la cinta de especialidades bajo la portada, el
+cierre de contacto como letrero de obra y el logo gigante del pie ("lo que no sume, mejor no
+tenerlo"). El cierre de contacto quedó en texto: título, botón y datos en líneas.
+
+Todo es CSS y SVG en línea: sin imágenes, fuentes ni librerías nuevas. 

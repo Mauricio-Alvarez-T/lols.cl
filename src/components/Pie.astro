@@ -1,9 +1,8 @@
 ---
 // Pie como sección diseñada: datos de contacto en columnas, rutas del sitio y de otros
-// públicos, certificaciones, datos legales y la marca en grande al cierre. Todo sobre el verde
+// públicos, certificaciones y datos legales. Todo sobre el verde
 // de LOLS, para que cada página termine con la marca (como el pie rojo de Arup). La frase de
 // cierre la pone el bloque Contacto, justo antes.
-import Logo from './Logo.astro';
 import Pendiente from './Pendiente.astro';
 import { empresa, navegacion, otrosPublicos, telefonoHref, whatsappHref, fundacion } from '../data/empresa';
 import { ejemplosSeguridad } from '../data/ejemplos';
@@ -55,10 +54,6 @@ const anio = new Date().getFullYear();
 				}
 			</ul>
 		</div>
-	</div>
-
-	<div class="contenedor marca" aria-hidden="true">
-		<Logo class="logo-grande" />
 	</div>
 
 	<div class="contenedor legal">
@@ -121,15 +116,6 @@ const anio = new Date().getFullYear();
 		font-family: var(--fuente-datos);
 		font-weight: 600;
 		font-size: 0.85rem;
-	}
-	/* Marca en grande: el logo a todo el ancho, un tono sobre el verde. */
-	.marca {
-		color: rgb(255 255 255 / 0.13);
-		padding-block: 0.5rem 0;
-	}
-	.marca :global(.logo-grande) {
-		width: 100%;
-		height: auto;
 	}
 	.legal {
 		display: flex;
