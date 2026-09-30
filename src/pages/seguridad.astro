@@ -5,23 +5,21 @@
 // Casi ningún sitio del rubro lo muestra: es el diferenciador (docs/investigacion-secciones.md).
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
-import VideoFondo from '../components/VideoFondo.astro';
+import ObraPortada from '../components/ObraPortada.astro';
 import Contacto from '../components/Contacto.astro';
 import { videos } from '../data/referencia';
 import { ejemplosSeguridad as ej } from '../data/ejemplos';
 ---
 
 <Base title="Seguridad y calidad" description="Indicadores de seguridad, certificaciones y registros de LOLS Ingeniería.">
-	<header class="portadilla contenedor">
+	<ObraPortada video={videos.seguridad}>
 		<p class="etiqueta">Seguridad y calidad</p>
-		<h1>Cada faena, con las personas primero</h1>
+		<h1 class="display">Cada faena, con las personas primero<span class="punto">.</span></h1>
 		<p class="bajada">
 			Indicadores, certificaciones y registros para que su área de contratos precalifique a LOLS sin
 			perseguir documentos.
 		</p>
-	</header>
-
-	<VideoFondo video={videos.seguridad} clase="banda" eager />
+	</ObraPortada>
 
 	<section class="seccion contenedor">
 		<div class="cabecera"><h2>Nuestro desempeño en seguridad</h2></div>
@@ -80,6 +78,9 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 </Base>
 
 <style>
+	.punto {
+		color: var(--lols-verde);
+	}
 	.indicadores {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
