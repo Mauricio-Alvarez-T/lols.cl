@@ -84,7 +84,7 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 				<ul class="pista" style="--i: 0">
 					{
 						obras.map((o, i) => (
-							<li class="foto" aria-hidden={i === 0 ? undefined : 'true'}>
+							<li class:list={['foto', { futura: i > 0 }]} aria-hidden={i === 0 ? undefined : 'true'}>
 								<a href={o.href} tabindex="-1" class="marco">
 									{esReferencial(o.imagen) ? (
 										<Referencial imagen={o.imagen} sizes="(max-width: 760px) 88vw, 60vw" />
@@ -130,6 +130,7 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 			});
 			fotos.forEach((f, i) => {
 				f.classList.toggle('pasada', i < actual);
+				f.classList.toggle('futura', i > actual);
 				if (i === actual) f.removeAttribute('aria-hidden');
 				else f.setAttribute('aria-hidden', 'true');
 			});
@@ -360,6 +361,16 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 		flex: 0 0 100%;
 		opacity: 1;
 		transition: opacity 0.8s;
+	}
+	/* Las que vienen, difuminadas (pedido del usuario): la activa queda nítida al llegar. */
+	.foto .marco :global(img) {
+		transition:
+			filter 0.6s,
+			transform 0.6s;
+	}
+	.foto.futura .marco :global(img) {
+		filter: saturate(0.88) contrast(1.04) blur(6px);
+		transform: scale(1.04); /* que el difuminado no deje borde claro */
 	}
 	.foto.pasada {
 		opacity: 0;
