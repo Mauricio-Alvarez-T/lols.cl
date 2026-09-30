@@ -1,0 +1,85 @@
+---
+// Servicios como mosaico de fotos con su nombre (nivel 1 de la divulgación progresiva,
+// docs/estructura.md § Mostrar, no contar): la tarjeta entera lleva a la página del servicio,
+// donde está el alcance, las obras y el detalle.
+import Pictograma from './Pictograma.astro';
+import Referencial from './Referencial.astro';
+import { servicios } from '../data/empresa';
+import { bandasServicio } from '../data/referencia';
+
+interface Props {
+	titulo?: 'h2' | 'h3';
+}
+const { titulo: Titulo = 'h3' } = Astro.props;
+---
+
+<ul class="mosaico">
+	{
+		servicios.map((s) => (
+			<li>
+				<a href={`/servicios/${s.slug}/`}>
+					<div class="foto marco">
+						<Referencial imagen={bandasServicio[s.slug]} sizes="(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw" />
+					</div>
+					<Titulo class="nombre">
+						<Pictograma nombre={s.icono} />
+						{s.nombre}
+					</Titulo>
+				</a>
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	.mosaico {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2vw, 1.5rem);
+	}
+	a {
+		display: block;
+		color: inherit;
+		text-decoration: none;
+	}
+	.foto {
+		aspect-ratio: 4 / 3;
+		margin-bottom: 0.9rem;
+	}
+	.foto :global(img) {
+		transition: transform 0.4s var(--suave);
+	}
+	a:hover .foto :global(img) {
+		transform: scale(1.03);
+	}
+	.nombre {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin: 0;
+		font-size: clamp(1.2rem, 1rem + 0.6vw, 1.5rem);
+		letter-spacing: -0.02em;
+	}
+	.nombre :global(.pictograma) {
+		flex-shrink: 0;
+		width: 1.6rem;
+		height: 1.6rem;
+		color: var(--lols-verde);
+	}
+	a:hover .nombre {
+		color: var(--lols-verde-oscuro);
+	}
+	@media (max-width: 960px) {
+		.mosaico {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (max-width: 480px) {
+		.mosaico {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

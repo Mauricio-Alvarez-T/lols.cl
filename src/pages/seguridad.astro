@@ -1,6 +1,7 @@
 ---
 // Seguridad y calidad: responde lo que pregunta un mandante al precalificar a un contratista
-// (indicadores certificados por la mutualidad, ISO, registros, programa de prevención).
+// (indicadores certificados por la mutualidad, ISO, registros). Cifras y sellos en grande,
+// pocos párrafos (docs/estructura.md § Mostrar, no contar).
 // Casi ningún sitio del rubro lo muestra: es el diferenciador (docs/investigacion-secciones.md).
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
@@ -61,25 +62,16 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 		</div>
 	</section>
 
-	<section class="seccion contenedor dos">
-		<div>
-			<h2>Inscritos donde nos buscan</h2>
-			<Pendiente bloque texto="registros de contratistas y mutualidad reales">
-				<ul class="lista">{ej.registros.map((r) => <li>{r}</li>)}</ul>
-			</Pendiente>
-		</div>
-		<div>
-			<h2>Cómo cuidamos cada obra</h2>
-			<Pendiente bloque texto="programa de prevención real">
-				<ul class="lista">{ej.programa.map((x) => <li>{x}</li>)}</ul>
-			</Pendiente>
-		</div>
+	<section class="seccion contenedor">
+		<div class="cabecera"><h2>Inscritos en</h2></div>
+		<Pendiente bloque texto="registros de contratistas y mutualidad reales">
+			<ul class="registros">{ej.registros.map((r) => <li>{r}</li>)}</ul>
+		</Pendiente>
 	</section>
 
 	<section class="seccion contenedor documentos">
 		<div>
 			<h2>¿Necesita la documentación para precalificar?</h2>
-			<p>Le enviamos certificados, indicadores de la mutualidad y antecedentes de la empresa.</p>
 		</div>
 		<a href="/contacto/?asunto=precalificacion#formulario" class="boton">Solicitar documentación</a>
 	</section>
@@ -154,34 +146,22 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 		margin: 0.2rem 0 0;
 		font-weight: 600;
 	}
-	.dos {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: clamp(2rem, 5vw, 4rem);
-	}
-	.dos h2 {
-		font-size: clamp(1.6rem, 3vw, 2.25rem);
-	}
-	.lista {
+	.registros {
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		border-top: 1px solid var(--linea);
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
 	}
-	.lista li {
-		position: relative;
-		padding: 0.85rem 0 0.85rem 1.5rem;
-		border-bottom: 1px solid var(--linea);
-		font-size: 1.05rem;
-	}
-	.lista li::before {
-		content: '';
-		position: absolute;
-		left: 0;
-		top: 1.3rem;
-		width: 0.55rem;
-		height: 0.55rem;
-		background: var(--lols-verde);
+	.registros li {
+		padding: 0.9rem 1.25rem;
+		border: 1px solid var(--linea);
+		border-top: 4px solid var(--lols-verde);
+		background: var(--lols-blanco);
+		font-family: var(--fuente-titulos);
+		font-size: 1.15rem;
+		font-weight: 700;
 	}
 	.documentos {
 		display: flex;
@@ -196,13 +176,8 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 		font-size: clamp(1.5rem, 3vw, 2rem);
 		margin-bottom: 0.4rem;
 	}
-	.documentos p {
-		margin: 0;
-		color: var(--lols-gris);
-	}
 	@media (max-width: 860px) {
-		.certificaciones,
-		.dos {
+		.certificaciones {
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}

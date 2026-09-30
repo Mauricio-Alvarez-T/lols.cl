@@ -98,3 +98,48 @@ cierre de contacto como letrero de obra y el logo gigante del pie ("lo que no su
 tenerlo"). El cierre de contacto quedó en texto: título, botón y datos en líneas.
 
 Todo es CSS y SVG en línea: sin imágenes, fuentes ni librerías nuevas. 
+
+## Mostrar, no contar (30-sep-2026)
+
+Premisa del usuario: "siempre es mejor mostrar que decir". Donde no sea estrictamente
+necesario, solo un título y una imagen; el detalle, recién cuando la persona lo pide.
+
+Filosofía base: **divulgación progresiva** (Nielsen Norman Group,
+https://www.nngroup.com/articles/progressive-disclosure/). Se complementa con "mostrar, no
+contar" para el primer nivel, con la investigación de NN/g sobre fotos
+(https://www.nngroup.com/articles/photos-as-web-content/: se miran las fotos reales, se ignora
+el stock) y con el "menos, pero mejor" de Dieter Rams. Es el mismo patrón que siguen
+Heatherwick, BIG, Snøhetta y Herzog & de Meuron: en el listado, foto + nombre + lugar; en la
+página del proyecto, fotos primero, un texto corto y un recuadro de datos.
+
+Reglas aplicadas:
+
+1. **Dos niveles.** Nivel 1: imagen + título (y, si hace falta, una línea). Nivel 2: una página
+   propia con todo. Nunca un tercer nivel.
+2. **La tarjeta entera es el enlace**, con título visible. Nada que aparezca solo al pasar el
+   mouse (en el celular no existe).
+3. **Enlaces que dicen adónde llevan** ("Ver indicadores y certificaciones", no "Ver más").
+4. **Sin ventanas emergentes para información**; el detalle vive en páginas con su URL.
+5. **Lo que un mandante necesita no se esconde** (NN/g B2B): nombres de los servicios,
+   teléfono y WhatsApp (pie y barra del celular), años de trayectoria y seguridad en corto.
+6. **Las cifras cuentan como imagen**: número grande, etiqueta corta.
+7. **Todo el contenido está en el HTML** (no se carga al hacer clic), para buscadores y
+   lectores de pantalla.
+
+Cambios:
+
+- **Portada (10 → 7 bloques):** obra en video con lema, bajada y botones · cifras · servicios en
+  seis fotos · obras en construcción (foto, nombre, comuna) · seguridad (video + dos datos) ·
+  clientes · contacto (frase + botón). Salieron el proyecto destacado, el equipamiento, "cómo
+  trabajamos" (sigue en /contacto/) y la agrupación Construir/Instalar/Mantener.
+- **Tarjetas de proyecto:** foto, pictograma, nombre y comuna; tipo, superficie, fechas y
+  dirección pasaron a la ficha.
+- **Ficha de proyecto:** la foto va primero; después nombre, titular, datos y relato.
+- **Servicios:** seis fotos con su nombre (antes, lista de texto sin imágenes).
+- **Empresa:** salieron los bloques de valores y de normas (texto); el equipamiento es foto +
+  nombre + una línea.
+- **Seguridad:** cifras y sellos; los registros como sellos; salió la lista del programa.
+- **Cierre de contacto:** frase + botón.
+
+Condición: la filosofía descansa en las fotos. Con stock sirve para la propuesta; el sitio final
+necesita fotos reales de obras, equipos y personas.

@@ -129,7 +129,8 @@ video {
 .seccion {
 	padding-block: var(--seccion);
 }
-.seccion + .seccion:not(.oscura, .gris) {
+/* Dos secciones claras seguidas comparten el espacio; después de una oscura o gris, no. */
+.seccion:not(.oscura, .gris) + .seccion:not(.oscura, .gris) {
 	padding-top: 0;
 }
 .seccion.gris {

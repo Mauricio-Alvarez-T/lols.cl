@@ -1,48 +1,31 @@
 ---
-// Equipamiento propio (reunión con don Luis, docs/reunion-inicial.md): vehículos, maquinaria y
-// seguridad de LOLS. Las categorías e ítems son los que se nombraron en la reunión; las
-// cantidades y las fotos son de muestra hasta tener las reales.
-//   completo  → con foto por categoría (Empresa).
-//   compacto  → solo texto, para la portada; enlaza a Empresa.
+// Equipamiento propio (reunión con don Luis, docs/reunion-inicial.md): una foto por categoría
+// con su nombre y, debajo, qué incluye en una línea. Las categorías e ítems son los que se
+// nombraron en la reunión; las cantidades y las fotos son de muestra hasta tener las reales.
 import Pendiente from './Pendiente.astro';
 import Referencial from './Referencial.astro';
 import { equipamiento } from '../data/empresa';
 import { fotosEquipamiento } from '../data/referencia';
 import { ejemplosEquipamiento } from '../data/ejemplos';
-
-interface Props {
-	compacto?: boolean;
-}
-const { compacto = false } = Astro.props;
 ---
 
-<div class:list={['equipamiento', { compacto }]}>
+<div class="equipamiento">
 	<div class="cabecera">
-		<div>
-			<h2>Equipamiento propio</h2>
-			<p class="bajada">Contamos con nuestro propio equipamiento para cada faena.</p>
-		</div>
-		{compacto && <a href="/empresa/#equipamiento" class="enlace-flecha">Ver el equipamiento</a>}
+		<h2>Equipamiento propio</h2>
 	</div>
 	<Pendiente texto="cantidades y fotos reales del equipamiento (la lista sigue: la reunión dice «etc.»)" />
 	<ul class="categorias">
 		{
 			equipamiento.map((c) => (
 				<li>
-					{!compacto && (
-						<div class="foto marco">
-							<Referencial imagen={fotosEquipamiento[c.clave]} sizes="(max-width: 760px) 100vw, 33vw" />
-						</div>
-					)}
+					<div class="foto marco">
+						<Referencial imagen={fotosEquipamiento[c.clave]} sizes="(max-width: 760px) 100vw, 33vw" />
+					</div>
 					<h3>{c.titulo}</h3>
+					<p class="items">{c.items.join(' · ')}</p>
 					<p class="cantidad">
 						<Pendiente texto="cantidad">{ejemplosEquipamiento[c.clave]}</Pendiente>
 					</p>
-					<ul class="items">
-						{c.items.map((i) => (
-							<li>{i}</li>
-						))}
-					</ul>
 				</li>
 			))
 		}
@@ -50,14 +33,6 @@ const { compacto = false } = Astro.props;
 </div>
 
 <style>
-	.cabecera {
-		align-items: end;
-	}
-	.bajada {
-		margin: 0.5rem 0 0;
-		max-width: 36rem;
-		color: var(--gris-medio);
-	}
 	.categorias {
 		list-style: none;
 		margin: 0;
@@ -68,36 +43,23 @@ const { compacto = false } = Astro.props;
 	}
 	.foto {
 		aspect-ratio: 4 / 3;
-		margin-bottom: 1.25rem;
+		margin-bottom: 1rem;
 	}
 	h3 {
-		font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+		font-size: clamp(1.3rem, 2.2vw, 1.6rem);
 		letter-spacing: -0.03em;
-		margin-bottom: 0.25rem;
-	}
-	.cantidad {
-		margin: 0 0 0.85rem;
-		font-family: var(--fuente-datos);
-		font-weight: 600;
-		color: var(--lols-verde-oscuro);
+		margin-bottom: 0.3rem;
 	}
 	.items {
-		list-style: none;
+		margin: 0 0 0.2rem;
+		color: var(--lols-gris);
+	}
+	.cantidad {
 		margin: 0;
-		padding: 0;
-		border-top: 1px solid var(--lols-carbon);
-	}
-	.items li {
-		padding: 0.6rem 0;
-		border-bottom: 1px solid var(--linea);
-	}
-	/* Compacto: las tres categorías como celdas de rótulo, sin fotos. */
-	.compacto .categorias > li {
-		padding-top: 1.25rem;
-		border-top: 3px solid var(--lols-carbon);
-	}
-	.compacto .items {
-		border-top: 0;
+		font-family: var(--fuente-datos);
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--lols-verde-oscuro);
 	}
 	@media (max-width: 760px) {
 		.categorias {

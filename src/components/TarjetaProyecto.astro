@@ -1,10 +1,8 @@
 ---
-// Tarjeta de proyecto: foto + nombre + rótulo de lámina con los mismos campos en todas
-// (patrón BIG + convención del cuadro de rótulo de un plano). Campos según la reunión con
-// don Luis: tipo de obra, superficie, comuna y, en las obras en construcción, la dirección y
-// desde cuándo. Junto al nombre, el pictograma LOLS del tipo de obra (como los íconos de
-// proyecto de BIG). `destacada` la agranda para dar jerarquía en la grilla. Al hacer clic,
-// su foto viaja a la portada de la ficha (view transition).
+// Tarjeta de proyecto (nivel 1 de la divulgación progresiva, docs/estructura.md § Mostrar, no
+// contar): foto, pictograma del tipo de obra (como BIG), nombre y comuna. Nada más: el tipo,
+// la superficie, las fechas y la dirección están en la ficha, a un clic. Toda la tarjeta es el
+// enlace. Al hacer clic, su foto viaja a la portada de la ficha (view transition).
 import Pendiente from './Pendiente.astro';
 import Pictograma from './Pictograma.astro';
 import { plantilla, estados, pictogramaDeTipo, type Estado, type Proyecto } from '../data/proyectos';
@@ -15,7 +13,7 @@ interface Props {
 	proyecto?: Proyecto; // sin proyecto = tarjeta de muestra
 	referencia?: ImagenReferencial; // foto y datos de ejemplo para la tarjeta de muestra
 	estado?: Estado; // estado de la tarjeta de muestra (las reales lo traen en el proyecto)
-	lamina?: number; // número correlativo en la grilla
+	lamina?: number; // (sin uso en la tarjeta; se conserva por compatibilidad)
 	destacada?: boolean;
 }
 const { proyecto, referencia, lamina, destacada = false } = Astro.props;
@@ -26,11 +24,6 @@ const foto = proyecto?.fotos[0];
 const href = `/proyectos/${proyecto?.slug ?? plantilla.slug}/`;
 const ej = referencia?.ejemplo;
 const tipo = proyecto?.tipo ?? ej?.tipo;
-const numero = lamina ? `L-${String(lamina).padStart(2, '0')}` : null;
-// Última celda: en una obra terminada importa el año; en una en construcción, desde cuándo.
-const fecha = enObra
-	? { titulo: 'Inicio', valor: proyecto?.inicio, pendiente: 'mes y año de inicio', ejemplo: ej?.inicio }
-	: { titulo: 'Año', valor: proyecto?.anio, pendiente: 'año de término', ejemplo: ej?.anio };
 ---
 
 <article class:list={['tarjeta', { destacada, 'en-obra': enObra }]} data-estado={estado}>
@@ -45,39 +38,9 @@ const fecha = enObra
 			</span>
 			<div>
 				<h3>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto">{ej?.nombre}</Pendiente>}</h3>
-				<p class="ubicacion">
-					{proyecto?.comuna ?? <Pendiente texto="comuna">{ej?.comuna}</Pendiente>}
-					{enObra && (
-						<>
-							{' · '}
-							{proyecto?.direccion ?? <Pendiente texto="dirección (confirmar si se puede publicar)">{ej?.direccion}</Pendiente>}
-						</>
-					)}
-				</p>
+				<p class="ubicacion">{proyecto?.comuna ?? <Pendiente texto="comuna">{ej?.comuna}</Pendiente>}</p>
 			</div>
 		</div>
-		<dl class="rotulo">
-			<div>
-				<dt>Tipo</dt>
-				<dd>{proyecto?.tipo ?? <Pendiente texto="tipo de obra">{ej?.tipo}</Pendiente>}</dd>
-			</div>
-			<div>
-				<dt>Superficie</dt>
-				<dd>{proyecto?.superficie ?? <Pendiente texto="m² construidos">{ej?.superficie}</Pendiente>}</dd>
-			</div>
-			<div>
-				<dt>{fecha.titulo}</dt>
-				<dd>{fecha.valor ?? <Pendiente texto={fecha.pendiente}>{fecha.ejemplo}</Pendiente>}</dd>
-			</div>
-			{
-				numero && (
-					<div class="lamina">
-						<dt>Lámina</dt>
-						<dd>{numero}</dd>
-					</div>
-				)
-			}
-		</dl>
 	</a>
 </article>
 
@@ -191,36 +154,4 @@ const fecha = enObra
 		font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2rem);
 	}
 
-	/* Rótulo de lámina: celdas con línea de dibujo, etiqueta condensada. */
-	.rotulo {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr));
-		margin: 0;
-		border-top: 1px solid var(--lols-carbon);
-	}
-	.rotulo > div {
-		padding: 0.45rem 0.6rem 0.5rem 0;
-		border-bottom: 1px solid var(--linea);
-	}
-	.rotulo > div + div {
-		padding-left: 0.6rem;
-		border-left: 1px solid var(--linea);
-	}
-	.rotulo dt {
-		font-family: var(--fuente-datos);
-		font-size: 0.72rem;
-		font-weight: 500;
-		color: var(--gris-medio);
-	}
-	.rotulo dd {
-		margin: 0.1rem 0 0;
-		font-size: 0.92rem;
-		font-weight: 500;
-		font-variant-numeric: tabular-nums;
-	}
-	.lamina dd {
-		font-family: var(--fuente-datos);
-		font-weight: 600;
-		color: var(--lols-verde-oscuro);
-	}
 </style>

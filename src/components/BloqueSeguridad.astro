@@ -1,99 +1,77 @@
 ---
-// Resumen de seguridad y calidad para la portada: el diferenciador que casi ningún sitio del
-// rubro muestra y que el mandante revisa primero (docs/investigacion-secciones.md).
+// Seguridad en la portada (nivel 1): la obra en video, un título y dos datos cortos, que es lo
+// que un mandante mira primero al precalificar (docs/investigacion-secciones.md). Indicadores,
+// certificaciones y registros completos están en /seguridad/.
 import Pendiente from './Pendiente.astro';
-import { ejemplosSeguridad as ej } from '../data/ejemplos';
+import VideoFondo from './VideoFondo.astro';
 import EjesPlano from './EjesPlano.astro';
+import { videos } from '../data/referencia';
+import { ejemplosSeguridad as ej } from '../data/ejemplos';
+
+const indicador = ej.indicadores[0];
+const certificacion = ej.certificaciones.find((c) => c.nombre.includes('45001')) ?? ej.certificaciones[0];
 ---
 
 <section class="seccion oscura plano seguridad">
 	<EjesPlano />
-	<div class="contenedor">
-		<div class="cabecera">
-			<div>
-				<p class="etiqueta">Seguridad y calidad</p>
-				<h2>Listos para su precalificación</h2>
-			</div>
+	<div class="contenedor grilla">
+		<div class="texto">
+			<p class="etiqueta">Seguridad y calidad</p>
+			<h2>Listos para su precalificación</h2>
+			<dl class="datos-cortos">
+				<div>
+					<dt><Pendiente texto="indicador real certificado por la mutualidad">{indicador.valor}</Pendiente></dt>
+					<dd>{indicador.etiqueta}</dd>
+				</div>
+				<div>
+					<dt><Pendiente texto="certificación vigente (confirmar)">{certificacion.nombre}</Pendiente></dt>
+					<dd>{certificacion.alcance}</dd>
+				</div>
+			</dl>
 			<a href="/seguridad/" class="enlace-flecha">Ver indicadores y certificaciones</a>
 		</div>
-		<div class="indicadores">
-			{
-				ej.indicadores.map((i) => (
-					<div>
-						<p class="numero">
-							<Pendiente texto="indicador real certificado por la mutualidad">{i.valor}</Pendiente>
-						</p>
-						<p>{i.etiqueta}</p>
-					</div>
-				))
-			}
-		</div>
-		<ul class="sellos" aria-label="Certificaciones y registros">
-			{
-				ej.certificaciones.map((c) => (
-					<li>
-						<Pendiente texto="certificación vigente (confirmar)">
-							<strong>{c.nombre}</strong> {c.alcance}
-						</Pendiente>
-					</li>
-				))
-			}
-			{
-				ej.registros.slice(0, 2).map((r) => (
-					<li>
-						<Pendiente texto="registro vigente (confirmar)">{r}</Pendiente>
-					</li>
-				))
-			}
-		</ul>
+		<VideoFondo video={videos.seguridad} clase="video-seguridad" />
 	</div>
 </section>
 
 <style>
-	.indicadores {
+	.grilla {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 1.5rem;
-		margin-bottom: 2.5rem;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+		gap: clamp(2rem, 5vw, 4.5rem);
+		align-items: center;
 	}
-	.indicadores > div {
-		padding-top: 1.25rem;
+	h2 {
+		margin-bottom: 2rem;
+	}
+	.datos-cortos {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1.5rem;
+		margin: 0 0 2rem;
+	}
+	.datos-cortos > div {
+		padding-top: 1rem;
 		border-top: 2px solid var(--lols-verde);
 	}
-	.indicadores p {
-		margin: 0;
-		color: #c8c8c8;
-	}
-	.indicadores .numero {
-		margin-bottom: 0.35rem;
+	dt {
 		font-family: var(--fuente-titulos);
-		font-size: clamp(2.5rem, 5vw, 4rem);
+		font-size: clamp(2rem, 4vw, 3rem);
 		font-weight: 700;
-		letter-spacing: -0.04em;
+		letter-spacing: -0.03em;
 		line-height: 1;
-		color: var(--lols-blanco);
+		margin-bottom: 0.4rem;
 	}
-	.sellos {
-		list-style: none;
+	dd {
 		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.6rem;
+		color: #c8cfca;
+		font-size: 0.95rem;
 	}
-	.sellos li {
-		padding: 0.5rem 0.9rem;
-		border: 1px solid #3a423c;
-		background: var(--carbon-2);
-		font-size: 0.9rem;
-		color: #d6d6d6;
+	.grilla > :global(.video-seguridad) {
+		aspect-ratio: 4 / 3;
 	}
-	.sellos strong {
-		color: var(--lols-blanco);
-		font-family: var(--fuente-titulos);
-	}
-	@media (max-width: 640px) {
-		.indicadores {
+	@media (max-width: 860px) {
+		.grilla {
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}

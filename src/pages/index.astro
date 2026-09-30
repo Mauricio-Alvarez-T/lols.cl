@@ -1,24 +1,18 @@
 ---
-// Portada. Estructura tomada de las referencias (docs/brief.md § 3):
-//   frase grande sobre blanco (Heatherwick) → video de obra a todo el ancho (BESIX / Ingevec) →
-//   cifras (Skanska) → servicios por necesidad del cliente (Ramboll) →
-//   proyecto destacado desafío/solución/resultado (Arup) → obras en construcción hoy y cartera
-//   contratada (reunión con don Luis) → equipamiento propio (reunión) → clientes (Tecsa) →
-//   seguridad y calidad → cómo trabajamos → contacto con persona.
-// Orden y secciones validados con 31 sitios del rubro: docs/investigacion-secciones.md.
+// Portada: mostrar, no contar (docs/estructura.md § Mostrar, no contar). Cada sección es
+// imagen + título y lleva a su página, donde está el detalle:
+//   obra en video con el lema → cifras → servicios en fotos → obras en construcción →
+//   seguridad (video + dos datos) → clientes → contacto.
 import Base from '../layouts/Base.astro';
-import Icono from '../components/Icono.astro';
 import Pendiente from '../components/Pendiente.astro';
 import TarjetaProyecto from '../components/TarjetaProyecto.astro';
 import Contacto from '../components/Contacto.astro';
-import { empresa, necesidades, necesidadesRevisar, servicioPorSlug, aniosTrayectoria, fundacion } from '../data/empresa';
+import { empresa, aniosTrayectoria, fundacion } from '../data/empresa';
 import { proyectosPorEstado } from '../data/proyectos';
-import Equipamiento from '../components/Equipamiento.astro';
-import Referencial from '../components/Referencial.astro';
-import { destacado, obrasEnCurso, logosEjemplo, videos } from '../data/referencia';
+import MosaicoServicios from '../components/MosaicoServicios.astro';
+import { obrasEnCurso, logosEjemplo, videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
 import BloqueSeguridad from '../components/BloqueSeguridad.astro';
-import Proceso from '../components/Proceso.astro';
 import { ejemploBajadaHero, ejemplosContratados } from '../data/ejemplos';
 
 const enObra = proyectosPorEstado('en-curso').slice(0, 3);
@@ -56,62 +50,14 @@ const cifras = [
 	<section class="seccion">
 		<div class="contenedor">
 			<div class="cabecera">
-				<div>
-					<p class="etiqueta">Servicios</p>
-					<h2>¿Qué necesita?</h2>
-				</div>
+				<h2>Servicios</h2>
 				<a href="/servicios/" class="enlace-flecha">Todos los servicios</a>
 			</div>
-			<Pendiente texto={`servicios agrupados por necesidad: ${necesidadesRevisar}`} />
-			<div class="necesidades">
-				{
-					necesidades.map((n) => (
-						<div class="necesidad">
-							<h3>{n.titulo}</h3>
-							<ul>
-								{n.servicios.map((slug) => {
-									const s = servicioPorSlug(slug);
-									return (
-										<li>
-											<a href={`/servicios/${s.slug}/`}>
-												<Icono nombre={s.icono} />
-												<span>{s.nombre}</span>
-											</a>
-										</li>
-									);
-								})}
-							</ul>
-						</div>
-					))
-				}
-			</div>
+			<MosaicoServicios />
 		</div>
 	</section>
 
 	<section class="seccion gris">
-		<div class="contenedor destacado">
-			<div class="destacado-foto marco">
-				<Referencial imagen={destacado} />
-			</div>
-			<div>
-				<p class="etiqueta">Proyecto destacado</p>
-				<h2 class="titular"><Pendiente texto="el resultado en una frase">Cinco pisos de comercio y oficinas en una esquina de alto tránsito</Pendiente></h2>
-				<dl class="datos">
-					<div><dt>Mandante</dt><dd><Pendiente texto="mandante">Inmobiliaria Ejemplo</Pendiente></dd></div>
-					<div><dt>Ubicación</dt><dd><Pendiente texto="comuna">Santiago</Pendiente></dd></div>
-					<div><dt>Año</dt><dd><Pendiente texto="año">2018</Pendiente></dd></div>
-				</dl>
-				<ol class="relato">
-					<li><strong>Desafío</strong> <Pendiente texto="qué problema tenía el mandante">Construir sin interrumpir el comercio de la cuadra.</Pendiente></li>
-					<li><strong>Solución</strong> <Pendiente texto="qué hizo LOLS">Obra gruesa, terminaciones e instalaciones con un solo equipo, por etapas.</Pendiente></li>
-					<li><strong>Resultado</strong> <Pendiente texto="qué se logró, con un número">Entregado en 14 meses, sin accidentes con tiempo perdido.</Pendiente></li>
-				</ol>
-				<a href="/proyectos/ejemplo/" class="enlace-flecha">Ver el proyecto</a>
-			</div>
-		</div>
-	</section>
-
-	<section class="seccion">
 		<div class="contenedor">
 			<div class="cabecera">
 				<h2>En obra ahora</h2>
@@ -136,11 +82,7 @@ const cifras = [
 		</div>
 	</section>
 
-	<section class="seccion gris">
-		<div class="contenedor">
-			<Equipamiento compacto />
-		</div>
-	</section>
+	<BloqueSeguridad />
 
 	<section class="seccion clientes">
 		<div class="contenedor">
@@ -155,14 +97,6 @@ const cifras = [
 					))
 				}
 			</ul>
-		</div>
-	</section>
-
-	<BloqueSeguridad />
-
-	<section class="seccion">
-		<div class="contenedor">
-			<Proceso />
 		</div>
 	</section>
 
@@ -207,86 +141,6 @@ const cifras = [
 		font-weight: 700;
 		letter-spacing: -0.04em;
 		color: var(--lols-carbon);
-	}
-
-	.nota {
-		margin: -1rem 0 2rem;
-		font-size: 0.9rem;
-	}
-	.necesidades {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: clamp(1.5rem, 4vw, 3rem);
-	}
-	.indice {
-		margin: 0 0 0.5rem;
-		font-family: var(--fuente-titulos);
-		font-weight: 700;
-		color: var(--lols-verde);
-	}
-	.necesidad h3 {
-		font-size: clamp(1.75rem, 3vw, 2.5rem);
-		letter-spacing: -0.035em;
-		margin-bottom: 1.25rem;
-	}
-	.necesidad ul {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		border-top: 1px solid var(--linea);
-	}
-	.necesidad a {
-		display: flex;
-		align-items: center;
-		gap: 0.85rem;
-		padding: 1rem 0;
-		border-bottom: 1px solid var(--linea);
-		color: var(--lols-carbon);
-		font-family: var(--fuente-titulos);
-		font-weight: 600;
-		font-size: 1.1rem;
-		text-decoration: none;
-	}
-	.necesidad a {
-		transition: padding-left 0.2s var(--suave), color 0.15s;
-	}
-	.necesidad a:hover {
-		color: var(--lols-verde-oscuro);
-		padding-left: 0.4rem;
-	}
-	.necesidad :global(.icono) {
-		width: 1.5rem;
-		height: 1.5rem;
-		flex-shrink: 0;
-		color: var(--lols-verde);
-	}
-
-	.destacado {
-		display: grid;
-		grid-template-columns: 1.15fr 1fr;
-		gap: clamp(2rem, 6vw, 5rem);
-		align-items: center;
-	}
-	.destacado-foto {
-		aspect-ratio: 4 / 5;
-		background: #dcdcd8;
-	}
-	.titular {
-		font-size: clamp(1.9rem, 3.5vw, 2.75rem);
-	}
-	.destacado .datos {
-		margin-block: 1.5rem;
-	}
-	.relato {
-		list-style: none;
-		margin: 0 0 2rem;
-		padding: 0;
-		display: grid;
-		gap: 0.85rem;
-	}
-	.relato strong {
-		display: block;
-		font-family: var(--fuente-titulos);
 	}
 
 	/* Jerarquía: la primera obra ocupa dos columnas y dos filas; las otras dos, apiladas. */
@@ -366,13 +220,6 @@ const cifras = [
 		.cifras > div:nth-child(3) {
 			padding-left: 0;
 			border-left: 0;
-		}
-		.necesidades,
-		.destacado {
-			grid-template-columns: minmax(0, 1fr);
-		}
-		.destacado-foto {
-			aspect-ratio: 4 / 3;
 		}
 		.grilla-proyectos {
 			grid-template-columns: repeat(2, 1fr);

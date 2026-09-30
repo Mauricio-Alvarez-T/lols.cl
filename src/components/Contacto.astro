@@ -1,8 +1,6 @@
 ---
-// Cierre de página: la invitación a cotizar y, al lado, a quién llamar o escribir (patrón
-// Arup / Mott MacDonald / Ramboll: contacto con una persona). Solo texto, sin adornos.
-import Pendiente from './Pendiente.astro';
-import { empresa, telefonoHref } from '../data/empresa';
+// Cierre de página (nivel 1): una frase y el botón. Teléfono, correo y dirección están en el
+// pie, justo debajo, y en la barra de contacto del celular; el formulario, en /contacto/.
 import EjesPlano from './EjesPlano.astro';
 
 interface Props {
@@ -13,78 +11,23 @@ const { titulo = 'Hablemos de su proyecto' } = Astro.props;
 
 <section class="seccion oscura plano contacto">
 	<EjesPlano filas={3} />
-	<div class="contenedor grilla">
-		<div>
-			<h2>{titulo}</h2>
-			<a href="/contacto/" class="boton">Solicitar cotización</a>
-		</div>
-		<dl class="datos-contacto">
-			<div>
-				<dt>A cargo</dt>
-				<dd>
-					<Pendiente texto="nombre de quien atiende cotizaciones">Nombre Apellido</Pendiente>,{' '}
-					<Pendiente texto="cargo">jefe de proyectos</Pendiente>
-				</dd>
-			</div>
-			<div>
-				<dt>Teléfono</dt>
-				<dd>
-					<Pendiente revisar={empresa.telefono.revisar}>
-						<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
-					</Pendiente>
-				</dd>
-			</div>
-			<div>
-				<dt>Correo</dt>
-				<dd>
-					<Pendiente revisar={empresa.correo.revisar}>
-						<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
-					</Pendiente>
-				</dd>
-			</div>
-		</dl>
+	<div class="contenedor fila">
+		<h2>{titulo}</h2>
+		<a href="/contacto/" class="boton">Solicitar cotización</a>
 	</div>
 </section>
 
 <style>
-	.grilla {
-		display: grid;
-		grid-template-columns: 1.3fr 1fr;
-		gap: clamp(2.5rem, 6vw, 6rem);
-		align-items: end;
+	.fila {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 2rem;
+		flex-wrap: wrap;
 	}
 	h2 {
+		max-width: 14ch;
+		margin: 0;
 		font-size: clamp(2.25rem, 5.5vw, 4.5rem);
-		margin-bottom: 2rem;
-	}
-	.datos-contacto {
-		margin: 0;
-		border-top: 1px solid #343b36;
-	}
-	.datos-contacto > div {
-		display: grid;
-		grid-template-columns: 6rem minmax(0, 1fr);
-		gap: 1rem;
-		align-items: baseline;
-		padding-block: 0.85rem;
-		border-bottom: 1px solid #343b36;
-	}
-	dt {
-		font-family: var(--fuente-datos);
-		font-size: 0.9rem;
-		font-weight: 500;
-		color: #a9b1ab;
-	}
-	dd {
-		margin: 0;
-		font-family: var(--fuente-titulos);
-		font-size: 1.1rem;
-		font-weight: 600;
-		overflow-wrap: anywhere;
-	}
-	@media (max-width: 860px) {
-		.grilla {
-			grid-template-columns: minmax(0, 1fr);
-		}
 	}
 </style>

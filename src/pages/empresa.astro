@@ -1,11 +1,12 @@
 ---
 // Empresa: propósito en grande (Heatherwick), línea de tiempo desde 1995 (Tecsa / Ingevec;
-// pedida en la reunión con don Luis), valores, equipamiento propio (reunión), seguridad y
-// equipo con nombre (Mott MacDonald).
+// pedida en la reunión con don Luis), equipamiento propio en fotos (reunión) y equipo con
+// nombre (Mott MacDonald). Mostrar, no contar: los valores y normas en texto se sacaron; la
+// seguridad tiene su propia página.
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import Contacto from '../components/Contacto.astro';
-import { empresa, valores, fundacion, aniosTrayectoria } from '../data/empresa';
+import { empresa, fundacion, aniosTrayectoria } from '../data/empresa';
 import Equipamiento from '../components/Equipamiento.astro';
 import Referencial from '../components/Referencial.astro';
 import { bandas, retratos } from '../data/referencia';
@@ -44,38 +45,13 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 		</ol>
 	</section>
 
-	<section class="seccion gris">
+
+	<section id="equipamiento" class="seccion gris ancla">
 		<div class="contenedor">
-			<div class="cabecera">
-				<h2>Un esquema basado en el esfuerzo, la creatividad y la responsabilidad</h2>
-			</div>
-			<div class="valores">
-				{
-					valores.map((v) => (
-						<div>
-							<h3>{v.titulo}</h3>
-							<p>{v.texto ?? <Pendiente texto="qué significa en la práctica">{ej.valores[v.titulo]}</Pendiente>}</p>
-						</div>
-					))
-				}
-			</div>
+			<Equipamiento />
 		</div>
 	</section>
 
-	<section id="equipamiento" class="seccion contenedor ancla">
-		<Equipamiento />
-	</section>
-
-	<section class="seccion gris">
-		<div class="contenedor dos">
-		<div>
-			<h2>Compromiso con las normas de seguridad y el medio ambiente</h2>
-		</div>
-		<Pendiente bloque texto="políticas, certificaciones, mutualidad e indicadores de seguridad">
-			<ul class="lista">{ej.seguridad.map((x) => <li>{x}</li>)}</ul>
-		</Pendiente>
-		</div>
-	</section>
 
 	<section class="seccion contenedor">
 		<div class="cabecera"><h2>Las personas a cargo</h2></div>
@@ -137,30 +113,6 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 		letter-spacing: -0.03em;
 		margin-bottom: 0.5rem;
 	}
-	.valores {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: clamp(1.5rem, 4vw, 3rem);
-	}
-	.indice {
-		margin: 0 0 0.5rem;
-		font-family: var(--fuente-titulos);
-		font-weight: 700;
-		color: var(--lols-verde-oscuro);
-	}
-	.valores h3 {
-		font-size: 1.75rem;
-		letter-spacing: -0.03em;
-	}
-	.dos {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: clamp(2rem, 5vw, 4rem);
-		align-items: start;
-	}
-	.dos h2 {
-		font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-	}
 	.equipo {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
@@ -180,36 +132,11 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 	.cargo {
 		color: var(--gris-medio);
 	}
-	.lista {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		border-top: 1px solid var(--linea);
-	}
-	.lista li {
-		padding: 0.85rem 0 0.85rem 1.5rem;
-		border-bottom: 1px solid var(--linea);
-		position: relative;
-		font-size: 1.1rem;
-	}
-	.lista li::before {
-		content: '';
-		position: absolute;
-		left: 0;
-		top: 1.35rem;
-		width: 0.55rem;
-		height: 0.55rem;
-		background: var(--lols-verde);
-	}
 	@media (max-width: 960px) {
 		.linea,
 		.equipo {
 			grid-template-columns: repeat(2, 1fr);
 			row-gap: 2.5rem;
-		}
-		.valores,
-		.dos {
-			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 	@media (max-width: 560px) {

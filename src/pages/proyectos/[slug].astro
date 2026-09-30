@@ -1,7 +1,7 @@
 ---
-// Ficha de proyecto (patrones Mott MacDonald / Heatherwick / Arup):
-//   titular que dice el resultado → recuadro de datos fijo → foto principal →
-//   desafío / solución / resultado con una cifra → galería → otros proyectos.
+// Ficha de proyecto (nivel 2: aquí va todo). Pirámide invertida, como Heatherwick: la foto
+// primero, después el nombre y el titular, el recuadro de datos, desafío / solución /
+// resultado con una cifra, el video, la galería y otros proyectos.
 import Base from '../../layouts/Base.astro';
 import Pendiente from '../../components/Pendiente.astro';
 import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
@@ -34,6 +34,18 @@ const relato = [
 ---
 
 <Base title={p.nombre ?? ej.nombre}>
+	<div class="portada marco" style="view-transition-name: foto-proyecto">
+		{
+			portada ? (
+				<img src={portada.src} alt={portada.alt} />
+			) : esEjemplo ? (
+				<Referencial imagen={bandas.fichaEjemplo} carga="eager" />
+			) : (
+				<Pendiente bloque texto="foto principal, horizontal, alta resolución" />
+			)
+		}
+	</div>
+
 	<header class="portadilla contenedor">
 		<p class="etiqueta"><a href="/proyectos/">Proyectos</a></p>
 		<p class="nombre">{p.nombre ?? <Pendiente texto="nombre del proyecto">{ej.nombre}</Pendiente>}</p>
@@ -64,17 +76,6 @@ const relato = [
 		</dl>
 	</header>
 
-	<div class="portada marco" style="view-transition-name: foto-proyecto">
-		{
-			portada ? (
-				<img src={portada.src} alt={portada.alt} />
-			) : esEjemplo ? (
-				<Referencial imagen={bandas.fichaEjemplo} carga="eager" />
-			) : (
-				<Pendiente bloque texto="foto principal, horizontal, alta resolución" />
-			)
-		}
-	</div>
 
 	<section class="seccion contenedor relato">
 		{
@@ -187,6 +188,9 @@ const relato = [
 		max-width: 20ch;
 		font-size: clamp(2.25rem, 5.5vw, 4.5rem);
 		margin-bottom: clamp(2rem, 5vw, 3.5rem);
+	}
+	.portada + .portadilla {
+		padding-top: clamp(2rem, 5vw, 3.5rem);
 	}
 	.portada {
 		aspect-ratio: 21 / 9;
