@@ -58,17 +58,12 @@ const cifras = [
 		</div>
 	</section>
 
-	<section class="seccion gris">
-		<div class="contenedor">
-			<div class="cabecera">
-				<h2>En obra ahora</h2>
-				<a href="/proyectos/#en-construccion" class="enlace-flecha">Todos los proyectos</a>
-			</div>
-			<CarruselObras
-				obras={enObra.length ? enObra.map(deProyecto) : obrasEnCurso.map(deMuestra)}
-				etiqueta="Obras en construcción"
-				sello="En construcción"
-			/>
+	<CarruselObras
+		titulo="En obra ahora"
+		enlace={{ href: '/proyectos/#en-construccion', texto: 'Todos los proyectos' }}
+		obras={enObra.length ? enObra.map(deProyecto) : obrasEnCurso.map(deMuestra)}
+	/>
+	<div class="contenedor cartera-fila">
 			<a href="/proyectos/#contratados" class="cartera">
 				<span class="cartera-n">
 					{contratados.length || <Pendiente texto="n.º de obras contratadas">{ejemplosContratados.length}</Pendiente>}
@@ -78,8 +73,7 @@ const cifras = [
 					<span class="enlace-flecha">Ver la cartera</span>
 				</span>
 			</a>
-		</div>
-	</section>
+	</div>
 
 	<BloqueSeguridad />
 
@@ -143,6 +137,12 @@ const cifras = [
 	}
 
 
+	.cartera-fila {
+		padding-bottom: var(--seccion);
+	}
+	.cartera-fila .cartera {
+		margin-top: 0;
+	}
 	/* Cartera contratada: una línea que muestra continuidad, con su número grande. */
 	.cartera {
 		display: flex;

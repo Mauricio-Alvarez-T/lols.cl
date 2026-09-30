@@ -1,14 +1,19 @@
 ---
-// Carrusel de obras (formato de los destacados de Ramboll, elegido por el usuario): cada
-// diapositiva es un panel con tipo, nombre y una línea de datos, junto a una foto grande; la
-// siguiente asoma a la derecha, flechas redondas abajo y una barra de avance arriba.
-// Nivel 1 de la divulgación progresiva: la diapositiva entera lleva a la ficha.
-// Sin avance automático (nada se mueve solo); con el dedo o el trackpad se desliza con
-// scroll-snap, y las flechas mueven de a una. Sin JavaScript sigue siendo una fila deslizable.
+// Carrusel de obras: réplica del carrusel de destacados de ramboll.com (pedido del usuario:
+// "exacto lo mismo"), con código propio y el verde de LOLS. Medido en su sitio a 1440 px:
+//   - franja gris desde el borde izquierdo hasta el 45 % del ancho, detrás del texto;
+//   - barra de avance arriba, ligada al scroll de la sección (a mitad de recorrido, ~53 %);
+//   - encabezado: rótulo en mayúsculas con barra vertical de color y "ver todos" a la derecha;
+//   - columna de texto (34 %): categoría, título en peso normal, párrafo liviano. Al cambiar,
+//     el texto saliente se va 218 px a la izquierda desvaneciéndose (transform 0,5 s,
+//     opacity 0,3 s) y el entrante llega desde la derecha; el título pasa de gris a oscuro;
+//   - columna de fotos (66 %, 16:9): la fila se desplaza (transform 0,6 s); las fotos ya
+//     pasadas se desvanecen (0,4 s) al cruzar la franja; la siguiente asoma hasta el borde;
+//   - flechas en círculos de 60 px con borde fino, alineadas a la derecha bajo la foto.
+// Sin avance automático. Vuelve al principio después de la última. Se puede deslizar con el
+// dedo. Sin JavaScript se ve la primera obra y cada título sigue siendo un enlace.
 import Pendiente from './Pendiente.astro';
-import Pictograma from './Pictograma.astro';
 import Referencial from './Referencial.astro';
-import { pictogramaDeTipo } from '../data/proyectos';
 import type { ImagenReferencial } from '../data/referencia';
 
 export interface ObraCarrusel {
@@ -23,27 +28,45 @@ export interface ObraCarrusel {
 
 interface Props {
 	obras: ObraCarrusel[];
-	etiqueta: string; // nombre accesible del carrusel
-	sello?: string; // p. ej. "En construcción"
+	titulo: string;
+	id?: string;
+	enlace?: { href: string; texto: string };
+	nota?: string;
 }
-const { obras, etiqueta, sello } = Astro.props;
+const { obras, titulo, id, enlace, nota } = Astro.props;
 const esReferencial = (i: ObraCarrusel['imagen']): i is ImagenReferencial => 'origen' in i;
+const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')}`;
 ---
 
-<div class="carrusel" role="region" aria-roledescription="carrusel" aria-label={etiqueta} data-carrusel>
+<section class="carrusel" id={id} aria-labelledby={idTitulo} aria-roledescription="carrusel" data-carrusel>
 	<div class="avance" aria-hidden="true"><span></span></div>
-	<ul class="pista">
-		{
-			obras.map((o, i) => (
-				<li class="diapositiva" aria-roledescription="diapositiva" aria-label={`${i + 1} de ${obras.length}`}>
-					<a href={o.href} class="vinculo">
-						<div class="panel">
-							<p class="tipo">
-								<Pictograma nombre={pictogramaDeTipo(o.tipo)} />
-								{o.ejemplo ? <Pendiente texto="tipo de obra">{o.tipo}</Pendiente> : o.tipo}
-							</p>
-							<h3>{o.ejemplo ? <Pendiente texto="nombre del proyecto">{o.nombre}</Pendiente> : o.nombre}</h3>
-							<p class="dato">
+	<div class="franja" aria-hidden="true"></div>
+
+	<div class="contenedor interior">
+		<header class="encabezado-carrusel">
+			<h2 id={idTitulo}>{titulo}</h2>
+			{nota && <p class="nota">{nota}</p>}
+			{
+				enlace && (
+					<a href={enlace.href} class="ver-todos">
+						<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" /></svg>
+						{enlace.texto}
+					</a>
+				)
+			}
+		</header>
+		<slot />
+
+		<div class="cuerpo">
+			<div class="textos">
+				{
+					obras.map((o, i) => (
+						<article class:list={['texto', i === 0 ? 'activo' : 'despues']} inert={i === 0 ? undefined : true} data-indice={i}>
+							<p class="categoria">{o.ejemplo ? <Pendiente texto="tipo de obra">{o.tipo}</Pendiente> : o.tipo}</p>
+							<h3>
+								<a href={o.href}>{o.ejemplo ? <Pendiente texto="nombre del proyecto">{o.nombre}</Pendiente> : o.nombre}</a>
+							</h3>
+							<p class="resumen">
 								{o.ejemplo ? <Pendiente texto="comuna">{o.comuna}</Pendiente> : o.comuna}
 								{o.superficie && (
 									<>
@@ -52,261 +75,365 @@ const esReferencial = (i: ObraCarrusel['imagen']): i is ImagenReferencial => 'or
 									</>
 								)}
 							</p>
-							<span class="enlace-flecha">Ver la obra</span>
-						</div>
-						<div class="foto marco">
-							{esReferencial(o.imagen) ? (
-								<Referencial imagen={o.imagen} sizes="(max-width: 760px) 90vw, 60vw" />
-							) : (
-								<img src={o.imagen.src} alt={o.imagen.alt} loading="lazy" />
-							)}
-							{sello && <span class="sello">{sello}</span>}
-						</div>
-					</a>
-				</li>
-			))
-		}
-	</ul>
-	<div class="controles">
-		<button type="button" class="flecha anterior" aria-label="Obra anterior" disabled>
-			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7M8 12h13" /></svg>
-		</button>
-		<button type="button" class="flecha siguiente" aria-label="Obra siguiente">
-			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7M16 12H3" /></svg>
-		</button>
+						</article>
+					))
+				}
+			</div>
+
+			<div class="fotos">
+				<ul class="pista" style="--i: 0">
+					{
+						obras.map((o, i) => (
+							<li class="foto" aria-hidden={i === 0 ? undefined : 'true'}>
+								<a href={o.href} tabindex="-1" class="marco">
+									{esReferencial(o.imagen) ? (
+										<Referencial imagen={o.imagen} sizes="(max-width: 760px) 88vw, 60vw" />
+									) : (
+										<img src={o.imagen.src} alt={o.imagen.alt} loading="lazy" />
+									)}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+				<div class="controles">
+					<button type="button" class="flecha anterior" aria-label="Obra anterior">
+						<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 7l-9 9 9 9M7.5 16h18" /></svg>
+					</button>
+					<button type="button" class="flecha siguiente" aria-label="Obra siguiente">
+						<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 7l9 9-9 9M24.5 16h-18" /></svg>
+					</button>
+				</div>
+				<p class="sr-only" aria-live="polite" data-anuncio></p>
+			</div>
+		</div>
 	</div>
-</div>
+</section>
 
 <script>
 	for (const c of document.querySelectorAll<HTMLElement>('[data-carrusel]')) {
 		const pista = c.querySelector<HTMLElement>('.pista')!;
-		const diapositivas = [...pista.children] as HTMLElement[];
-		const anterior = c.querySelector<HTMLButtonElement>('.anterior')!;
-		const siguiente = c.querySelector<HTMLButtonElement>('.siguiente')!;
-		const barra = c.querySelector<HTMLElement>('.avance span')!;
+		const fotos = [...pista.children] as HTMLElement[];
+		const textos = [...c.querySelectorAll<HTMLElement>('.texto')];
+		const anuncio = c.querySelector<HTMLElement>('[data-anuncio]')!;
+		const total = textos.length;
+		let actual = 0;
 
-		const actual = () => {
-			const x = pista.scrollLeft;
-			let i = 0;
-			diapositivas.forEach((d, n) => {
-				if (Math.abs(d.offsetLeft - pista.offsetLeft - x) < Math.abs(diapositivas[i].offsetLeft - pista.offsetLeft - x)) i = n;
+		const mostrar = (n: number) => {
+			actual = (n + total) % total; // después de la última vuelve a la primera
+			pista.style.setProperty('--i', String(actual));
+			textos.forEach((t, i) => {
+				t.classList.toggle('activo', i === actual);
+				t.classList.toggle('antes', i < actual);
+				t.classList.toggle('despues', i > actual);
+				t.inert = i !== actual;
 			});
-			return i;
+			fotos.forEach((f, i) => {
+				f.classList.toggle('pasada', i < actual);
+				if (i === actual) f.removeAttribute('aria-hidden');
+				else f.setAttribute('aria-hidden', 'true');
+			});
+			anuncio.textContent = `Obra ${actual + 1} de ${total}: ${textos[actual].querySelector('h3')?.textContent?.trim() ?? ''}`;
 		};
-		const ir = (i: number) => {
-			const d = diapositivas[Math.max(0, Math.min(diapositivas.length - 1, i))];
-			pista.scrollTo({ left: d.offsetLeft - pista.offsetLeft, behavior: 'smooth' });
-		};
-		let pendiente = false;
-		const actualizar = () => {
-			pendiente = false;
-			const i = actual();
-			const fin = pista.scrollLeft + pista.clientWidth >= pista.scrollWidth - 4;
-			anterior.disabled = pista.scrollLeft < 4;
-			siguiente.disabled = fin;
-			barra.style.transform = `scaleX(${fin ? 1 : (i + 1) / diapositivas.length})`;
-		};
-		pista.addEventListener('scroll', () => {
-			if (!pendiente) {
-				pendiente = true;
-				requestAnimationFrame(actualizar);
-			}
+
+		c.querySelector('.anterior')!.addEventListener('click', () => mostrar(actual - 1));
+		c.querySelector('.siguiente')!.addEventListener('click', () => mostrar(actual + 1));
+		c.addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowRight') mostrar(actual + 1);
+			if (e.key === 'ArrowLeft') mostrar(actual - 1);
 		});
-		anterior.addEventListener('click', () => ir(actual() - 1));
-		siguiente.addEventListener('click', () => ir(actual() + 1));
-		// Transición a la ficha: la foto clicada viaja a la portada (igual que TarjetaProyecto).
-		for (const a of pista.querySelectorAll<HTMLAnchorElement>('.vinculo')) {
-			a.addEventListener('click', () => {
-				const foto = a.querySelector<HTMLElement>('.foto');
-				if (foto) foto.style.viewTransitionName = 'foto-proyecto';
-			});
-		}
+
+		// Deslizar con el dedo sobre las fotos.
+		let x0: number | null = null;
+		pista.addEventListener('pointerdown', (e) => {
+			if (e.pointerType !== 'mouse') x0 = e.clientX;
+		});
+		pista.addEventListener('pointerup', (e) => {
+			if (x0 === null) return;
+			const dx = e.clientX - x0;
+			x0 = null;
+			if (Math.abs(dx) > 40) mostrar(actual + (dx < 0 ? 1 : -1));
+		});
+		pista.addEventListener('pointercancel', () => (x0 = null));
+
+		// Transición a la ficha: la foto de la obra activa viaja a la portada.
+		c.addEventListener('click', (e) => {
+			const a = (e.target as HTMLElement).closest('a');
+			if (!a || a.classList.contains('ver-todos')) return;
+			const marco = fotos[actual].querySelector<HTMLElement>('.marco');
+			if (marco) marco.style.viewTransitionName = 'foto-proyecto';
+		});
 		addEventListener('pageshow', () => {
-			for (const f of pista.querySelectorAll<HTMLElement>('.foto')) f.style.viewTransitionName = '';
+			for (const m of pista.querySelectorAll<HTMLElement>('.marco')) m.style.viewTransitionName = '';
 		});
-		actualizar();
 	}
 </script>
 
 <style>
 	.carrusel {
+		--col-texto: 34%;
+		--separacion: 40px;
 		position: relative;
+		overflow: hidden;
+		padding-block: 0 4rem;
+		view-timeline-name: --carrusel;
+		scroll-margin-top: 4.5rem;
 	}
-	/* Barra de avance: cuánto del carrusel se ha recorrido (como la línea azul de Ramboll). */
+
+	/* Barra de avance ligada al scroll de la sección. */
 	.avance {
-		height: 4px;
-		margin-bottom: 1.5rem;
-		background: var(--linea);
+		position: relative;
+		z-index: 2;
+		height: 5px;
 	}
 	.avance span {
 		display: block;
 		height: 100%;
 		background: var(--lols-verde);
 		transform-origin: left;
-		transform: scaleX(0.2);
-		transition: transform 0.35s var(--suave);
+		transform: scaleX(0.5);
 	}
-	.pista {
+	@supports (animation-timeline: view()) {
+		.avance span {
+			animation: llenar linear both;
+			animation-timeline: --carrusel;
+			animation-range: cover 0% cover 100%;
+		}
+	}
+	@keyframes llenar {
+		from {
+			transform: scaleX(0);
+		}
+		to {
+			transform: scaleX(1);
+		}
+	}
+
+	/* Franja gris: desde el borde izquierdo hasta el 45 % del ancho, toda la altura. */
+	.franja {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		width: 45%;
+		background: var(--lols-gris-claro);
+	}
+
+	.interior {
+		position: relative;
+		z-index: 1;
+	}
+
+	.encabezado-carrusel {
 		display: flex;
-		gap: clamp(1rem, 2vw, 1.5rem);
+		align-items: center;
+		gap: 1rem 2rem;
+		flex-wrap: wrap;
+		padding-block: 2.25rem 2.75rem;
+	}
+	.encabezado-carrusel h2 {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
 		margin: 0;
-		padding: 0;
-		list-style: none;
-		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		scrollbar-width: none;
-		overscroll-behavior-x: contain;
+		font-family: var(--fuente-titulos);
+		font-size: 0.95rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		line-height: 1.3;
+		text-transform: uppercase;
 	}
-	.pista::-webkit-scrollbar {
-		display: none;
+	.encabezado-carrusel h2::before {
+		content: '';
+		width: 2px;
+		height: 1.25rem;
+		background: var(--lols-verde);
 	}
-	/* La siguiente diapositiva asoma: cada una mide un poco menos que el ancho visible. */
-	.diapositiva {
-		flex: 0 0 calc(100% - clamp(3rem, 8vw, 7rem));
-		scroll-snap-align: start;
+	.nota {
+		margin: 0;
+		color: var(--gris-medio);
+		font-size: 0.95rem;
 	}
-	.vinculo {
+	.ver-todos {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-left: auto;
+		color: var(--lols-verde-oscuro);
+		font-family: var(--fuente-titulos);
+		font-weight: 600;
+		text-decoration: none;
+		transition: transform 0.3s;
+	}
+	.ver-todos svg {
+		width: 0.9rem;
+		height: 0.9rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.8;
+		transition: transform 0.5s ease-in-out;
+	}
+	.ver-todos:hover svg {
+		transform: translateX(3px);
+	}
+
+	.cuerpo {
 		display: grid;
-		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr);
-		height: 100%;
+		grid-template-columns: var(--col-texto) minmax(0, 1fr);
+	}
+
+	/* Textos apilados en el mismo lugar; solo el activo es visible. */
+	.textos {
+		position: relative;
+		padding-right: 5rem;
+	}
+	.texto {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: calc(100% - 5rem);
+		opacity: 0;
+		transition:
+			transform 0.5s,
+			opacity 0.3s;
+	}
+	.texto.antes {
+		transform: translateX(-218px);
+	}
+	.texto.despues {
+		transform: translateX(218px);
+	}
+	.texto.activo {
+		position: relative;
+		width: 100%;
+		opacity: 1;
+		transform: none;
+	}
+	.categoria {
+		margin: 0 0 1.1rem;
+		font-size: 0.95rem;
+		color: var(--lols-gris);
+	}
+	h3 {
+		margin: 0 0 1.75rem;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(1.6rem, 1.1rem + 1.1vw, 1.9rem);
+		font-weight: 450;
+		line-height: 1.33;
+		letter-spacing: -0.01em;
+		color: #7a857f;
+		transition: color 0.3s ease-in-out;
+	}
+	.texto.activo h3 {
+		color: var(--lols-carbon);
+	}
+	h3 a {
 		color: inherit;
 		text-decoration: none;
 	}
-	.panel {
+	h3 a:hover {
+		color: var(--lols-verde-oscuro);
+	}
+	.resumen {
+		margin: 0;
+		font-size: clamp(1.15rem, 1rem + 0.4vw, 1.3rem);
+		font-weight: 300;
+		line-height: 1.35;
+		color: var(--lols-carbon);
+	}
+
+	/* Fotos: la fila se desplaza de a una; la siguiente asoma hasta el borde de la pantalla. */
+	.fotos {
+		min-width: 0;
+	}
+	.pista {
 		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		padding: clamp(1.5rem, 3.5vw, 3rem);
-		background: var(--lols-gris-claro);
-	}
-	:global(.seccion.gris) .panel {
-		background: var(--lols-blanco);
-	}
-	.tipo {
-		display: flex;
-		align-items: center;
-		gap: 0.55rem;
+		gap: var(--separacion);
 		margin: 0;
-		font-family: var(--fuente-datos);
-		font-weight: 600;
-		color: var(--lols-verde-oscuro);
-	}
-	.tipo :global(.pictograma) {
-		flex-shrink: 0;
-		width: 1.5rem;
-		height: 1.5rem;
-		color: var(--lols-verde);
-	}
-	h3 {
-		margin: 0;
-		font-size: clamp(1.6rem, 1rem + 2vw, 2.6rem);
-		letter-spacing: -0.035em;
-		line-height: 1.08;
-	}
-	.dato {
-		margin: 0;
-		color: var(--lols-gris);
-	}
-	.panel .enlace-flecha {
-		margin-top: auto;
-		padding-top: 1rem;
-		color: var(--lols-verde-oscuro);
-	}
-	.vinculo:hover .enlace-flecha::after {
-		width: 1.75rem;
-	}
-	.vinculo:hover h3 {
-		color: var(--lols-verde-oscuro);
+		padding: 0;
+		list-style: none;
+		transform: translateX(calc(var(--i) * (-100% - var(--separacion))));
+		transition: transform 0.6s;
+		touch-action: pan-y;
 	}
 	.foto {
-		position: relative;
-		aspect-ratio: 16 / 10;
+		flex: 0 0 100%;
+		opacity: 1;
+		transition: opacity 0.8s;
 	}
-	.foto :global(img) {
-		transition: transform 0.5s var(--suave);
+	.foto.pasada {
+		opacity: 0;
+		transition-duration: 0.4s;
 	}
-	.vinculo:hover .foto :global(img) {
-		transform: scale(1.03);
+	.foto .marco {
+		display: grid;
+		aspect-ratio: 16 / 9;
 	}
-	.sello {
-		grid-area: 1 / 1;
-		align-self: start;
-		justify-self: start;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.45rem;
-		margin: 0.9rem;
-		padding: 0.3rem 0.65rem 0.3rem 0.55rem;
-		background: var(--lols-blanco);
-		color: var(--lols-carbon);
-		font: 600 0.8rem/1.2 var(--fuente-datos);
-		z-index: 1;
-	}
-	.sello::before {
-		content: '';
-		width: 0.55rem;
-		height: 0.55rem;
-		border-radius: 50%;
-		background: var(--lols-verde);
-	}
+
 	.controles {
 		display: flex;
 		justify-content: flex-end;
-		gap: 0.75rem;
-		margin-top: 1.25rem;
+		gap: 10px;
+		margin-top: 22px;
 	}
 	.flecha {
 		display: grid;
 		place-items: center;
-		width: 3.5rem;
-		height: 3.5rem;
-		border: 1.5px solid var(--lols-carbon);
+		width: 60px;
+		height: 60px;
+		padding: 0;
+		border: 1px solid #273943;
 		border-radius: 50%;
 		background: transparent;
-		color: var(--lols-carbon);
+		color: #273943;
 		cursor: pointer;
-		transition:
-			background-color 0.15s,
-			color 0.15s,
-			opacity 0.15s;
 	}
 	.flecha svg {
-		width: 1.4rem;
-		height: 1.4rem;
+		width: 32px;
+		height: 32px;
 		fill: none;
 		stroke: currentColor;
-		stroke-width: 1.6;
+		stroke-width: 1.5;
+		stroke-linecap: round;
+		stroke-linejoin: round;
 	}
-	.flecha:hover:not(:disabled) {
-		background: var(--lols-carbon);
-		color: var(--lols-blanco);
+	.flecha:hover {
+		border-color: var(--lols-verde-oscuro);
+		color: var(--lols-verde-oscuro);
 	}
-	.flecha:disabled {
-		opacity: 0.3;
-		cursor: default;
-	}
-	@media (max-width: 760px) {
-		.diapositiva {
-			flex-basis: 88%;
+
+	@media (max-width: 860px) {
+		.franja {
+			display: none;
 		}
-		.vinculo {
+		.cuerpo {
 			grid-template-columns: minmax(0, 1fr);
 		}
-		.foto {
+		.fotos {
 			order: -1;
-			aspect-ratio: 4 / 3;
+			margin-bottom: 1.5rem;
 		}
-		.panel {
-			padding: 1.25rem;
+		.pista {
+			--separacion: 16px;
+		}
+		.foto {
+			flex-basis: 88%;
+		}
+		.pista {
+			transform: translateX(calc(var(--i) * (-88% - var(--separacion))));
+		}
+		.textos {
+			padding-right: 0;
+		}
+		.texto {
+			width: 100%;
+		}
+		.controles {
+			margin-top: 1rem;
 		}
 		.flecha {
-			width: 3rem;
-			height: 3rem;
-		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.pista {
-			scroll-behavior: auto;
+			width: 52px;
+			height: 52px;
 		}
 	}
 </style>

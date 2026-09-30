@@ -52,22 +52,15 @@ const bloques = [
 		</div>
 	</nav>
 
-	<section id="en-construccion" class="seccion contenedor bloque">
-		<div class="cabecera">
-			<h2>En construcción</h2>
-			<p class="nota">Obras en ejecución hoy.</p>
-		</div>
-		{
-			hayReales ? (
-				<CarruselObras obras={enCurso.map(deProyecto)} etiqueta="Obras en construcción" sello="En construcción" />
-			) : (
-				<>
-					<Pendiente texto="obras en construcción con superficie, comuna, dirección y tipo; fotos y videos de Rodrigo" />
-					<CarruselObras obras={obrasEnCurso.map(deMuestra)} etiqueta="Obras en construcción" sello="En construcción" />
-				</>
-			)
-		}
-	</section>
+	{
+		hayReales ? (
+			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={enCurso.map(deProyecto)} />
+		) : (
+			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={obrasEnCurso.map(deMuestra)}>
+				<Pendiente texto="obras en construcción con superficie, comuna, dirección y tipo; fotos y videos de Rodrigo" />
+			</CarruselObras>
+		)
+	}
 
 	<section id="contratados" class="seccion gris bloque">
 		<div class="contenedor">
@@ -125,21 +118,15 @@ const bloques = [
 		</div>
 	</section>
 
-	<section id="terminados" class="seccion contenedor bloque">
-		<div class="cabecera">
-			<h2>Terminados</h2>
-		</div>
-		{
-			hayReales ? (
-				<CarruselObras obras={terminados.map(deProyecto)} etiqueta="Obras terminadas" />
-			) : (
-				<>
-					<Pendiente texto="obras terminadas que elija don Luis, con fotos nuevas (las de 2018 salen del sitio)" />
-					<CarruselObras obras={obras2018.map(deMuestra)} etiqueta="Obras terminadas" />
-				</>
-			)
-		}
-	</section>
+	{
+		hayReales ? (
+			<CarruselObras id="terminados" titulo="Terminados" obras={terminados.map(deProyecto)} />
+		) : (
+			<CarruselObras id="terminados" titulo="Terminados" obras={obras2018.map(deMuestra)}>
+				<Pendiente texto="obras terminadas que elija don Luis, con fotos nuevas (las de 2018 salen del sitio)" />
+			</CarruselObras>
+		)
+	}
 
 	<Contacto />
 </Base>

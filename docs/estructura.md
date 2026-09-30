@@ -146,8 +146,12 @@ necesita fotos reales de obras, equipos y personas.
 
 ### Carrusel de obras (30-sep-2026)
 
-A pedido del usuario, las obras en construcción y las terminadas (en Proyectos y en "En obra
-ahora" de la portada) se muestran como los destacados de Ramboll: panel con tipo, nombre y una
-línea (comuna · m²) junto a una foto grande; la siguiente asoma, flechas redondas y barra de
-avance (`CarruselObras.astro`). Sin avance automático; se desliza con scroll-snap y la
-diapositiva entera lleva a la ficha. Los contratados siguen en tabla (aún no hay foto).
+A pedido del usuario, réplica del carrusel de destacados de ramboll.com ("exacto lo mismo":
+estilo y animaciones), medido en su sitio y reescrito con código propio y el verde de LOLS
+(`CarruselObras.astro`): franja gris hasta el 45 % del ancho; barra de avance ligada al scroll;
+encabezado en mayúsculas con barra vertical; texto (34 %) que sale 218 px a la izquierda y entra
+desde la derecha (transform 0,5 s, opacity 0,3 s), título de gris a oscuro; fotos 16:9 en fila
+que se desplaza (0,6 s), las pasadas se desvanecen (0,4 s) y la siguiente asoma; flechas en
+círculos de 60 px. Sin avance automático, vuelve al inicio tras la última, se desliza con el
+dedo. Se usa en obras en construcción y terminadas (Proyectos) y en "En obra ahora" (portada).
+Los contratados siguen en tabla.
