@@ -122,6 +122,46 @@ const ruta = Astro.url.pathname;
 		display: none;
 	}
 
+	/* Flotante (con JS): sobre la imagen de la cabecera, sin fondo, logo y menú en blanco, con un
+	   degradado arriba para que se lea sobre cualquier foto. Al bajar (.con-sombra) o con el menú
+	   del celular abierto vuelve a ser sólido. El contenido sube por debajo (margen negativo). */
+	:global(.encabezado-flotante) .encabezado {
+		transition:
+			background-color 0.3s,
+			border-color 0.3s,
+			box-shadow 0.25s;
+	}
+	:global(.encabezado-flotante) .encabezado:not(:global(.con-sombra)):not(:has([aria-expanded='true'])) {
+		background: linear-gradient(to bottom, rgb(20 20 20 / 0.55), rgb(20 20 20 / 0));
+		border-bottom-color: transparent;
+	}
+	:global(.encabezado-flotante) .encabezado:not(:global(.con-sombra)):not(:has([aria-expanded='true'])) .marca {
+		color: var(--lols-blanco);
+	}
+	:global(.encabezado-flotante) .encabezado:not(:global(.con-sombra)):not(:has([aria-expanded='true'])) .desde {
+		color: var(--lols-blanco);
+		border-left-color: rgb(255 255 255 / 0.35);
+	}
+	:global(.encabezado-flotante) .encabezado:not(:global(.con-sombra)):not(:has([aria-expanded='true'])) nav ul a {
+		color: var(--lols-blanco);
+	}
+	:global(.encabezado-flotante) .encabezado:not(:global(.con-sombra)):not(:has([aria-expanded='true'])) .barras,
+	:global(.encabezado-flotante) .encabezado:not(:global(.con-sombra)):not(:has([aria-expanded='true'])) .barras::before,
+	:global(.encabezado-flotante) .encabezado:not(:global(.con-sombra)):not(:has([aria-expanded='true'])) .barras::after {
+		background: var(--lols-blanco);
+	}
+	.marca,
+	.desde,
+	nav ul a {
+		transition: color 0.3s;
+	}
+	:global(.encabezado-flotante main) {
+		margin-top: calc(-4.5rem - 5px);
+	}
+	:global(.encabezado-flotante section.hero-obra .fondo-hero .pausa) {
+		margin-top: 5.5rem;
+	}
+
 	@media (max-width: 360px) {
 		.desde {
 			display: none;

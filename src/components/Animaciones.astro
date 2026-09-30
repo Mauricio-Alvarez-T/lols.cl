@@ -12,9 +12,12 @@
 	}
 	window.__animaciones = true;
 
-	// Sombra del encabezado: un solo listener pasivo, sin trabajo por cada píxel.
+	// Encabezado: transparente sobre la cabecera con imagen de cada página (se integra a la obra
+	// en vez de verse como una barra aparte) y sólido al bajar. Solo con JS: sin él queda sólido.
+	// Un solo listener pasivo, sin trabajo por cada píxel.
 	const encabezado = document.querySelector('.encabezado');
 	if (encabezado) {
+		document.documentElement.classList.add('encabezado-flotante');
 		let pendiente = false;
 		const actualizar = () => {
 			encabezado.classList.toggle('con-sombra', window.scrollY > 8);
