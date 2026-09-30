@@ -136,6 +136,7 @@ const mixkit = (id: number, alt: string): VideoReferencial => ({
 export const videos = {
 	portada: mixkit(4010, 'Vista aérea de edificios en construcción con grúas'),
 	seguridad: mixkit(23170, 'Dos profesionales con casco revisan planos en obra'),
+	empresa: mixkit(46753, 'Dos trabajadores con casco caminan hacia la obra'),
 	trabaja: mixkit(31473, 'Trabajadores en obra gruesa de un edificio'),
 	timelapse: mixkit(31454, 'Timelapse de grúas trabajando en la construcción de un edificio'),
 };

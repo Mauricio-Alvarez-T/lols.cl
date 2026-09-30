@@ -9,23 +9,20 @@ import Contacto from '../components/Contacto.astro';
 import { empresa, fundacion, aniosTrayectoria } from '../data/empresa';
 import Equipamiento from '../components/Equipamiento.astro';
 import Referencial from '../components/Referencial.astro';
-import { bandas, retratos } from '../data/referencia';
+import { retratos, videos } from '../data/referencia';
+import ObraPortada from '../components/ObraPortada.astro';
 import { ejemplosEmpresa as ej } from '../data/ejemplos';
 ---
 
 <Base title="Empresa" description={`Quiénes somos: ${empresa.razonSocial}.`}>
-	<header class="portadilla contenedor">
+	<ObraPortada video={videos.empresa}>
 		<p class="etiqueta">Empresa</p>
-		<h1>{empresa.directrices}</h1>
+		<h1 class="display largo">{empresa.directrices.replace(/\.$/, '')}<span class="punto">.</span></h1>
 		<p class="bajada">
 			{aniosTrayectoria} años de experiencia en el área de construcción,
 			con compromiso por las normas de seguridad y el respeto por el medio ambiente.
 		</p>
-	</header>
-
-	<div class="banda marco">
-		<Referencial imagen={bandas.empresa} carga="eager" />
-	</div>
+	</ObraPortada>
 
 	<section class="seccion contenedor">
 		<div class="cabecera"><h2>Nuestra trayectoria</h2></div>
@@ -74,12 +71,8 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 </Base>
 
 <style>
-	.portadilla h1 {
-		max-width: 16ch;
-	}
-	.banda {
-		aspect-ratio: 21 / 8;
-		background: #2a2a2a;
+	.punto {
+		color: var(--lols-verde);
 	}
 	.ancla {
 		scroll-margin-top: 5rem;
@@ -140,9 +133,6 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 		}
 	}
 	@media (max-width: 560px) {
-		.banda {
-			aspect-ratio: 4 / 3;
-		}
 		.linea {
 			grid-template-columns: minmax(0, 1fr);
 		}
