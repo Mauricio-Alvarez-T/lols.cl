@@ -1,0 +1,312 @@
+---
+// Carrusel de obras (formato de los destacados de Ramboll, elegido por el usuario): cada
+// diapositiva es un panel con tipo, nombre y una línea de datos, junto a una foto grande; la
+// siguiente asoma a la derecha, flechas redondas abajo y una barra de avance arriba.
+// Nivel 1 de la divulgación progresiva: la diapositiva entera lleva a la ficha.
+// Sin avance automático (nada se mueve solo); con el dedo o el trackpad se desliza con
+// scroll-snap, y las flechas mueven de a una. Sin JavaScript sigue siendo una fila deslizable.
+import Pendiente from './Pendiente.astro';
+import Pictograma from './Pictograma.astro';
+import Referencial from './Referencial.astro';
+import { pictogramaDeTipo } from '../data/proyectos';
+import type { ImagenReferencial } from '../data/referencia';
+
+export interface ObraCarrusel {
+	href: string;
+	imagen: ImagenReferencial | { src: string; alt: string };
+	tipo: string | null;
+	nombre: string | null;
+	comuna: string | null;
+	superficie: string | null;
+	ejemplo?: boolean; // datos de muestra: se marcan con Pendiente
+}
+
+interface Props {
+	obras: ObraCarrusel[];
+	etiqueta: string; // nombre accesible del carrusel
+	sello?: string; // p. ej. "En construcción"
+}
+const { obras, etiqueta, sello } = Astro.props;
+const esReferencial = (i: ObraCarrusel['imagen']): i is ImagenReferencial => 'origen' in i;
+---
+
+<div class="carrusel" role="region" aria-roledescription="carrusel" aria-label={etiqueta} data-carrusel>
+	<div class="avance" aria-hidden="true"><span></span></div>
+	<ul class="pista">
+		{
+			obras.map((o, i) => (
+				<li class="diapositiva" aria-roledescription="diapositiva" aria-label={`${i + 1} de ${obras.length}`}>
+					<a href={o.href} class="vinculo">
+						<div class="panel">
+							<p class="tipo">
+								<Pictograma nombre={pictogramaDeTipo(o.tipo)} />
+								{o.ejemplo ? <Pendiente texto="tipo de obra">{o.tipo}</Pendiente> : o.tipo}
+							</p>
+							<h3>{o.ejemplo ? <Pendiente texto="nombre del proyecto">{o.nombre}</Pendiente> : o.nombre}</h3>
+							<p class="dato">
+								{o.ejemplo ? <Pendiente texto="comuna">{o.comuna}</Pendiente> : o.comuna}
+								{o.superficie && (
+									<>
+										{' · '}
+										{o.ejemplo ? <Pendiente texto="m² construidos">{o.superficie}</Pendiente> : o.superficie}
+									</>
+								)}
+							</p>
+							<span class="enlace-flecha">Ver la obra</span>
+						</div>
+						<div class="foto marco">
+							{esReferencial(o.imagen) ? (
+								<Referencial imagen={o.imagen} sizes="(max-width: 760px) 90vw, 60vw" />
+							) : (
+								<img src={o.imagen.src} alt={o.imagen.alt} loading="lazy" />
+							)}
+							{sello && <span class="sello">{sello}</span>}
+						</div>
+					</a>
+				</li>
+			))
+		}
+	</ul>
+	<div class="controles">
+		<button type="button" class="flecha anterior" aria-label="Obra anterior" disabled>
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7M8 12h13" /></svg>
+		</button>
+		<button type="button" class="flecha siguiente" aria-label="Obra siguiente">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7M16 12H3" /></svg>
+		</button>
+	</div>
+</div>
+
+<script>
+	for (const c of document.querySelectorAll<HTMLElement>('[data-carrusel]')) {
+		const pista = c.querySelector<HTMLElement>('.pista')!;
+		const diapositivas = [...pista.children] as HTMLElement[];
+		const anterior = c.querySelector<HTMLButtonElement>('.anterior')!;
+		const siguiente = c.querySelector<HTMLButtonElement>('.siguiente')!;
+		const barra = c.querySelector<HTMLElement>('.avance span')!;
+
+		const actual = () => {
+			const x = pista.scrollLeft;
+			let i = 0;
+			diapositivas.forEach((d, n) => {
+				if (Math.abs(d.offsetLeft - pista.offsetLeft - x) < Math.abs(diapositivas[i].offsetLeft - pista.offsetLeft - x)) i = n;
+			});
+			return i;
+		};
+		const ir = (i: number) => {
+			const d = diapositivas[Math.max(0, Math.min(diapositivas.length - 1, i))];
+			pista.scrollTo({ left: d.offsetLeft - pista.offsetLeft, behavior: 'smooth' });
+		};
+		let pendiente = false;
+		const actualizar = () => {
+			pendiente = false;
+			const i = actual();
+			const fin = pista.scrollLeft + pista.clientWidth >= pista.scrollWidth - 4;
+			anterior.disabled = pista.scrollLeft < 4;
+			siguiente.disabled = fin;
+			barra.style.transform = `scaleX(${fin ? 1 : (i + 1) / diapositivas.length})`;
+		};
+		pista.addEventListener('scroll', () => {
+			if (!pendiente) {
+				pendiente = true;
+				requestAnimationFrame(actualizar);
+			}
+		});
+		anterior.addEventListener('click', () => ir(actual() - 1));
+		siguiente.addEventListener('click', () => ir(actual() + 1));
+		// Transición a la ficha: la foto clicada viaja a la portada (igual que TarjetaProyecto).
+		for (const a of pista.querySelectorAll<HTMLAnchorElement>('.vinculo')) {
+			a.addEventListener('click', () => {
+				const foto = a.querySelector<HTMLElement>('.foto');
+				if (foto) foto.style.viewTransitionName = 'foto-proyecto';
+			});
+		}
+		addEventListener('pageshow', () => {
+			for (const f of pista.querySelectorAll<HTMLElement>('.foto')) f.style.viewTransitionName = '';
+		});
+		actualizar();
+	}
+</script>
+
+<style>
+	.carrusel {
+		position: relative;
+	}
+	/* Barra de avance: cuánto del carrusel se ha recorrido (como la línea azul de Ramboll). */
+	.avance {
+		height: 4px;
+		margin-bottom: 1.5rem;
+		background: var(--linea);
+	}
+	.avance span {
+		display: block;
+		height: 100%;
+		background: var(--lols-verde);
+		transform-origin: left;
+		transform: scaleX(0.2);
+		transition: transform 0.35s var(--suave);
+	}
+	.pista {
+		display: flex;
+		gap: clamp(1rem, 2vw, 1.5rem);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+		overscroll-behavior-x: contain;
+	}
+	.pista::-webkit-scrollbar {
+		display: none;
+	}
+	/* La siguiente diapositiva asoma: cada una mide un poco menos que el ancho visible. */
+	.diapositiva {
+		flex: 0 0 calc(100% - clamp(3rem, 8vw, 7rem));
+		scroll-snap-align: start;
+	}
+	.vinculo {
+		display: grid;
+		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr);
+		height: 100%;
+		color: inherit;
+		text-decoration: none;
+	}
+	.panel {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: clamp(1.5rem, 3.5vw, 3rem);
+		background: var(--lols-gris-claro);
+	}
+	:global(.seccion.gris) .panel {
+		background: var(--lols-blanco);
+	}
+	.tipo {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		margin: 0;
+		font-family: var(--fuente-datos);
+		font-weight: 600;
+		color: var(--lols-verde-oscuro);
+	}
+	.tipo :global(.pictograma) {
+		flex-shrink: 0;
+		width: 1.5rem;
+		height: 1.5rem;
+		color: var(--lols-verde);
+	}
+	h3 {
+		margin: 0;
+		font-size: clamp(1.6rem, 1rem + 2vw, 2.6rem);
+		letter-spacing: -0.035em;
+		line-height: 1.08;
+	}
+	.dato {
+		margin: 0;
+		color: var(--lols-gris);
+	}
+	.panel .enlace-flecha {
+		margin-top: auto;
+		padding-top: 1rem;
+		color: var(--lols-verde-oscuro);
+	}
+	.vinculo:hover .enlace-flecha::after {
+		width: 1.75rem;
+	}
+	.vinculo:hover h3 {
+		color: var(--lols-verde-oscuro);
+	}
+	.foto {
+		position: relative;
+		aspect-ratio: 16 / 10;
+	}
+	.foto :global(img) {
+		transition: transform 0.5s var(--suave);
+	}
+	.vinculo:hover .foto :global(img) {
+		transform: scale(1.03);
+	}
+	.sello {
+		grid-area: 1 / 1;
+		align-self: start;
+		justify-self: start;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		margin: 0.9rem;
+		padding: 0.3rem 0.65rem 0.3rem 0.55rem;
+		background: var(--lols-blanco);
+		color: var(--lols-carbon);
+		font: 600 0.8rem/1.2 var(--fuente-datos);
+		z-index: 1;
+	}
+	.sello::before {
+		content: '';
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: var(--lols-verde);
+	}
+	.controles {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.75rem;
+		margin-top: 1.25rem;
+	}
+	.flecha {
+		display: grid;
+		place-items: center;
+		width: 3.5rem;
+		height: 3.5rem;
+		border: 1.5px solid var(--lols-carbon);
+		border-radius: 50%;
+		background: transparent;
+		color: var(--lols-carbon);
+		cursor: pointer;
+		transition:
+			background-color 0.15s,
+			color 0.15s,
+			opacity 0.15s;
+	}
+	.flecha svg {
+		width: 1.4rem;
+		height: 1.4rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.6;
+	}
+	.flecha:hover:not(:disabled) {
+		background: var(--lols-carbon);
+		color: var(--lols-blanco);
+	}
+	.flecha:disabled {
+		opacity: 0.3;
+		cursor: default;
+	}
+	@media (max-width: 760px) {
+		.diapositiva {
+			flex-basis: 88%;
+		}
+		.vinculo {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.foto {
+			order: -1;
+			aspect-ratio: 4 / 3;
+		}
+		.panel {
+			padding: 1.25rem;
+		}
+		.flecha {
+			width: 3rem;
+			height: 3rem;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.pista {
+			scroll-behavior: auto;
+		}
+	}
+</style>

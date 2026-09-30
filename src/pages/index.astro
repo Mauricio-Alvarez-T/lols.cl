@@ -5,7 +5,8 @@
 //   seguridad (video + dos datos) → clientes → contacto.
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
-import TarjetaProyecto from '../components/TarjetaProyecto.astro';
+import CarruselObras from '../components/CarruselObras.astro';
+import { deProyecto, deMuestra } from '../data/carrusel';
 import Contacto from '../components/Contacto.astro';
 import { empresa, aniosTrayectoria, fundacion } from '../data/empresa';
 import { proyectosPorEstado } from '../data/proyectos';
@@ -63,13 +64,11 @@ const cifras = [
 				<h2>En obra ahora</h2>
 				<a href="/proyectos/#en-construccion" class="enlace-flecha">Todos los proyectos</a>
 			</div>
-			<div class="grilla-proyectos">
-				{
-					enObra.length
-						? enObra.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)
-						: obrasEnCurso.map((f, i) => <TarjetaProyecto referencia={f} estado="en-curso" lamina={i + 1} destacada={i === 0} />)
-				}
-			</div>
+			<CarruselObras
+				obras={enObra.length ? enObra.map(deProyecto) : obrasEnCurso.map(deMuestra)}
+				etiqueta="Obras en construcción"
+				sello="En construcción"
+			/>
 			<a href="/proyectos/#contratados" class="cartera">
 				<span class="cartera-n">
 					{contratados.length || <Pendiente texto="n.º de obras contratadas">{ejemplosContratados.length}</Pendiente>}
@@ -143,16 +142,6 @@ const cifras = [
 		color: var(--lols-carbon);
 	}
 
-	/* Jerarquía: la primera obra ocupa dos columnas y dos filas; las otras dos, apiladas. */
-	.grilla-proyectos {
-		display: grid;
-		grid-template-columns: 2fr 1fr;
-		gap: clamp(1.5rem, 3vw, 2.5rem);
-		align-items: start;
-	}
-	.grilla-proyectos > :global(.destacada) {
-		grid-row: span 2;
-	}
 
 	/* Cartera contratada: una línea que muestra continuidad, con su número grande. */
 	.cartera {
@@ -221,9 +210,6 @@ const cifras = [
 			padding-left: 0;
 			border-left: 0;
 		}
-		.grilla-proyectos {
-			grid-template-columns: repeat(2, 1fr);
-		}
 		.logos {
 			grid-template-columns: repeat(3, 1fr);
 		}
@@ -231,9 +217,6 @@ const cifras = [
 	@media (max-width: 560px) {
 		.banda {
 			aspect-ratio: 4 / 3;
-		}
-		.grilla-proyectos {
-			grid-template-columns: minmax(0, 1fr);
 		}
 		.logos {
 			grid-template-columns: repeat(2, 1fr);

@@ -143,3 +143,11 @@ Cambios:
 
 Condición: la filosofía descansa en las fotos. Con stock sirve para la propuesta; el sitio final
 necesita fotos reales de obras, equipos y personas.
+
+### Carrusel de obras (30-sep-2026)
+
+A pedido del usuario, las obras en construcción y las terminadas (en Proyectos y en "En obra
+ahora" de la portada) se muestran como los destacados de Ramboll: panel con tipo, nombre y una
+línea (comuna · m²) junto a una foto grande; la siguiente asoma, flechas redondas y barra de
+avance (`CarruselObras.astro`). Sin avance automático; se desliza con scroll-snap y la
+diapositiva entera lleva a la ficha. Los contratados siguen en tabla (aún no hay foto).

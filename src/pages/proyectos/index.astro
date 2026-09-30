@@ -1,5 +1,6 @@
 ---
-// Portafolio en tres bloques, en el orden que pidió don Luis (docs/reunion-inicial.md):
+// Portafolio en tres bloques (las obras en construcción y las terminadas, en carrusel como
+// los destacados de Ramboll), en el orden que pidió don Luis (docs/reunion-inicial.md):
 //   1. En construcción: lo que LOLS está haciendo hoy, con tipo, superficie, comuna y dirección.
 //   2. Contratados: obras firmadas que aún no parten (muestran cartera y continuidad).
 //   3. Terminados: el portafolio de siempre.
@@ -7,7 +8,8 @@
 // bloque que corresponde.
 import Base from '../../layouts/Base.astro';
 import Pendiente from '../../components/Pendiente.astro';
-import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
+import CarruselObras from '../../components/CarruselObras.astro';
+import { deProyecto, deMuestra } from '../../data/carrusel';
 import Contacto from '../../components/Contacto.astro';
 import Pictograma from '../../components/Pictograma.astro';
 import { proyectosPorEstado, pictogramaDeTipo } from '../../data/proyectos';
@@ -57,15 +59,11 @@ const bloques = [
 		</div>
 		{
 			hayReales ? (
-				<div class="grilla dos">
-					{enCurso.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)}
-				</div>
+				<CarruselObras obras={enCurso.map(deProyecto)} etiqueta="Obras en construcción" sello="En construcción" />
 			) : (
 				<>
 					<Pendiente texto="obras en construcción con superficie, comuna, dirección y tipo; fotos y videos de Rodrigo" />
-					<div class="grilla dos">
-						{obrasEnCurso.map((f, i) => <TarjetaProyecto referencia={f} estado="en-curso" lamina={i + 1} destacada={i === 0} />)}
-					</div>
+					<CarruselObras obras={obrasEnCurso.map(deMuestra)} etiqueta="Obras en construcción" sello="En construcción" />
 				</>
 			)
 		}
@@ -133,15 +131,11 @@ const bloques = [
 		</div>
 		{
 			hayReales ? (
-				<div class="grilla">
-					{terminados.map((p, i) => <TarjetaProyecto proyecto={p} lamina={i + 1} destacada={i === 0} />)}
-				</div>
+				<CarruselObras obras={terminados.map(deProyecto)} etiqueta="Obras terminadas" />
 			) : (
 				<>
 					<Pendiente texto="obras terminadas que elija don Luis, con fotos nuevas (las de 2018 salen del sitio)" />
-					<div class="grilla">
-						{obras2018.map((f, i) => <TarjetaProyecto referencia={f} estado="terminado" lamina={i + 1} destacada={i === 0} />)}
-					</div>
+					<CarruselObras obras={obras2018.map(deMuestra)} etiqueta="Obras terminadas" />
 				</>
 			)
 		}
@@ -195,24 +189,6 @@ const bloques = [
 	.nota {
 		margin: 0;
 		color: var(--gris-medio);
-	}
-	.grilla {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
-	}
-	.grilla > :global(.destacada) {
-		grid-column: span 2;
-	}
-	/* En construcción: pocas obras, más grandes; la primera ocupa el ancho completo. */
-	.grilla.dos {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-	.grilla.dos > :global(.destacada) {
-		grid-column: 1 / -1;
-	}
-	.grilla.dos > :global(.destacada .foto) {
-		aspect-ratio: 21 / 9;
 	}
 
 	/* Cartera contratada: tabla tipo cuadro de obras de un plano (sin fotos: aún no hay obra). */
@@ -270,11 +246,6 @@ const bloques = [
 		font-weight: 600;
 	}
 
-	@media (max-width: 960px) {
-		.grilla {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-	}
 	@media (max-width: 640px) {
 		.indice {
 			grid-template-columns: minmax(0, 1fr);
@@ -283,16 +254,6 @@ const bloques = [
 			padding-left: 0;
 			border-left: 0;
 			border-top: 1px solid var(--linea);
-		}
-		.grilla,
-		.grilla.dos {
-			grid-template-columns: minmax(0, 1fr);
-		}
-		.grilla > :global(.destacada) {
-			grid-column: auto;
-		}
-		.grilla.dos > :global(.destacada .foto) {
-			aspect-ratio: 4 / 3;
 		}
 		/* En celular la tabla pasa a fichas apiladas (sin scroll lateral). */
 		.cartera {
