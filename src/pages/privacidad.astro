@@ -2,12 +2,14 @@
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import { empresa } from '../data/empresa';
+import ObraPortada from '../components/ObraPortada.astro';
+import { bandas } from '../data/referencia';
 ---
 
 <Base title="Política de privacidad">
-	<header class="portadilla contenedor">
-		<h1>Política de privacidad</h1>
-	</header>
+	<ObraPortada imagen={bandas.privacidad} baja>
+		<h1 class="display largo">Política de privacidad</h1>
+	</ObraPortada>
 
 	<section class="seccion contenedor">
 		<Pendiente

@@ -44,6 +44,12 @@ export const bandas = {
 	portada: unsplash('1599707254554-027aeb4deacd', 'Grúas sobre un edificio en construcción'),
 	empresa: unsplash('1541888946425-d81bb19240f5', 'Equipo de obra sobre una losa'),
 	fichaEjemplo: unsplash('1655975719898-8f3432eed322', 'Grúa sobre una estructura en construcción'),
+	// Cabeceras de páginas interiores (ObraPortada con imagen).
+	proyectos: unsplash('1466803136990-7c174b34ff32', 'Vista aérea de una obra de edificación en la ciudad'),
+	contacto: unsplash('1774599730788-a74cd9253b56', 'Equipo revisando planos en terreno'),
+	proveedores: unsplash('1763926025477-423847028860', 'Estanterías con barras y perfiles metálicos'),
+	error: unsplash('1603465410243-af3e840367dd', 'Maquinaria en una obra detenida'),
+	privacidad: unsplash('1487491424367-7571f9afbb30', 'Vista aérea de edificios de altura'),
 };
 
 export const bandasServicio: Record<string, ImagenReferencial> = {

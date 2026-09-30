@@ -20,19 +20,16 @@ const { servicio: s } = Astro.props as { servicio: Servicio };
 const relacionados = proyectos.filter((p) => p.servicios.includes(s.slug)).slice(0, 3);
 const otros = servicios.filter((o) => o.slug !== s.slug);
 const ej = ejemplosServicio[s.slug];
+import ObraPortada from '../../components/ObraPortada.astro';
 ---
 
 <Base title={s.nombre}>
-	<header class="portadilla contenedor">
+	<ObraPortada imagen={bandasServicio[s.slug]} baja>
 		<p class="etiqueta"><a href="/servicios/">Servicios</a></p>
 		<div class="nombre"><Icono nombre={s.icono} /><span>{s.nombre}</span></div>
-		<h1>{s.problema ?? <Pendiente texto="el problema del cliente que este servicio resuelve, como titular">{ej.problema}</Pendiente>}</h1>
+		<h1 class="display largo">{s.problema ?? <Pendiente texto="el problema del cliente que este servicio resuelve, como titular">{ej.problema}</Pendiente>}</h1>
 		<p class="bajada">{s.resumen ?? <Pendiente texto="cómo lo resuelve LOLS, en dos líneas">{ej.resumen}</Pendiente>}</p>
-	</header>
-
-	<div class="banda marco">
-		<Referencial imagen={bandasServicio[s.slug]} carga="eager" />
-	</div>
+	</ObraPortada>
 
 	<section class="seccion contenedor columnas">
 		<div>
@@ -82,20 +79,12 @@ const ej = ejemplosServicio[s.slug];
 		font-family: var(--fuente-titulos);
 		font-weight: 700;
 		font-size: 1.25rem;
-		color: var(--lols-verde-oscuro);
+		color: var(--lols-blanco);
 	}
 	.nombre :global(.icono) {
 		width: 2rem;
 		height: 2rem;
-		color: var(--lols-verde);
-	}
-	.portadilla h1 {
-		max-width: 22ch;
-		font-size: clamp(2.25rem, 5.5vw, 4.5rem);
-	}
-	.banda {
-		aspect-ratio: 21 / 8;
-		background: #2a2a2a;
+		color: var(--lols-lima);
 	}
 	.columnas {
 		display: grid;

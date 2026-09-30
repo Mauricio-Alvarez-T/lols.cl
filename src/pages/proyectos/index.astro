@@ -30,16 +30,18 @@ const bloques = [
 	{ id: 'contratados', estado: 'contratado', titulo: 'Contratados', n: cuenta.contratados },
 	{ id: 'terminados', estado: 'terminado', titulo: 'Terminados', n: cuenta.terminados },
 ];
+import ObraPortada from '../../components/ObraPortada.astro';
+import { bandas } from '../../data/referencia';
 ---
 
 <Base title="Proyectos" description="Obras en construcción, contratadas y terminadas de LOLS Ingeniería.">
-	<header class="portadilla contenedor">
+	<ObraPortada imagen={bandas.proyectos} baja>
 		<p class="etiqueta">Proyectos</p>
-		<h1>Obras que hablan por nosotros</h1>
+		<h1 class="display largo">Obras que hablan por nosotros</h1>
 		<p class="bajada"><Pendiente texto="una frase sobre el portafolio (tipos de obra, años, regiones)">Edificios de oficinas, centros de bodegas y obras industriales en la Región Metropolitana.</Pendiente></p>
-	</header>
+	</ObraPortada>
 
-	<nav class="contenedor" aria-label="Bloques de proyectos">
+	<nav class="contenedor bloques" aria-label="Bloques de proyectos">
 		<div class="indice">
 			{
 				bloques.map((b) => (
@@ -142,6 +144,9 @@ const bloques = [
 </script>
 
 <style>
+	.bloques {
+		padding-block: clamp(2.5rem, 6vw, 4rem);
+	}
 	.indice {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));

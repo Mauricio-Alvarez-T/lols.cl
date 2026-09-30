@@ -1,12 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
+import ObraPortada from '../components/ObraPortada.astro';
+import { bandas } from '../data/referencia';
 ---
 
 <Base title="Página no encontrada">
-	<header class="portadilla contenedor">
+	<ObraPortada imagen={bandas.error} baja>
 		<p class="etiqueta">Error 404</p>
-		<h1>Esta página no existe</h1>
+		<h1 class="display largo">Esta página no existe</h1>
 		<p class="bajada">Puede que haya cambiado de dirección.</p>
 		<a href="/" class="boton">Volver al inicio</a>
-	</header>
+	</ObraPortada>
 </Base>

@@ -6,14 +6,16 @@ import Pendiente from '../../components/Pendiente.astro';
 import Contacto from '../../components/Contacto.astro';
 import MosaicoServicios from '../../components/MosaicoServicios.astro';
 import { servicios } from '../../data/empresa';
+import ObraPortada from '../../components/ObraPortada.astro';
+import { bandas } from '../../data/referencia';
 ---
 
 <Base title="Servicios" description={`Servicios de LOLS Ingeniería: ${servicios.map((s) => s.nombre).join(', ')}.`}>
-	<header class="portadilla contenedor">
+	<ObraPortada imagen={bandas.empresa} baja>
 		<p class="etiqueta">Servicios</p>
-		<h1>Seis especialidades</h1>
+		<h1 class="display largo">Seis especialidades</h1>
 		<p class="bajada"><Pendiente texto="una frase que presente los servicios">Un solo responsable para su proyecto, sin coordinar a varios contratistas.</Pendiente></p>
-	</header>
+	</ObraPortada>
 
 	<section class="seccion contenedor mosaico">
 		<MosaicoServicios titulo="h2" />
@@ -22,8 +24,3 @@ import { servicios } from '../../data/empresa';
 	<Contacto />
 </Base>
 
-<style>
-	.mosaico {
-		padding-top: 0;
-	}
-</style>

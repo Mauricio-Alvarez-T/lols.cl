@@ -4,19 +4,31 @@
 // degradado desde abajo asegura la lectura sobre cualquier cuadro del video. Encima, los ejes
 // del plano se trazan al cargar y quedan muy tenues (animaciones.css).
 // El contenido (título, bajada, botones) llega por el slot desde la página.
+// Acepta video (portada, Seguridad, Empresa…) o imagen (páginas interiores): toda cabecera
+// lleva al menos una imagen, nunca solo texto (pedido del usuario, 30-sep).
 import VideoFondo from './VideoFondo.astro';
-import type { VideoReferencial } from '../data/referencia';
+import Referencial from './Referencial.astro';
+import type { ImagenReferencial, VideoReferencial } from '../data/referencia';
 
 interface Props {
-	video: VideoReferencial;
+	video?: VideoReferencial;
+	imagen?: ImagenReferencial | { src: string; alt: string };
+	baja?: boolean; // páginas interiores: menos alto, para que el contenido asome antes
 }
-const { video } = Astro.props;
+const { video, imagen, baja = false } = Astro.props;
 const verticales = [25, 50, 75];
 const horizontales = [40];
 ---
 
-<section class="hero-obra">
-	<VideoFondo video={video} clase="fondo-hero" eager />
+<section class:list={['hero-obra', { baja }]}>
+	{video && <VideoFondo video={video} clase="fondo-hero" eager />}
+	{
+		!video && imagen && (
+			<div class="fondo-hero marco">
+				{'origen' in imagen ? <Referencial imagen={imagen} carga="eager" sizes="100vw" /> : <img src={imagen.src} alt={imagen.alt} fetchpriority="high" />}
+			</div>
+		)
+	}
 	<div class="velo" aria-hidden="true"></div>
 	<div class="trazo" aria-hidden="true">
 		{verticales.map((x, i) => <span class="eje-v" style={`left: ${x}%; --i: ${i}`} />)}
@@ -36,6 +48,9 @@ const horizontales = [40];
 		overflow: hidden;
 		background: var(--lols-carbon);
 		color: var(--lols-blanco);
+	}
+	.hero-obra.baja {
+		min-height: clamp(26rem, 68svh, 40rem);
 	}
 	.velo {
 		position: absolute;

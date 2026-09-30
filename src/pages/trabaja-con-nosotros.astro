@@ -3,7 +3,7 @@
 // Aquí el video de faena suma: muestra el trabajo real y la cultura.
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
-import VideoFondo from '../components/VideoFondo.astro';
+import ObraPortada from '../components/ObraPortada.astro';
 import { empresa } from '../data/empresa';
 import { videos } from '../data/referencia';
 import { ejemplosTrabaja as ej } from '../data/ejemplos';
@@ -12,13 +12,12 @@ const asunto = encodeURIComponent('Postulación: [cargo]');
 ---
 
 <Base title="Trabaja con nosotros" description="Súmate al equipo de LOLS Ingeniería.">
-	<header class="portadilla contenedor">
+	<ObraPortada video={videos.trabaja}>
 		<p class="etiqueta">Trabaja con nosotros</p>
-		<h1>Construye con nosotros</h1>
+		<h1 class="display">Construye con nosotros<span class="punto">.</span></h1>
 		<p class="bajada"><Pendiente texto="frase para postulantes">{ej.bajada}</Pendiente></p>
-	</header>
+	</ObraPortada>
 
-	<VideoFondo video={videos.trabaja} clase="banda" eager />
 
 	<section class="seccion contenedor">
 		<div class="cabecera"><h2>Lo que ofrecemos</h2></div>
@@ -59,6 +58,9 @@ const asunto = encodeURIComponent('Postulación: [cargo]');
 </Base>
 
 <style>
+	.punto {
+		color: var(--lols-verde);
+	}
 	.motivos {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));

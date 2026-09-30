@@ -6,14 +6,16 @@ import { empresa } from '../data/empresa';
 import { ejemplosProveedores as ej } from '../data/ejemplos';
 
 const asunto = encodeURIComponent('Proveedor: [rubro]');
+import ObraPortada from '../components/ObraPortada.astro';
+import { bandas } from '../data/referencia';
 ---
 
 <Base title="Proveedores" description="Cómo ser proveedor de LOLS Ingeniería.">
-	<header class="portadilla contenedor">
+	<ObraPortada imagen={bandas.proveedores} baja>
 		<p class="etiqueta">Proveedores</p>
-		<h1>Trabajemos juntos</h1>
+		<h1 class="display largo">Trabajemos juntos</h1>
 		<p class="bajada"><Pendiente texto="frase para proveedores">{ej.bajada}</Pendiente></p>
-	</header>
+	</ObraPortada>
 
 	<section class="seccion contenedor dos">
 		<div>
