@@ -267,6 +267,12 @@ const idFicha = (o: ObraCarrusel, i: number) => `obra-${o.id ?? `${seccion}-${i 
 		for (const b of panel.querySelectorAll<HTMLButtonElement>('[data-paso]')) {
 			b.addEventListener('click', () => mostrar(actual + Number(b.dataset.paso)));
 		}
+		// Las flechas de la barra de la ficha solo aparecen cuando las del carrusel ya no se ven
+		// (al bajar leyendo la ficha); si no, quedarían dos pares de flechas juntos.
+		const controles = c.querySelector<HTMLElement>('.controles')!;
+		new IntersectionObserver(([e]) => panel.classList.toggle('con-flechas', !e.isIntersecting), {
+			rootMargin: '-80px 0px 0px 0px', // bajo el encabezado fijo
+		}).observe(controles);
 		for (const b of panel.querySelectorAll<HTMLButtonElement>('[data-cerrar]')) b.addEventListener('click', cerrar);
 
 		registrar(grupo);
@@ -500,6 +506,18 @@ const idFicha = (o: ObraCarrusel, i: number) => `obra-${o.id ?? `${seccion}-${i 
 	}
 	.fichas {
 		padding-top: clamp(1.75rem, 4vw, 2.75rem);
+	}
+	.ficha-obras:not(.con-flechas) [data-paso] {
+		display: none;
+	}
+	.ficha-obras.con-flechas [data-paso] {
+		animation: flechas-entran 0.3s var(--suave);
+	}
+	@keyframes flechas-entran {
+		from {
+			opacity: 0;
+			transform: scale(0.85);
+		}
 	}
 
 	/* Fotos: la fila se desplaza de a una; la siguiente asoma hasta el borde de la pantalla. */
