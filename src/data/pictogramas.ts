@@ -12,4 +12,11 @@ export type NombrePictograma =
 	| 'bodegaje'
 	| 'centro-bodegas'
 	| 'industrial'
-	| 'habilitacion';
+	| 'habilitacion'
+	| 'andamio'
+	| 'alzaprima'
+	| 'moldaje'
+	| 'maquinaria'
+	| 'faena'
+	| 'vehiculo'
+	| 'seguridad';

@@ -96,9 +96,12 @@ export const obrasEnCurso = [
 ] satisfies ImagenReferencial[];
 
 // Equipamiento propio (reunión con don Luis): fotos de stock hasta tener las reales.
-export const fotosEquipamiento = {
+export const fotosEquipamiento: Record<string, ImagenReferencial> = {
+	alzaprimas: unsplash('1666796776547-5c25a077d9af', 'Alzaprimas y vigas bajo el moldaje de una losa'),
+	moldajes: unsplash('1575971637203-d6255d9947a9', 'Paneles de moldaje para muros en una obra'),
+	andamios: unsplash('1636362556682-11231883c01c', 'Edificio en altura cubierto de andamios'),
+	maquinaria: unsplash('1620388640785-892616248ec8', 'Grúa horquilla moviendo material en una bodega'),
 	vehiculos: unsplash('1628464682320-6a9ae020cb2b', 'Camioneta blanca de doble cabina'),
-	maquinaria: unsplash('1777181693263-2a333f0f808d', 'Trabajadores operando una hormigonera en obra'),
 	seguridad: unsplash('1662309376159-b95fb193d96b', 'Cascos y chalecos reflectantes colgados en una pared'),
 };
 

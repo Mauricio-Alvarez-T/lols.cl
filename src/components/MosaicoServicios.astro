@@ -2,7 +2,7 @@
 // Servicios como mosaico de fotos con su nombre (nivel 1 de la divulgación progresiva,
 // docs/estructura.md § Mostrar, no contar). Al pinchar una foto, su ficha (FichaServicio) se
 // despliega bajo esa fila, a todo el ancho, como en Google Imágenes: las demás fotos quedan
-// arriba y abajo y no se sale de la página (src/scripts/despliegue.ts). Sin JavaScript cada
+// arriba y abajo y no se sale de la página (src/scripts/mosaico.ts). Sin JavaScript cada
 // foto lleva a la página del servicio.
 import Pictograma from './Pictograma.astro';
 import Referencial from './Referencial.astro';
@@ -24,7 +24,7 @@ const idPanel = 'ficha-servicios';
 		servicios.map((s) => (
 			<li class="item">
 				<a href={`/servicios/${s.slug}/`} data-abre={`servicio-${s.slug}`}>
-					<div class="foto marco">
+					<div class="foto marco marco-mosaico">
 						<Referencial imagen={bandasServicio[s.slug]} sizes="(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw" />
 					</div>
 					<Titulo class="nombre">
@@ -35,7 +35,7 @@ const idPanel = 'ficha-servicios';
 			</li>
 		))
 	}
-	<li class="ficha-panel ficha-servicios" id={idPanel} role="region" aria-label="Detalle del servicio" hidden>
+	<li class="ficha-panel en-mosaico" id={idPanel} role="region" aria-label="Detalle del servicio" hidden>
 		<div class="ficha-dentro">
 			<div class="interior">
 				<div class="ficha-barra">
@@ -67,83 +67,7 @@ const idPanel = 'ficha-servicios';
 </ul>
 
 <script>
-	import { registrar, abrir, cerrar, abiertaEn, type Grupo } from '../scripts/despliegue';
-
-	for (const m of document.querySelectorAll<HTMLElement>('[data-mosaico]')) {
-		const panel = m.querySelector<HTMLElement>(':scope > .ficha-panel')!;
-		const items = [...m.querySelectorAll<HTMLElement>(':scope > .item')];
-		const enlaces = items.map((it) => it.querySelector<HTMLAnchorElement>('a')!);
-		const ids = enlaces.map((a) => a.dataset.abre!);
-		const fichas = ids.map((id) => panel.querySelector<HTMLElement>(`[data-ficha="${id}"]`)!);
-		let actual = -1;
-
-		for (const a of enlaces) a.setAttribute('aria-controls', panel.id);
-
-		// El panel va justo después de la última foto de la fila de la pinchada (sirve con 3, 2
-		// o 1 columnas) y su muesca apunta al centro de esa foto.
-		const ubicar = () => {
-			if (actual < 0) return false;
-			const it = items[actual];
-			const fila = it.offsetTop;
-			const ultimo = items.filter((o) => Math.abs(o.offsetTop - fila) < 4).pop() ?? it;
-			const movido = ultimo.nextElementSibling !== panel;
-			if (movido) ultimo.after(panel);
-			const r = it.getBoundingClientRect();
-			const base = m.getBoundingClientRect();
-			panel.style.setProperty('--x', `${r.left - base.left + r.width / 2}px`);
-			return movido;
-		};
-
-		const marcar = () =>
-			items.forEach((it, i) => {
-				it.classList.toggle('abierta', i === actual);
-				enlaces[i].setAttribute('aria-expanded', String(i === actual));
-			});
-
-		const grupo: Grupo = {
-			tiene: (id) => ids.includes(id),
-			mostrar: (id) => {
-				actual = ids.indexOf(id);
-				const estabaAbierto = panel.classList.contains('abierto');
-				if (ubicar() && estabaAbierto) {
-					// Cambió de fila: volver a desplegarlo en su nuevo lugar.
-					panel.classList.remove('abierto');
-					void panel.offsetHeight;
-					panel.classList.add('abierto');
-				}
-				fichas.forEach((f, i) => (f.hidden = i !== actual));
-				marcar();
-			},
-			panel: () => panel,
-			disparador: () => enlaces[actual] ?? null,
-			alCerrar: () => {
-				actual = -1;
-				marcar();
-			},
-		};
-
-		enlaces.forEach((a, i) =>
-			a.addEventListener('click', (e) => {
-				if (e.ctrlKey || e.metaKey || e.shiftKey) return; // abrir la página en otra pestaña
-				e.preventDefault();
-				if (abiertaEn(grupo) === ids[i]) cerrar();
-				else abrir(grupo, ids[i]);
-			}),
-		);
-		for (const b of panel.querySelectorAll<HTMLButtonElement>('[data-cerrar]')) b.addEventListener('click', cerrar);
-
-		let pendiente = false;
-		addEventListener('resize', () => {
-			if (pendiente || actual < 0) return;
-			pendiente = true;
-			requestAnimationFrame(() => {
-				pendiente = false;
-				ubicar();
-			});
-		});
-
-		registrar(grupo);
-	}
+	import '../scripts/mosaico';
 </script>
 
 <style>
@@ -171,22 +95,6 @@ const idPanel = 'ficha-servicios';
 	.item > a:hover .foto :global(img) {
 		transform: scale(1.03);
 	}
-	/* La foto abierta queda marcada con la losa verde abajo. */
-	.foto::after {
-		content: '';
-		grid-area: 1 / 1;
-		align-self: end;
-		height: 6px;
-		position: relative; /* encima de la foto (con filter se pinta como posicionada) */
-		z-index: 1;
-		background: var(--lols-verde);
-		transform: scaleX(0);
-		transform-origin: left;
-		transition: transform 0.4s var(--suave);
-	}
-	.abierta .foto::after {
-		transform: none;
-	}
 	.nombre {
 		display: flex;
 		align-items: center;
@@ -204,36 +112,6 @@ const idPanel = 'ficha-servicios';
 	.item > a:hover .nombre,
 	.abierta .nombre {
 		color: var(--lols-verde-oscuro);
-	}
-
-	/* Panel bajo la fila (base en global.css): a todo el ancho del mosaico, en hormigón claro,
-	   con una muesca que apunta a la foto abierta. */
-	.ficha-servicios {
-		grid-column: 1 / -1;
-		position: relative;
-		background: var(--lols-gris-claro);
-	}
-	.ficha-servicios::before {
-		content: '';
-		position: absolute;
-		top: -0.7rem;
-		left: calc(var(--x, 50%) - 0.7rem);
-		border: 0.7rem solid transparent;
-		border-top: 0;
-		border-bottom-color: var(--lols-gris-claro);
-		transition: left 0.35s var(--suave);
-	}
-	.interior {
-		padding-inline: clamp(1rem, 4vw, 2.5rem);
-	}
-	.ficha-servicios .ficha-barra {
-		background: var(--lols-gris-claro);
-	}
-	.ficha-servicios [data-ficha] > :global(.ficha-servicio) {
-		padding-top: clamp(1.5rem, 4vw, 2.5rem);
-	}
-	.ficha-servicios .ficha-pie {
-		padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
 	}
 
 	@media (max-width: 960px) {

@@ -171,6 +171,12 @@ mecánica es común (`src/scripts/despliegue.ts`):
   a todo el ancho bajo la fila de la foto pinchada, con una muesca que apunta a ella. La fila se
   calcula con 3, 2 o 1 columnas. «Cotizar …» lleva al formulario con el servicio ya elegido
   (`/contacto/?servicio=slug`).
+- **Equipamiento propio** (`Equipamiento`, en /empresa/): el mismo mosaico (`src/scripts/mosaico.ts`).
+  La foto lleva la cifra en grande y el detalle muestra qué incluye cada categoría. Las
+  categorías e ítems vienen del inventario de la Bóveda (andamios, alzaprimas y vigas,
+  moldajes, maquinaria) y de la reunión con don Luis (vehículos, seguridad). Las cifras son
+  redondas, como pidió el usuario: las de la Bóveda quedan marcadas para revisar y las de
+  vehículos y EPP son de ejemplo.
 - **Volver**: abrir agrega una entrada al historial (`#obra-…` / `#servicio-…`). El botón Atrás
   del navegador, Esc o «Cerrar» pliegan la ficha y dejan a la persona donde estaba. Cambiar de
   ficha no agrega entradas. Una sola ficha abierta por página.

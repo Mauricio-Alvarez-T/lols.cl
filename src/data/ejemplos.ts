@@ -156,10 +156,3 @@ export const ejemplosContratados = [
 	{ nombre: 'Edificio corporativo San Miguel', tipo: 'Edificio y oficinas', comuna: 'San Miguel', superficie: '5.400 m²', inicio: 'Marzo 2027' },
 	{ nombre: 'Planta de distribución Maipú', tipo: 'Industrial', comuna: 'Maipú', superficie: '9.200 m²', inicio: 'Segundo semestre 2027' },
 ];
-
-// Cantidades del equipamiento propio (solo de muestra).
-export const ejemplosEquipamiento: Record<string, string> = {
-	vehiculos: '8 camionetas y 3 camiones',
-	maquinaria: 'Más de 600 alzaprimas, gatas y hormigoneras',
-	seguridad: 'EPP para todo el equipo, renovado en cada faena',
-};

@@ -1,0 +1,20 @@
+---
+// Cifra de una categoría de equipamiento con su marca de modo propuesta: las aproximadas del
+// inventario quedan para revisar; las de ejemplo, como pendientes (src/data/empresa.ts).
+import Pendiente from './Pendiente.astro';
+import type { CategoriaEquipo } from '../data/empresa';
+
+interface Props {
+	c: CategoriaEquipo;
+	nota: string;
+}
+const { c, nota } = Astro.props;
+---
+
+{
+	c.cifra.estado === 'aprox' ? (
+		<Pendiente revisar={nota}>{c.cifra.valor}</Pendiente>
+	) : (
+		<Pendiente texto={`cantidad de ${c.titulo.toLowerCase()}`}>{c.cifra.valor}</Pendiente>
+	)
+}

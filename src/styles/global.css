@@ -542,6 +542,62 @@ html.ver-marcadores span.ejemplo::after {
 	padding-block: clamp(2rem, 4vw, 3rem) clamp(2.5rem, 6vw, 4rem);
 }
 
+/* Panel bajo la fila de un mosaico (src/scripts/mosaico.ts): a todo el ancho, en hormigón
+   claro, con una muesca que apunta a la foto abierta (--x). La foto abierta lleva la losa
+   verde abajo (.item.abierta .marco-mosaico). */
+.ficha-panel.en-mosaico {
+	grid-column: 1 / -1;
+	position: relative;
+	background: var(--lols-gris-claro);
+}
+.oscura .ficha-panel.en-mosaico,
+.gris .ficha-panel.en-mosaico {
+	background: var(--fondo);
+}
+.ficha-panel.en-mosaico::before {
+	content: '';
+	position: absolute;
+	top: -0.7rem;
+	left: calc(var(--x, 50%) - 0.7rem);
+	border: 0.7rem solid transparent;
+	border-top: 0;
+	border-bottom-color: var(--lols-gris-claro);
+	transition: left 0.35s var(--suave);
+}
+.gris .ficha-panel.en-mosaico::before {
+	border-bottom-color: var(--fondo);
+}
+.en-mosaico .interior {
+	padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+.ficha-panel.en-mosaico .ficha-barra {
+	background: var(--lols-gris-claro);
+}
+.gris .ficha-panel.en-mosaico .ficha-barra {
+	background: var(--fondo);
+}
+.en-mosaico [data-ficha] > :first-child {
+	padding-top: clamp(1.5rem, 4vw, 2.5rem);
+}
+.en-mosaico .ficha-pie {
+	padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
+}
+.item .marco-mosaico::after {
+	content: '';
+	grid-area: 1 / 1;
+	align-self: end;
+	position: relative; /* encima de la foto (con filter se pinta como posicionada) */
+	z-index: 1;
+	height: 6px;
+	background: var(--lols-verde);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 0.4s var(--suave);
+}
+.item.abierta .marco-mosaico::after {
+	transform: none;
+}
+
 .sr-only {
 	position: absolute;
 	width: 1px;
