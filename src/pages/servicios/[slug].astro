@@ -1,6 +1,7 @@
 ---
 // Página de servicio: parte del problema del cliente (Arup / Ramboll), sigue con lo que hace
-// LOLS, lo muestra en proyectos reales y termina con una persona de contacto.
+// LOLS, lo muestra en proyectos reales y termina con una persona de contacto. Es el enlace
+// directo y el respaldo sin JavaScript: en el sitio, la ficha se despliega en el mosaico.
 import Base from '../../layouts/Base.astro';
 import Icono from '../../components/Icono.astro';
 import Pendiente from '../../components/Pendiente.astro';
@@ -11,6 +12,7 @@ import { proyectos } from '../../data/proyectos';
 import Referencial from '../../components/Referencial.astro';
 import { bandasServicio, obras2018 } from '../../data/referencia';
 import { ejemplosServicio } from '../../data/ejemplos';
+import FichaServicio from '../../components/FichaServicio.astro';
 
 export function getStaticPaths() {
 	return servicios.map((servicio) => ({ params: { slug: servicio.slug }, props: { servicio } }));
@@ -31,19 +33,8 @@ import ObraPortada from '../../components/ObraPortada.astro';
 		<p class="bajada">{s.resumen ?? <Pendiente texto="cómo lo resuelve LOLS, en dos líneas">{ej.resumen}</Pendiente>}</p>
 	</ObraPortada>
 
-	<section class="seccion contenedor columnas">
-		<div>
-			<h2>Qué hacemos</h2>
-			<Pendiente bloque texto="alcance: lista de trabajos que incluye">
-				<ul class="lista">{ej.alcance.map((a) => <li>{a}</li>)}</ul>
-			</Pendiente>
-		</div>
-		<div>
-			<h2>Para quién</h2>
-			<Pendiente bloque texto="tipos de cliente o industria">
-				<ul class="lista">{ej.clientes.map((c) => <li>{c}</li>)}</ul>
-			</Pendiente>
-		</div>
+	<section class="seccion contenedor">
+		<FichaServicio servicio={s} sub="h2" />
 	</section>
 
 	<section class="seccion contenedor">
@@ -86,36 +77,6 @@ import ObraPortada from '../../components/ObraPortada.astro';
 		height: 2rem;
 		color: var(--lols-lima);
 	}
-	.columnas {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: clamp(2rem, 5vw, 4rem);
-	}
-	.columnas h2 {
-		font-size: 1.75rem;
-		letter-spacing: -0.02em;
-	}
-	.lista {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		border-top: 1px solid var(--linea);
-	}
-	.lista li {
-		padding: 0.85rem 0 0.85rem 1.5rem;
-		border-bottom: 1px solid var(--linea);
-		position: relative;
-		font-size: 1.1rem;
-	}
-	.lista li::before {
-		content: '';
-		position: absolute;
-		left: 0;
-		top: 1.35rem;
-		width: 0.55rem;
-		height: 0.55rem;
-		background: var(--lols-verde);
-	}
 	.grilla {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
@@ -153,7 +114,6 @@ import ObraPortada from '../../components/ObraPortada.astro';
 		}
 	}
 	@media (max-width: 760px) {
-		.columnas,
 		.grilla {
 			grid-template-columns: minmax(0, 1fr);
 		}

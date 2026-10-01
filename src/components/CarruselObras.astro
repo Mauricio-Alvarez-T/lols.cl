@@ -11,12 +11,20 @@
 //     pasadas se desvanecen (0,4 s) al cruzar la franja; la siguiente asoma hasta el borde;
 //   - flechas en círculos de 60 px con borde fino, alineadas a la derecha bajo la foto.
 // Sin avance automático. Vuelve al principio después de la última. Se puede deslizar con el
-// dedo. Sin JavaScript se ve la primera obra y cada título sigue siendo un enlace.
+// dedo. Sin JavaScript se ve la primera obra y cada título sigue siendo un enlace a su página.
+//
+// Ficha en el lugar (pedido del usuario: no salir de la página para ver el detalle): con
+// "Ver ficha", el título o la foto, la ficha completa (FichaObra) se despliega bajo el
+// carrusel; las flechas, de arriba o de la barra de la ficha, cambian la obra y la ficha con
+// ella. Atrás, Esc o "Cerrar" la pliegan (src/scripts/despliegue.ts).
 import Pendiente from './Pendiente.astro';
 import Referencial from './Referencial.astro';
-import type { ImagenReferencial } from '../data/referencia';
+import FichaObra from './FichaObra.astro';
+import type { EjemploTarjeta, ImagenReferencial } from '../data/referencia';
+import type { Proyecto } from '../data/proyectos';
 
 export interface ObraCarrusel {
+	id: string | null; // slug; las muestras reciben uno según su posición
 	href: string;
 	imagen: ImagenReferencial | { src: string; alt: string };
 	tipo: string | null;
@@ -24,6 +32,7 @@ export interface ObraCarrusel {
 	comuna: string | null;
 	superficie: string | null;
 	ejemplo?: boolean; // datos de muestra: se marcan con Pendiente
+	ficha: { proyecto: Proyecto; muestra?: EjemploTarjeta };
 }
 
 interface Props {
@@ -35,10 +44,13 @@ interface Props {
 }
 const { obras, titulo, id, enlace, nota } = Astro.props;
 const esReferencial = (i: ObraCarrusel['imagen']): i is ImagenReferencial => 'origen' in i;
-const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')}`;
+const seccion = id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-');
+const idTitulo = `carrusel-${seccion}`;
+const idPanel = `ficha-${seccion}`;
+const idFicha = (o: ObraCarrusel, i: number) => `obra-${o.id ?? `${seccion}-${i + 1}`}`;
 ---
 
-<section class="carrusel" id={id} aria-labelledby={idTitulo} aria-roledescription="carrusel" data-carrusel>
+<section class="carrusel" id={id} aria-labelledby={idTitulo} aria-roledescription="carrusel" data-carrusel data-panel={idPanel}>
 	<div class="avance" aria-hidden="true"><span></span></div>
 	<div class="franja" aria-hidden="true"></div>
 
@@ -75,6 +87,10 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 									</>
 								)}
 							</p>
+							<button type="button" class="ver-ficha" aria-expanded="false" aria-controls={idPanel} hidden>
+								<span>Ver ficha</span>
+								<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" /></svg>
+							</button>
 						</article>
 					))
 				}
@@ -110,7 +126,53 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 	</div>
 </section>
 
+<div class="ficha-panel ficha-obras" id={idPanel} role="region" aria-label={`Ficha de obra: ${titulo}`} hidden>
+	<div class="ficha-dentro">
+		<div class="contenedor">
+			<div class="ficha-barra">
+				<p class="ficha-rotulo"><span class="rotulo-largo">Ficha de obra</span> <span data-posicion>1 de {obras.length}</span></p>
+				<div class="ficha-acciones">
+					{
+						obras.length > 1 && (
+							<>
+								<button type="button" class="ficha-boton icono-solo" data-paso="-1" aria-label="Obra anterior">
+									<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
+								</button>
+								<button type="button" class="ficha-boton icono-solo" data-paso="1" aria-label="Obra siguiente">
+									<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" /></svg>
+								</button>
+							</>
+						)
+					}
+					<button type="button" class="ficha-boton" data-cerrar>
+						Cerrar
+						<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg>
+					</button>
+				</div>
+			</div>
+			<div class="fichas">
+				{
+					obras.map((o, i) => (
+						<div data-ficha={idFicha(o, i)} hidden>
+							<FichaObra proyecto={o.ficha.proyecto} muestra={o.ficha.muestra} nivel={3} />
+						</div>
+					))
+				}
+			</div>
+			<div class="ficha-pie">
+				<a href="/contacto/" class="boton">Cotizar un proyecto parecido</a>
+				<button type="button" class="ficha-boton" data-cerrar>
+					Cerrar ficha
+					<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 10l5-5 5 5" /></svg>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
+	import { registrar, abrir, cambiar, cerrar, abiertaEn, type Grupo } from '../scripts/despliegue';
+
 	for (const c of document.querySelectorAll<HTMLElement>('[data-carrusel]')) {
 		const pista = c.querySelector<HTMLElement>('.pista')!;
 		const fotos = [...pista.children] as HTMLElement[];
@@ -119,7 +181,36 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 		const total = textos.length;
 		let actual = 0;
 
-		const mostrar = (n: number) => {
+		const panel = document.getElementById(c.dataset.panel!)!;
+		const fichas = [...panel.querySelectorAll<HTMLElement>('[data-ficha]')];
+		const ids = fichas.map((f) => f.dataset.ficha!);
+		const posicion = panel.querySelector<HTMLElement>('[data-posicion]')!;
+		const botones = textos.map((t) => t.querySelector<HTMLButtonElement>('.ver-ficha')!);
+		for (const b of botones) b.hidden = false;
+
+		const marcar = (abierta: boolean) => {
+			c.classList.toggle('con-ficha', abierta);
+			botones.forEach((b, i) => {
+				const esta = abierta && i === actual;
+				b.setAttribute('aria-expanded', String(esta));
+				b.querySelector('span')!.textContent = esta ? 'Cerrar ficha' : 'Ver ficha';
+			});
+		};
+		const grupo: Grupo = {
+			tiene: (id) => ids.includes(id),
+			mostrar: (id) => {
+				const n = ids.indexOf(id);
+				if (n !== actual) mostrar(n, false);
+				fichas.forEach((f, i) => (f.hidden = i !== n));
+				posicion.textContent = `${n + 1} de ${total}`;
+				marcar(true);
+			},
+			panel: () => panel,
+			disparador: () => botones[actual],
+			alCerrar: () => marcar(false),
+		};
+
+		const mostrar = (n: number, sincronizar = true) => {
 			actual = (n + total) % total; // después de la última vuelve a la primera
 			pista.style.setProperty('--i', String(actual));
 			textos.forEach((t, i) => {
@@ -135,6 +226,8 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 				else f.setAttribute('aria-hidden', 'true');
 			});
 			anuncio.textContent = `Obra ${actual + 1} de ${total}: ${textos[actual].querySelector('h3')?.textContent?.trim() ?? ''}`;
+			// Con la ficha abierta, cambiar de obra cambia también la ficha.
+			if (sincronizar && abiertaEn(grupo)) cambiar(grupo, ids[actual]);
 		};
 
 		c.querySelector('.anterior')!.addEventListener('click', () => mostrar(actual - 1));
@@ -157,16 +250,26 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 		});
 		pista.addEventListener('pointercancel', () => (x0 = null));
 
-		// Transición a la ficha: la foto de la obra activa viaja a la portada.
+		// Ficha en el lugar: el botón la abre o la cierra; el título o la foto activa la abren;
+		// una foto que asoma al lado lleva a esa obra. Ctrl/Cmd + clic sigue abriendo la página.
+		for (const b of botones) {
+			b.addEventListener('click', () => (abiertaEn(grupo) ? cerrar() : abrir(grupo, ids[actual])));
+		}
 		c.addEventListener('click', (e) => {
 			const a = (e.target as HTMLElement).closest('a');
-			if (!a || a.classList.contains('ver-todos')) return;
-			const marco = fotos[actual].querySelector<HTMLElement>('.marco');
-			if (marco) marco.style.viewTransitionName = 'foto-proyecto';
+			if (!a || a.classList.contains('ver-todos') || e.ctrlKey || e.metaKey || e.shiftKey) return;
+			e.preventDefault();
+			const foto = a.closest<HTMLElement>('.foto');
+			const n = foto ? fotos.indexOf(foto) : actual;
+			if (n !== actual) mostrar(n);
+			else abrir(grupo, ids[actual]);
 		});
-		addEventListener('pageshow', () => {
-			for (const m of pista.querySelectorAll<HTMLElement>('.marco')) m.style.viewTransitionName = '';
-		});
+		for (const b of panel.querySelectorAll<HTMLButtonElement>('[data-paso]')) {
+			b.addEventListener('click', () => mostrar(actual + Number(b.dataset.paso)));
+		}
+		for (const b of panel.querySelectorAll<HTMLButtonElement>('[data-cerrar]')) b.addEventListener('click', cerrar);
+
+		registrar(grupo);
 	}
 </script>
 
@@ -336,11 +439,67 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 		color: var(--lols-verde-oscuro);
 	}
 	.resumen {
-		margin: 0;
+		margin: 0 0 1.25rem;
 		font-size: clamp(1.15rem, 1rem + 0.4vw, 1.3rem);
 		font-weight: 300;
 		line-height: 1.35;
 		color: var(--lols-carbon);
+	}
+
+	/* Botón de la ficha: texto visible (no solo al pasar el mouse), como el "ver todos". */
+	.ver-ficha {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		min-height: 2.75rem;
+		padding: 0;
+		border: 0;
+		border-bottom: 2px solid var(--lols-verde);
+		background: none;
+		color: var(--lols-verde-oscuro);
+		font: 600 1rem var(--fuente-titulos);
+		cursor: pointer;
+	}
+	.ver-ficha[hidden] {
+		display: none;
+	}
+	.ver-ficha svg {
+		width: 1rem;
+		height: 1rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.8;
+		transition: transform 0.35s var(--suave);
+	}
+	.ver-ficha[aria-expanded='true'] svg {
+		transform: rotate(180deg);
+	}
+	.foto .marco {
+		cursor: pointer;
+	}
+	/* Con la ficha abierta, la foto activa queda marcada con una losa verde abajo. */
+	.foto .marco::after {
+		content: '';
+		grid-area: 1 / 1;
+		align-self: end;
+		height: 6px;
+		position: relative; /* encima de la foto (con filter se pinta como posicionada) */
+		z-index: 1;
+		background: var(--lols-verde);
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 0.4s var(--suave);
+	}
+	.con-ficha .foto:not(.futura, .pasada) .marco::after {
+		transform: none;
+	}
+
+	/* Panel de la ficha (base en global.css). */
+	.ficha-obras {
+		border-bottom: 1px solid var(--linea);
+	}
+	.fichas {
+		padding-top: clamp(1.75rem, 4vw, 2.75rem);
 	}
 
 	/* Fotos: la fila se desplaza de a una; la siguiente asoma hasta el borde de la pantalla. */
@@ -356,10 +515,13 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 		transform: translateX(calc(var(--i) * (-100% - var(--separacion))));
 		transition: transform 0.6s;
 		touch-action: pan-y;
+		/* La fila corrida pasa por encima de la columna de texto: solo las fotos reciben clics. */
+		pointer-events: none;
 	}
 	.foto {
 		flex: 0 0 100%;
 		opacity: 1;
+		pointer-events: auto;
 		transition: opacity 0.8s;
 	}
 	/* Las que vienen, difuminadas (pedido del usuario): la activa queda nítida al llegar. */
@@ -372,7 +534,9 @@ const idTitulo = `carrusel-${id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-')
 		filter: saturate(0.88) contrast(1.04) blur(6px);
 		transform: scale(1.04); /* que el difuminado no deje borde claro */
 	}
+	/* Las pasadas quedan invisibles encima de la columna de texto: que no le roben el clic. */
 	.foto.pasada {
+		pointer-events: none;
 		opacity: 0;
 		transition-duration: 0.4s;
 	}

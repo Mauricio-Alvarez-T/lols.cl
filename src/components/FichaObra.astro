@@ -1,0 +1,273 @@
+---
+// Ficha de obra (nivel 2: aquí va todo). La usan la página de cada proyecto y el panel que
+// se despliega bajo el carrusel (CarruselObras). Pirámide invertida, como Heatherwick: nombre y
+// titular, el recuadro de datos, desafío / solución / resultado con una cifra, el testimonio,
+// el video y la galería. La foto principal no va aquí: en la página es la portada y en el
+// carrusel ya está a la vista.
+//
+// `muestra`: datos de una tarjeta de ejemplo (referencia.ts) que reemplazan nombre, tipo,
+// comuna y superficie del ejemplo general, para que cada obra de muestra tenga los suyos.
+import Pendiente from './Pendiente.astro';
+import Pictograma from './Pictograma.astro';
+import Referencial from './Referencial.astro';
+import VideoFondo from './VideoFondo.astro';
+import { servicioPorSlug } from '../data/empresa';
+import { plantilla, estados, pictogramaDeTipo, type Estado, type Proyecto } from '../data/proyectos';
+import { obras2018, videos, type EjemploTarjeta } from '../data/referencia';
+import { ejemploProyecto, ejemploFichaExtra, ejemploTestimonio as testimonio } from '../data/ejemplos';
+
+interface Props {
+	proyecto: Proyecto;
+	muestra?: EjemploTarjeta;
+	nivel?: 1 | 3; // 1 en la página del proyecto; 3 dentro del panel (bajo el h2 del carrusel)
+}
+const { proyecto: p, muestra, nivel = 1 } = Astro.props;
+const Titulo = `h${nivel}` as 'h1' | 'h3';
+const Sub = `h${nivel + 1}` as 'h2' | 'h4';
+const compacta = nivel > 1;
+
+const esEjemplo = p.slug === plantilla.slug;
+const ej = { ...ejemploProyecto, ...muestra };
+// Estado de la muestra: las terminadas traen año; las en construcción, fecha de inicio.
+const estado: Estado | null = p.estado ?? (muestra ? (muestra.anio ? 'terminado' : 'en-curso') : null);
+const galeria = p.fotos.slice(1);
+const relato = [
+	{ titulo: 'Desafío', texto: p.desafio, pendiente: 'qué problema tenía el mandante', ejemplo: ej.desafio },
+	{ titulo: 'Solución', texto: p.solucion, pendiente: 'qué hizo LOLS y cómo', ejemplo: ej.solucion },
+	{ titulo: 'Resultado', texto: p.resultado, pendiente: 'qué se logró', ejemplo: ej.resultado },
+];
+---
+
+<div class:list={['ficha-obra', { compacta }]}>
+	<header class="cabeza">
+		<p class="nombre">{p.nombre ?? <Pendiente texto="nombre del proyecto">{ej.nombre}</Pendiente>}</p>
+		<Titulo class="titulo-ficha" tabindex={compacta ? '-1' : undefined}>
+			{p.titular ?? <Pendiente texto="el resultado en una frase (no el nombre de la obra)">{ej.titular}</Pendiente>}
+		</Titulo>
+	</header>
+
+	<dl class="datos">
+		<div>
+			<dt>Tipo de obra</dt>
+			<dd class="con-picto">
+				<Pictograma nombre={pictogramaDeTipo(p.tipo ?? ej.tipo)} />
+				{p.tipo ?? <Pendiente texto="tipo de obra">{ej.tipo}</Pendiente>}
+			</dd>
+		</div>
+		<div><dt>Mandante</dt><dd>{p.mandante ?? <Pendiente texto="mandante">{ej.mandante}</Pendiente>}</dd></div>
+		<div><dt>Comuna</dt><dd>{p.comuna ?? <Pendiente texto="comuna">{ej.comuna}</Pendiente>}</dd></div>
+		<div><dt>Dirección</dt><dd>{p.direccion ?? <Pendiente texto="dirección (confirmar si se puede publicar)">{ej.direccion}</Pendiente>}</dd></div>
+		<div><dt>Superficie construida</dt><dd>{p.superficie ?? <Pendiente texto="m² construidos">{ej.superficie}</Pendiente>}</dd></div>
+		{
+			estado === 'terminado' || (esEjemplo && !estado) ? (
+				<div><dt>Año de término</dt><dd>{p.anio ?? <Pendiente texto="año">{ej.anio}</Pendiente>}</dd></div>
+			) : (
+				<div><dt>{estado === 'contratado' ? 'Inicio previsto' : 'Inicio'}</dt><dd>{p.inicio ?? <Pendiente texto="mes y año de inicio">{ej.inicio}</Pendiente>}</dd></div>
+			)
+		}
+		<div><dt>Plazo</dt><dd>{p.plazo ?? <Pendiente texto="plazo de ejecución">{ejemploFichaExtra.plazo}</Pendiente>}</dd></div>
+		<div><dt>Rol de LOLS</dt><dd><Pendiente texto="contratista principal o subcontrato">{ejemploFichaExtra.rol}</Pendiente></dd></div>
+		<div><dt>Servicios</dt><dd>{p.servicios.map((s) => servicioPorSlug(s).nombre).join(', ')}</dd></div>
+		<div><dt>Estado</dt><dd>{estado ? estados[estado] : <Pendiente texto="estado">{ej.estado}</Pendiente>}</dd></div>
+	</dl>
+
+	<div class="relato">
+		{
+			relato.map((r) => (
+				<div class="paso">
+					<Sub>{r.titulo}</Sub>
+					<p>{r.texto ?? <Pendiente texto={r.pendiente}>{r.ejemplo}</Pendiente>}</p>
+				</div>
+			))
+		}
+		<div class="cifra">
+			<p class="numero">{p.cifra?.valor ?? <Pendiente texto="cifra">{ej.cifra.valor}</Pendiente>}</p>
+			<p>{p.cifra?.etiqueta ?? <Pendiente texto="qué mide (plazo, m², ahorro…)">{ej.cifra.etiqueta}</Pendiente>}</p>
+		</div>
+	</div>
+
+	<Pendiente bloque texto="testimonio real del mandante, con nombre, cargo y empresa">
+		<figure class="testimonio">
+			<blockquote>“{testimonio.cita}”</blockquote>
+			<figcaption><strong>{testimonio.nombre}</strong> · {testimonio.cargo}, {testimonio.empresa}</figcaption>
+		</figure>
+	</Pendiente>
+
+	{
+		p.video ? (
+			<div>
+				<Sub class="subtitulo">La obra en video</Sub>
+				<video class="video-obra" src={p.video.src} poster={p.video.poster} controls playsinline preload="none" />
+			</div>
+		) : (
+			esEjemplo && (
+				<div>
+					<Sub class="subtitulo">La obra en un minuto</Sub>
+					<VideoFondo video={videos.timelapse} modo="clic" clase="timelapse" etiqueta="Ver timelapse de la obra" />
+				</div>
+			)
+		)
+	}
+
+	<div>
+		<Sub class="sr-only">Galería</Sub>
+		<div class="galeria">
+			{
+				galeria.length
+					? galeria.map((f) => (
+							<div class="marco">
+								<img src={f.src} alt={f.alt} loading="lazy" />
+							</div>
+						))
+					: esEjemplo
+						? obras2018.slice(3, 6).map((f) => (
+								<div class="marco">
+									<Referencial imagen={f} sizes="(max-width: 560px) 100vw, 50vw" />
+								</div>
+							))
+						: [1, 2, 3].map(() => (
+								<div class="marco">
+									<Pendiente bloque texto="foto de galería" />
+								</div>
+							))
+			}
+		</div>
+	</div>
+
+	<slot />
+</div>
+
+<style>
+	.ficha-obra {
+		display: grid;
+		gap: clamp(2.5rem, 6vw, 4.5rem);
+	}
+	.ficha-obra.compacta {
+		gap: clamp(2rem, 4vw, 3rem);
+	}
+	.nombre {
+		margin-bottom: 0.75rem;
+		font-family: var(--fuente-titulos);
+		font-weight: 700;
+		font-size: 1.15rem;
+		color: var(--lols-verde-oscuro);
+	}
+	.titulo-ficha {
+		max-width: 20ch;
+		margin: 0;
+		font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+	}
+	.compacta .titulo-ficha {
+		max-width: 26ch;
+		font-size: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+		letter-spacing: -0.02em;
+		line-height: 1.15;
+		text-wrap: balance;
+	}
+	.titulo-ficha:focus {
+		outline: none;
+	}
+	.con-picto {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.con-picto :global(.pictograma) {
+		flex-shrink: 0;
+		width: 1.35rem;
+		height: 1.35rem;
+		color: var(--lols-verde);
+	}
+	.relato {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr) 0.8fr;
+		gap: clamp(1.5rem, 4vw, 3rem);
+	}
+	.paso {
+		padding-top: 1.25rem;
+		border-top: 3px solid var(--lols-carbon);
+	}
+	.paso :is(h2, h4) {
+		margin-bottom: 0.75rem;
+		font-size: 1.5rem;
+		letter-spacing: -0.02em;
+	}
+	.paso p {
+		margin: 0;
+	}
+	.cifra {
+		padding-top: 1.25rem;
+		border-top: 3px solid var(--lols-verde);
+	}
+	.cifra .numero {
+		margin-bottom: 0.25rem;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(2.5rem, 5vw, 3.75rem);
+		font-weight: 700;
+		letter-spacing: -0.04em;
+		line-height: 1;
+	}
+	.cifra p:last-child {
+		margin: 0;
+		color: var(--gris-medio);
+	}
+	.testimonio {
+		margin: 0;
+		max-width: 52rem;
+		padding-left: 1.5rem;
+		border-left: 4px solid var(--lols-verde);
+	}
+	.testimonio blockquote {
+		margin: 0 0 1rem;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(1.4rem, 3vw, 2.1rem);
+		font-weight: 600;
+		line-height: 1.3;
+		letter-spacing: -0.02em;
+	}
+	.compacta .testimonio blockquote {
+		font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+	}
+	.testimonio figcaption {
+		color: var(--gris-medio);
+	}
+	.subtitulo {
+		font-size: 1.5rem;
+		letter-spacing: -0.02em;
+		margin-bottom: 1.25rem;
+	}
+	.ficha-obra :global(.timelapse),
+	.video-obra {
+		aspect-ratio: 16 / 9;
+	}
+	.video-obra {
+		width: 100%;
+		background: #000;
+	}
+	.galeria {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: 1rem;
+	}
+	.galeria .marco {
+		aspect-ratio: 4 / 3;
+	}
+	.galeria .marco:first-child {
+		grid-row: span 2;
+		aspect-ratio: auto;
+	}
+	@media (max-width: 960px) {
+		.relato {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	@media (max-width: 560px) {
+		.galeria {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.galeria .marco:first-child {
+			grid-row: auto;
+			aspect-ratio: 4 / 3;
+		}
+	}
+</style>

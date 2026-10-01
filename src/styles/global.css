@@ -424,6 +424,124 @@ html.ver-marcadores span.ejemplo::after {
 	vertical-align: middle;
 }
 
+/* Panel de ficha que se despliega en el lugar (src/scripts/despliegue.ts; lo usan
+   CarruselObras y MosaicoServicios). Se abre animando la fila de 0fr a 1fr; overflow: clip
+   (no hidden) para que la barra de arriba pueda quedar fija al bajar por la ficha. */
+.ficha-panel {
+	display: grid;
+	grid-template-rows: 0fr;
+	opacity: 0;
+	transition:
+		grid-template-rows 0.5s var(--suave),
+		opacity 0.35s;
+}
+.ficha-panel[hidden] {
+	display: none;
+}
+.ficha-panel.abierto {
+	grid-template-rows: 1fr;
+	opacity: 1;
+}
+.ficha-dentro {
+	min-height: 0;
+	overflow: clip;
+}
+.ficha-panel [data-ficha]:not([hidden]) {
+	animation: ficha-entra 0.35s var(--suave);
+}
+@keyframes ficha-entra {
+	from {
+		opacity: 0;
+		transform: translateY(0.75rem);
+	}
+}
+.ficha-barra {
+	position: sticky;
+	top: calc(4.5rem + 5px); /* bajo el encabezado */
+	z-index: 2;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem 1.5rem;
+	padding-block: 0.85rem;
+	background: var(--fondo);
+	border-bottom: 1px solid var(--linea);
+}
+.ficha-rotulo {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	margin: 0;
+	font-family: var(--fuente-datos);
+	font-size: 0.85rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--lols-carbon);
+	font-variant-numeric: tabular-nums;
+}
+.ficha-rotulo::before {
+	content: '';
+	width: 0.6rem;
+	height: 0.6rem;
+	background: var(--lols-verde);
+}
+.ficha-acciones {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+.ficha-boton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.45rem;
+	min-height: 2.75rem;
+	min-width: 2.75rem;
+	padding: 0 1rem;
+	border: 1px solid var(--lols-carbon);
+	border-radius: 999px;
+	background: transparent;
+	color: var(--lols-carbon);
+	font: 600 0.95rem var(--fuente-titulos);
+	cursor: pointer;
+	transition:
+		background-color 0.2s,
+		color 0.2s;
+}
+.ficha-boton.icono-solo {
+	padding: 0;
+}
+.ficha-boton:hover {
+	background: var(--lols-carbon);
+	color: var(--fondo);
+}
+.ficha-boton svg {
+	width: 1rem;
+	height: 1rem;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+@media (max-width: 480px) {
+	.ficha-barra {
+		flex-wrap: nowrap;
+	}
+	.ficha-rotulo .rotulo-largo {
+		display: none;
+	}
+}
+.ficha-pie {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1rem;
+	padding-block: clamp(2rem, 4vw, 3rem) clamp(2.5rem, 6vw, 4rem);
+}
+
 .sr-only {
 	position: absolute;
 	width: 1px;

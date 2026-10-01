@@ -114,12 +114,13 @@ página del proyecto, fotos primero, un texto corto y un recuadro de datos.
 
 Reglas aplicadas:
 
-1. **Dos niveles.** Nivel 1: imagen + título (y, si hace falta, una línea). Nivel 2: una página
-   propia con todo. Nunca un tercer nivel.
+1. **Dos niveles.** Nivel 1: imagen + título (y, si hace falta, una línea). Nivel 2: todo el
+   detalle, que se despliega en el lugar (ver «Detalle en el lugar», abajo). Nunca un tercer nivel.
 2. **La tarjeta entera es el enlace**, con título visible. Nada que aparezca solo al pasar el
    mouse (en el celular no existe).
 3. **Enlaces que dicen adónde llevan** ("Ver indicadores y certificaciones", no "Ver más").
-4. **Sin ventanas emergentes para información**; el detalle vive en páginas con su URL.
+4. **Sin ventanas emergentes para información**; el detalle se abre en la misma página y tiene
+   su URL (hash), además de su página propia.
 5. **Lo que un mandante necesita no se esconde** (NN/g B2B): nombres de los servicios,
    teléfono y WhatsApp (pie y barra del celular), años de trayectoria y seguridad en corto.
 6. **Las cifras cuentan como imagen**: número grande, etiqueta corta.
@@ -155,3 +156,27 @@ que se desplaza (0,6 s), las pasadas se desvanecen (0,4 s) y la siguiente asoma;
 círculos de 60 px. Sin avance automático, vuelve al inicio tras la última, se desliza con el
 dedo. Se usa en obras en construcción y terminadas (Proyectos) y en "En obra ahora" (portada).
 Los contratados siguen en tabla.
+
+## Detalle en el lugar (1-oct-2026)
+
+Pedido del usuario: ver el detalle no debe llevar a otra página, porque volver al punto de partida
+no es intuitivo. El detalle se abre en el lugar y los demás ítems quedan arriba y abajo. La
+mecánica es común (`src/scripts/despliegue.ts`):
+
+- **Obras** (`CarruselObras`): el carrusel tipo Ramboll se mantiene. «Ver ficha», el título o la
+  foto activa despliegan la ficha completa (`FichaObra`) justo bajo el carrusel. Las flechas, las
+  del carrusel o las de la barra de la ficha, cambian de obra y la ficha cambia con ella. Una foto
+  que asoma al lado lleva a esa obra.
+- **Servicios** (`MosaicoServicios`): como en Google Imágenes, la ficha (`FichaServicio`) se abre
+  a todo el ancho bajo la fila de la foto pinchada, con una muesca que apunta a ella. La fila se
+  calcula con 3, 2 o 1 columnas. «Cotizar …» lleva al formulario con el servicio ya elegido
+  (`/contacto/?servicio=slug`).
+- **Volver**: abrir agrega una entrada al historial (`#obra-…` / `#servicio-…`). El botón Atrás
+  del navegador, Esc o «Cerrar» pliegan la ficha y dejan a la persona donde estaba. Cambiar de
+  ficha no agrega entradas. Una sola ficha abierta por página.
+- **Enlace directo**: la página que carga con el hash abre esa ficha.
+- **Sin JavaScript** o con Ctrl/Cmd + clic: los enlaces van a `/proyectos/[slug]/` y
+  `/servicios/[slug]/`, que usan los mismos componentes de ficha y quedan para Google.
+- Todo el contenido de las fichas está en el HTML (oculto hasta abrirse; las imágenes son
+  `lazy` y no se descargan antes).
+

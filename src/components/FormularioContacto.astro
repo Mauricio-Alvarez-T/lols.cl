@@ -96,6 +96,10 @@ import { servicios } from '../data/empresa';
 	}
 
 	const params = new URLSearchParams(location.search);
+	// "Cotizar …" desde la ficha de un servicio (MosaicoServicios) llega con ?servicio=slug.
+	const servicio = form.elements.namedItem('servicio') as HTMLSelectElement | null;
+	const pedido = params.get('servicio');
+	if (servicio && pedido && [...servicio.options].some((o) => o.value === pedido)) servicio.value = pedido;
 	if (params.get('asunto') === 'precalificacion') {
 		const mensaje = form.elements.namedItem('mensaje') as HTMLTextAreaElement;
 		if (!mensaje.value) {
