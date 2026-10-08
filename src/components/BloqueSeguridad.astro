@@ -1,15 +1,13 @@
 ---
 // Seguridad en la portada (nivel 1): la obra en video, un título y dos datos cortos, que es lo
-// que un mandante mira primero al precalificar (docs/investigacion-secciones.md). Indicadores,
-// certificaciones y registros completos están en /seguridad/.
+// que un mandante mira primero al precalificar (docs/investigacion-secciones.md). Don Luis
+// (08-10-2026): sin indicadores ni ISO; la mutual y la Política de Seguridad y Salud en el
+// Trabajo (DS 44), que están en /seguridad/.
 import Pendiente from './Pendiente.astro';
 import VideoFondo from './VideoFondo.astro';
 import EjesPlano from './EjesPlano.astro';
+import { empresa } from '../data/empresa';
 import { videos } from '../data/referencia';
-import { ejemplosSeguridad as ej } from '../data/ejemplos';
-
-const indicador = ej.indicadores[0];
-const certificacion = ej.certificaciones.find((c) => c.nombre.includes('45001')) ?? ej.certificaciones[0];
 ---
 
 <section class="seccion oscura plano seguridad">
@@ -20,15 +18,15 @@ const certificacion = ej.certificaciones.find((c) => c.nombre.includes('45001'))
 			<h2>Listos para su precalificación</h2>
 			<dl class="datos-cortos">
 				<div>
-					<dt><Pendiente texto="indicador real certificado por la mutualidad">{indicador.valor}</Pendiente></dt>
-					<dd>{indicador.etiqueta}</dd>
+					<dt>Mutual</dt>
+					<dd>Adheridos a la {empresa.mutual}</dd>
 				</div>
 				<div>
-					<dt><Pendiente texto="certificación vigente (confirmar)">{certificacion.nombre}</Pendiente></dt>
-					<dd>{certificacion.alcance}</dd>
+					<dt><Pendiente texto="publicar el documento de la política">DS 44</Pendiente></dt>
+					<dd>Política de Seguridad y Salud en el Trabajo</dd>
 				</div>
 			</dl>
-			<a href="/seguridad/" class="enlace-flecha">Ver indicadores y certificaciones</a>
+			<a href="/seguridad/" class="enlace-flecha">Ver la política y la mutualidad</a>
 		</div>
 		<VideoFondo video={videos.seguridad} clase="video-seguridad" />
 	</div>

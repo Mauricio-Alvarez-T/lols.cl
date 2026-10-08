@@ -1,69 +1,29 @@
 ---
-// Empresa: propósito en grande (Heatherwick), línea de tiempo desde 1995 (Tecsa / Ingevec;
-// pedida en la reunión con don Luis), equipamiento propio en fotos (reunión) y equipo con
-// nombre (Mott MacDonald). Mostrar, no contar: los valores y normas en texto se sacaron; la
-// seguridad tiene su propia página.
+// Empresa: propósito en grande (Heatherwick) y equipamiento propio en fotos (reunión con don
+// Luis). Mostrar, no contar: los valores y normas en texto se sacaron; la seguridad tiene su
+// propia página. Don Luis (08-10-2026): sin línea de tiempo y sin nombres de personas, así que
+// salieron la trayectoria por años y "Las personas a cargo".
 import Base from '../layouts/Base.astro';
-import Pendiente from '../components/Pendiente.astro';
 import Contacto from '../components/Contacto.astro';
-import { empresa, fundacion, aniosTrayectoria } from '../data/empresa';
+import { empresa, aniosTrayectoria } from '../data/empresa';
 import Equipamiento from '../components/Equipamiento.astro';
-import Referencial from '../components/Referencial.astro';
-import { retratos, videos } from '../data/referencia';
+import { videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
-import { ejemplosEmpresa as ej } from '../data/ejemplos';
 ---
 
 <Base title="Empresa" description={`Quiénes somos: ${empresa.razonSocial}.`}>
 	<ObraPortada video={videos.empresa}>
 		<p class="etiqueta">Empresa</p>
-		<h1 class="display largo">{empresa.directrices.replace(/\.$/, '')}<span class="punto">.</span></h1>
+		<h1 class="display largo">{empresa.directrices.replace(/.$/, '')}<span class="punto">.</span></h1>
 		<p class="bajada">
 			{aniosTrayectoria} años de experiencia en el área de construcción,
 			con compromiso por las normas de seguridad y el respeto por el medio ambiente.
 		</p>
 	</ObraPortada>
 
-	<section class="seccion contenedor">
-		<div class="cabecera"><h2>Nuestra trayectoria</h2></div>
-		<ol class="linea">
-			<li>
-				<p class="anio">{fundacion}</p>
-				<p>Nace LOLS Ingeniería</p>
-			</li>
-			{
-				ej.hitos.map((h) => (
-					<li>
-						<p class="anio"><Pendiente texto="año del hito">{h.anio}</Pendiente></p>
-						<p><Pendiente texto="hito de la empresa">{h.texto}</Pendiente></p>
-					</li>
-				))
-			}
-		</ol>
-	</section>
-
-
 	<section id="equipamiento" class="seccion gris ancla">
 		<div class="contenedor">
 			<Equipamiento />
-		</div>
-	</section>
-
-
-	<section class="seccion contenedor">
-		<div class="cabecera"><h2>Las personas a cargo</h2></div>
-		<div class="equipo">
-			{
-				ej.equipo.map((m, i) => (
-					<div>
-						<div class="retrato marco">
-							<Referencial imagen={retratos.equipo[i]} sizes="(max-width: 960px) 50vw, 25vw" />
-						</div>
-						<p class="persona"><Pendiente texto="nombre">{m.nombre}</Pendiente></p>
-						<p class="cargo"><Pendiente texto="cargo">{m.cargo}</Pendiente></p>
-					</div>
-				))
-			}
 		</div>
 	</section>
 
@@ -76,65 +36,5 @@ import { ejemplosEmpresa as ej } from '../data/ejemplos';
 	}
 	.ancla {
 		scroll-margin-top: 5rem;
-	}
-	.linea {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(5, minmax(0, 1fr));
-		gap: 1.5rem;
-	}
-	.linea li {
-		position: relative;
-		padding-top: 2rem;
-		border-top: 2px solid var(--lols-carbon);
-	}
-	.linea li::before {
-		content: '';
-		position: absolute;
-		top: -0.45rem;
-		left: 0;
-		width: 0.8rem;
-		height: 0.8rem;
-		background: var(--lols-verde);
-	}
-	.anio {
-		font-family: var(--fuente-titulos);
-		font-size: 2rem;
-		font-weight: 700;
-		letter-spacing: -0.03em;
-		margin-bottom: 0.5rem;
-	}
-	.equipo {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 1.5rem;
-	}
-	.retrato {
-		aspect-ratio: 4 / 5;
-		margin-bottom: 1rem;
-	}
-	.equipo p {
-		margin: 0 0 0.25rem;
-	}
-	.persona {
-		font-family: var(--fuente-titulos);
-		font-weight: 700;
-	}
-	.cargo {
-		color: var(--gris-medio);
-	}
-	@media (max-width: 960px) {
-		.linea,
-		.equipo {
-			grid-template-columns: repeat(2, 1fr);
-			row-gap: 2.5rem;
-		}
-	}
-	@media (max-width: 560px) {
-		.linea {
-			grid-template-columns: minmax(0, 1fr);
-		}
 	}
 </style>

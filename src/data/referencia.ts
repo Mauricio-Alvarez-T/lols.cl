@@ -55,10 +55,7 @@ export const bandas = {
 export const bandasServicio: Record<string, ImagenReferencial> = {
 	construccion: unsplash('1609867271967-a82f85c48531', 'Faena de construcción con grúa'),
 	'montaje-industrial': unsplash('1509024368907-57294758cfc5', 'Estructura metálica'),
-	mantencion: unsplash('1642749776312-aa42ce20c9f5', 'Técnicos revisando equipos de climatización en una azotea'),
 	electricidad: unsplash('1635335874521-7987db781153', 'Tablero eléctrico cableado'),
-	'voz-y-datos': unsplash('1544197150-b99a580bb7a8', 'Patch panel de red con cables'),
-	muebles: unsplash('1590880795696-20c7dfadacde', 'Taller de carpintería'),
 };
 
 export const destacado = lols('abate-vertical.jpg', 'Edificio de cinco pisos en esquina, obra LOLS');
@@ -105,26 +102,9 @@ export const fotosEquipamiento: Record<string, ImagenReferencial> = {
 	seguridad: unsplash('1662309376159-b95fb193d96b', 'Cascos y chalecos reflectantes colgados en una pared'),
 };
 
-// Retratos de stock para la persona de contacto y el equipo (nombres de ejemplo).
-const retrato = (id: string, alt: string) => unsplash(id, alt, '&crop=faces');
-export const retratos = {
-	contacto: retrato('1672748341520-6a839e6c05bb', 'Retrato de ejemplo: profesional con casco rojo'),
-	equipo: [
-		retrato('1621905252472-943afaa20e20', 'Retrato de ejemplo: profesional con casco en la mano'),
-		retrato('1688841747582-41097036109d', 'Retrato de ejemplo: profesional con casco y chaleco'),
-		retrato('1787672357797-f5fa35bb0d18', 'Retrato de ejemplo: técnico con overol azul'),
-		retrato('1587715718640-987708ba38e1', 'Retrato de ejemplo: profesional en obra'),
-	],
-};
-
-// Logos genéricos de clientes (public/referencia/logos/, no son marcas reales).
-export const logosEjemplo = ['constructora', 'inmobiliaria', 'retail', 'industrial', 'logistica', 'energia'].map(
-	(n) => `/referencia/logos/${n}.svg`,
-);
-
 // Videos de stock (Mixkit, licencia libre, enlazados desde su CDN). Uso según
 // docs/investigacion-secciones.md: loops decorativos donde suman ambiente (portada, seguridad,
-// trabaja con nosotros) y un timelapse que se reproduce al hacer clic en la ficha de proyecto.
+// trabaja con nosotros). El timelapse de la ficha de proyecto se sacó (don Luis: nada de videos de avance).
 // Peso: 720p ≤ 5 MB en los loops; 360p (< 1 MB) en celular. Componente VideoFondo.
 export interface VideoReferencial {
 	id: number;
@@ -147,5 +127,4 @@ export const videos = {
 	seguridad: mixkit(23170, 'Dos profesionales con casco revisan planos en obra'),
 	empresa: mixkit(46753, 'Dos trabajadores con casco caminan hacia la obra'),
 	trabaja: mixkit(31473, 'Trabajadores en obra gruesa de un edificio'),
-	timelapse: mixkit(31454, 'Timelapse de grúas trabajando en la construcción de un edificio'),
 };

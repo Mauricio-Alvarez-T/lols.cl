@@ -12,7 +12,6 @@ import { proyectos } from '../../data/proyectos';
 import Referencial from '../../components/Referencial.astro';
 import { bandasServicio, obras2018 } from '../../data/referencia';
 import { ejemplosServicio } from '../../data/ejemplos';
-import FichaServicio from '../../components/FichaServicio.astro';
 
 export function getStaticPaths() {
 	return servicios.map((servicio) => ({ params: { slug: servicio.slug }, props: { servicio } }));
@@ -32,10 +31,6 @@ import ObraPortada from '../../components/ObraPortada.astro';
 		<h1 class="display largo">{s.problema ?? <Pendiente texto="el problema del cliente que este servicio resuelve, como titular">{ej.problema}</Pendiente>}</h1>
 		<p class="bajada">{s.resumen ?? <Pendiente texto="cómo lo resuelve LOLS, en dos líneas">{ej.resumen}</Pendiente>}</p>
 	</ObraPortada>
-
-	<section class="seccion contenedor">
-		<FichaServicio servicio={s} sub="h2" />
-	</section>
 
 	<section class="seccion contenedor">
 		<div class="cabecera">

@@ -20,15 +20,17 @@ const enCurso = proyectosPorEstado('en-curso');
 const contratados = proyectosPorEstado('contratado');
 const terminados = proyectosPorEstado('terminado');
 const hayReales = enCurso.length + contratados.length + terminados.length > 0;
+// Las contratadas pueden faltar aunque haya obras reales: mientras tanto, la tabla de muestra.
+const contratadosMuestra = contratados.length === 0;
 
 // Cantidades del índice: las reales, o las de las muestras mientras no haya proyectos.
 const cuenta = hayReales
-	? { enCurso: enCurso.length, contratados: contratados.length, terminados: terminados.length }
+	? { enCurso: enCurso.length, contratados: contratados.length || ejemplosContratados.length, terminados: terminados.length }
 	: { enCurso: obrasEnCurso.length, contratados: ejemplosContratados.length, terminados: obras2018.length };
 const bloques = [
-	{ id: 'en-construccion', estado: 'en-curso', titulo: 'En construcción', n: cuenta.enCurso },
-	{ id: 'contratados', estado: 'contratado', titulo: 'Contratados', n: cuenta.contratados },
-	{ id: 'terminados', estado: 'terminado', titulo: 'Terminados', n: cuenta.terminados },
+	{ id: 'en-construccion', estado: 'en-curso', titulo: 'En construcción', n: cuenta.enCurso, muestra: !hayReales },
+	{ id: 'contratados', estado: 'contratado', titulo: 'Contratados', n: cuenta.contratados, muestra: contratadosMuestra },
+	{ id: 'terminados', estado: 'terminado', titulo: 'Terminados', n: cuenta.terminados, muestra: !hayReales },
 ];
 import ObraPortada from '../../components/ObraPortada.astro';
 import { bandas } from '../../data/referencia';
@@ -46,7 +48,7 @@ import { bandas } from '../../data/referencia';
 			{
 				bloques.map((b) => (
 					<a href={`#${b.id}`} data-estado={b.estado}>
-						<span class="n">{hayReales ? b.n : <Pendiente texto="cantidad">{b.n}</Pendiente>}</span>
+						<span class="n">{b.muestra ? <Pendiente texto="cantidad">{b.n}</Pendiente> : b.n}</span>
 						<span>{b.titulo}</span>
 					</a>
 				))
@@ -56,7 +58,9 @@ import { bandas } from '../../data/referencia';
 
 	{
 		hayReales ? (
-			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={enCurso.map(deProyecto)} />
+			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={enCurso.map(deProyecto)}>
+				<Pendiente texto="render, tipo de obra, superficie e inicio de cada obra en construcción" />
+			</CarruselObras>
 		) : (
 			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={obrasEnCurso.map(deMuestra)}>
 				<Pendiente texto="obras en construcción con superficie, comuna, dirección y tipo; fotos y videos de Rodrigo" />
@@ -70,7 +74,7 @@ import { bandas } from '../../data/referencia';
 				<h2>Contratados</h2>
 				<p class="nota">Obras adjudicadas que parten en los próximos meses.</p>
 			</div>
-			{!hayReales && <Pendiente texto="obras contratadas que aún no parten (confirmar qué se puede publicar antes del inicio)" />}
+			{contratadosMuestra && <Pendiente texto="obras contratadas que aún no parten, con su render o plano" />}
 			<div class="tabla-envoltura">
 				<table class="cartera">
 					<thead>
@@ -84,7 +88,7 @@ import { bandas } from '../../data/referencia';
 					</thead>
 					<tbody>
 						{
-							hayReales
+							!contratadosMuestra
 								? contratados.map((p) => (
 										<tr>
 											<th scope="row">
@@ -122,7 +126,9 @@ import { bandas } from '../../data/referencia';
 
 	{
 		hayReales ? (
-			<CarruselObras id="terminados" titulo="Terminados" obras={terminados.map(deProyecto)} />
+			<CarruselObras id="terminados" titulo="Terminados" nota="Las más recientes y una obra por año de las anteriores." obras={terminados.map(deProyecto)}>
+				<Pendiente texto="la obra de cada año de 2019 a 2025 (la elige don Luis) y fotos de las terminadas en 2026" />
+			</CarruselObras>
 		) : (
 			<CarruselObras id="terminados" titulo="Terminados" obras={obras2018.map(deMuestra)}>
 				<Pendiente texto="obras terminadas que elija don Luis, con fotos nuevas (las de 2018 salen del sitio)" />

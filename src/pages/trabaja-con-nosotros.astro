@@ -1,6 +1,7 @@
 ---
 // Ruta propia para postulantes: no pasan por el canal comercial (docs/investigacion-secciones.md).
-// Aquí el video de faena suma: muestra el trabajo real y la cultura.
+// Aquí el video de faena suma: muestra el trabajo real y la cultura. Los CV llegan a lols@lols.cl
+// (don Luis, 08-10-2026) hasta que se cree un correo propio para postulaciones.
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import ObraPortada from '../components/ObraPortada.astro';
@@ -49,7 +50,6 @@ const asunto = encodeURIComponent('Postulación: [cargo]');
 				</p>
 				<a class="boton" href={`mailto:${empresa.correo.valor}?subject=${asunto}`}>Enviar CV por correo</a>
 				<p class="nota">
-					<Pendiente texto="correo de postulaciones (¿rrhh@lols.cl?)" />
 					Sus datos se usan solo para este proceso de selección. <a href="/privacidad/">Política de privacidad</a>.
 				</p>
 			</div>
@@ -63,7 +63,7 @@ const asunto = encodeURIComponent('Postulación: [cargo]');
 	}
 	.motivos {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: clamp(1.5rem, 4vw, 3rem);
 	}
 	.indice {

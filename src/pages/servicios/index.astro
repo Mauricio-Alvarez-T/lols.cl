@@ -1,6 +1,7 @@
 ---
-// Servicios (nivel 1): seis fotos con su nombre. Qué incluye cada uno, para quién y en qué
-// obras se ha hecho está en su página (docs/estructura.md § Mostrar, no contar).
+// Servicios (nivel 1): una foto por servicio con su nombre; el problema que resuelve y en qué
+// obras se ha hecho está en su página (docs/estructura.md § Mostrar, no contar). Sin "seis
+// especialidades": don Luis pidió quitar ese apartado y dejar tres servicios (08-10-2026).
 import Base from '../../layouts/Base.astro';
 import Pendiente from '../../components/Pendiente.astro';
 import Contacto from '../../components/Contacto.astro';
@@ -13,7 +14,7 @@ import { bandas } from '../../data/referencia';
 <Base title="Servicios" description={`Servicios de LOLS Ingeniería: ${servicios.map((s) => s.nombre).join(', ')}.`}>
 	<ObraPortada imagen={bandas.empresa} baja>
 		<p class="etiqueta">Servicios</p>
-		<h1 class="display largo">Seis especialidades</h1>
+		<h1 class="display largo">Construcción, montaje industrial y electricidad</h1>
 		<p class="bajada"><Pendiente texto="una frase que presente los servicios">Un solo responsable para su proyecto, sin coordinar a varios contratistas.</Pendiente></p>
 	</ObraPortada>
 

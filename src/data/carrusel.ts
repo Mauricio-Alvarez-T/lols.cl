@@ -1,13 +1,13 @@
 // Obras para CarruselObras: proyectos reales o, mientras no haya, las muestras de referencia.
 // Cada una trae lo que necesita su ficha (FichaObra), que se despliega bajo el carrusel.
 import type { ObraCarrusel } from '../components/CarruselObras.astro';
-import { plantilla, type Proyecto } from './proyectos';
-import { bandas, type ImagenReferencial } from './referencia';
+import { plantilla, fotoPrincipal, type Proyecto } from './proyectos';
+import type { ImagenReferencial } from './referencia';
 
 export const deProyecto = (p: Proyecto): ObraCarrusel => ({
 	id: p.slug,
 	href: `/proyectos/${p.slug}/`,
-	imagen: p.fotos[0] ?? bandas.fichaEjemplo,
+	imagen: fotoPrincipal(p),
 	tipo: p.tipo,
 	nombre: p.nombre,
 	comuna: p.comuna,

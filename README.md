@@ -35,11 +35,14 @@ Fuera de producción el sitio se ve como el final: cada `<Pendiente texto="…">
 
 `respaldo-wp/` es la copia del contenido del WordPress viejo (extraída 2026-09-28): 21 páginas (JSON de la API + HTML renderizado) y 95 imágenes originales. **Es la única copia fuera de WordPress: no borrar.**
 
-Datos de contacto vigentes en el sitio viejo:
+Datos de contacto vigentes en el sitio viejo (la dirección y la razón social se actualizaron
+en `src/data/empresa.ts` con los datos confirmados en octubre de 2026):
 - LOLS INGENIERÍA LIMITADA
 - El Mirador 112-150, Cerrillos, Santiago
 - +56 652 710 609
 - lols@lols.cl
+
+Respuestas de don Luis a las preguntas de la jefatura: [docs/respuestas-don-luis-2026-10-08.md](docs/respuestas-don-luis-2026-10-08.md).
 
 Páginas: Inicio, Quiénes somos, Nuestros servicios (Construcción, Muebles, Montaje industrial, Mantención, Electricidad, Voz y datos), Proyectos terminados (8), Proyectos en construcción (7), Contacto.
 

@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Pendiente from '../components/Pendiente.astro';
 import FormularioContacto from '../components/FormularioContacto.astro';
 import { empresa, telefonoHref, whatsappHref } from '../data/empresa';
 import Proceso from '../components/Proceso.astro';
@@ -12,7 +11,7 @@ import { bandas } from '../data/referencia';
 	<ObraPortada imagen={bandas.contacto} baja>
 		<p class="etiqueta">Contacto</p>
 		<h1 class="display largo">Hablemos de su proyecto</h1>
-		<p class="bajada">Cuéntenos qué necesita y le respondemos con una propuesta. Si prefiere, escríbanos por WhatsApp.</p>
+		<p class="bajada">Cuéntenos qué necesita: después de recibir su solicitud, nos ponemos en contacto con usted. Si prefiere, escríbanos por WhatsApp.</p>
 		<p class="canales">
 			<a class="boton" href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a>
 			<a class="boton secundario" href={telefonoHref(empresa.telefono.valor)}>Llamar</a>
@@ -26,29 +25,22 @@ import { bandas } from '../data/referencia';
 		</div>
 		<aside>
 			<dl class="datos vertical">
-				<div>
-					<dt>Quién atiende</dt>
-					<dd><Pendiente texto="nombre y cargo">Nombre Apellido · Jefe de proyectos</Pendiente></dd>
-				</div>
+				<!-- Sin "Quién atiende": no van nombres de personas (don Luis, 08-10-2026). -->
 				<div>
 					<dt>Teléfono</dt>
-					<dd>
-						<Pendiente revisar={empresa.telefono.revisar}>
-							<a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a>
-						</Pendiente>
-					</dd>
+					<dd><a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a></dd>
 				</div>
 				<div>
 					<dt>Correo</dt>
-					<dd>
-						<Pendiente revisar={empresa.correo.revisar}>
-							<a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>
-						</Pendiente>
-					</dd>
+					<dd><a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a></dd>
+				</div>
+				<div>
+					<dt>Horario</dt>
+					<dd>{empresa.horario}</dd>
 				</div>
 				<div>
 					<dt>Oficina</dt>
-					<dd><Pendiente revisar={empresa.direccion.revisar}>{empresa.direccion.valor}</Pendiente></dd>
+					<dd>{empresa.direccion.valor}</dd>
 				</div>
 			</dl>
 			<div class="despues">
@@ -56,7 +48,7 @@ import { bandas } from '../data/referencia';
 			</div>
 			<div class="mapa marco">
 				<iframe
-					title="Mapa: El Mirador 112-150, Cerrillos"
+					title="Mapa: El Mirador 150, Cerrillos"
 					src="https://www.openstreetmap.org/export/embed.html?bbox=-70.7236%2C-33.5093%2C-70.7077%2C-33.5013&layer=mapnik&marker=-33.50535%2C-70.71567"
 					loading="lazy"
 					referrerpolicy="no-referrer"></iframe>

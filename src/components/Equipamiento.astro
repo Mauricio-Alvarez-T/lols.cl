@@ -1,25 +1,22 @@
 ---
-// Equipamiento propio: un mosaico con una foto por categoría y, encima, la cifra en grande
-// (mostrar, no contar: el número es la imagen). Al pinchar, el detalle de la categoría se
-// despliega bajo su fila, como los servicios (src/scripts/mosaico.ts). Categorías e ítems del
-// inventario de la Bóveda y de la reunión con don Luis (src/data/empresa.ts); las fotos son de
-// muestra hasta tener las reales.
+// Equipamiento propio: un mosaico con una foto por categoría. Al pinchar, el detalle de la
+// categoría se despliega bajo su fila, como los servicios (src/scripts/mosaico.ts). Categorías e
+// ítems del inventario de la Bóveda y de la reunión con don Luis (src/data/empresa.ts); las
+// fotos son de muestra hasta tener las reales. Sin cantidades (don Luis, 08-10-2026).
 import Pendiente from './Pendiente.astro';
 import Referencial from './Referencial.astro';
 import Pictograma from './Pictograma.astro';
-import CifraEquipo from './CifraEquipo.astro';
 import { equipamiento } from '../data/empresa';
 import { fotosEquipamiento } from '../data/referencia';
 
 const idPanel = 'ficha-equipamiento';
-const notaAprox = 'cifra aproximada del inventario de la Bóveda (mar-2026); confirmar que es equipo propio y que sigue vigente';
 ---
 
 <div class="equipamiento">
 	<div class="cabecera">
 		<h2>Equipamiento propio</h2>
 	</div>
-	<Pendiente texto="fotos reales del equipamiento; cantidades de vehículos y de EPP" />
+	<Pendiente texto="fotos reales del equipamiento" />
 
 	<ul class="mosaico" data-mosaico>
 		{
@@ -28,12 +25,6 @@ const notaAprox = 'cifra aproximada del inventario de la Bóveda (mar-2026); con
 					<a href={`#equipo-${c.clave}`} data-abre={`equipo-${c.clave}`}>
 						<div class="foto marco marco-mosaico">
 							<Referencial imagen={fotosEquipamiento[c.clave]} sizes="(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw" />
-							<p class="cifra">
-								<span class="valor">
-									<CifraEquipo c={c} nota={notaAprox} />
-								</span>
-								<span class="unidad">{c.cifra.unidad}</span>
-							</p>
 						</div>
 						<h3 class="nombre">
 							<Pictograma nombre={c.pictograma} />
@@ -47,7 +38,7 @@ const notaAprox = 'cifra aproximada del inventario de la Bóveda (mar-2026); con
 			<div class="ficha-dentro">
 				<div class="interior">
 					<div class="ficha-barra">
-						<p class="ficha-rotulo">Equipamiento propio</p>
+						<p class="ficha-rotulo">Qué incluye</p>
 						<div class="ficha-acciones">
 							<button type="button" class="ficha-boton" data-cerrar>
 								Cerrar
@@ -60,21 +51,14 @@ const notaAprox = 'cifra aproximada del inventario de la Bóveda (mar-2026); con
 							<div data-ficha={`equipo-${c.clave}`} hidden>
 								<div class="detalle">
 									<div class="resumen">
-										<p class="titulo-categoria">
+										<h4 class="titulo-ficha" tabindex="-1">
 											<Pictograma nombre={c.pictograma} />
 											{c.titulo}
-										</p>
-										<h4 class="titulo-ficha" tabindex="-1">
-											<span class="grande">
-												<CifraEquipo c={c} nota={notaAprox} />
-											</span>
-											<span class="unidad-grande">{c.cifra.unidad}</span>
 										</h4>
-										{c.cifra.estado === 'aprox' && <p class="nota">Cifra aproximada.</p>}
 									</div>
 									<ul class="lista">
 										{c.items.map((i) => (
-											<li>{i}</li>
+											<li>{typeof i === 'string' ? i : <Pendiente revisar={i.revisar}>{i.texto}</Pendiente>}</li>
 										))}
 									</ul>
 								</div>
@@ -123,36 +107,6 @@ const notaAprox = 'cifra aproximada del inventario de la Bóveda (mar-2026); con
 	.item > a:hover .foto :global(img) {
 		transform: scale(1.03);
 	}
-	/* La cifra sobre la foto, abajo a la izquierda, con un degradado para que se lea. */
-	.cifra {
-		grid-area: 1 / 1;
-		align-self: end;
-		position: relative;
-		z-index: 1;
-		display: flex;
-		flex-direction: column;
-		margin: 0;
-		padding: 3.5rem 1.1rem 1rem;
-		background: linear-gradient(to top, rgb(16 20 17 / 0.82), rgb(16 20 17 / 0));
-		color: var(--lols-blanco);
-		pointer-events: none;
-	}
-	.valor {
-		font-family: var(--fuente-titulos);
-		font-size: clamp(2.4rem, 1.6rem + 2.4vw, 3.6rem);
-		font-weight: 700;
-		letter-spacing: -0.04em;
-		line-height: 1;
-		font-variant-numeric: tabular-nums;
-	}
-	.unidad {
-		margin-top: 0.3rem;
-		font-family: var(--fuente-datos);
-		font-size: 0.9rem;
-		font-weight: 600;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-	}
 	.nombre {
 		display: flex;
 		align-items: center;
@@ -173,49 +127,32 @@ const notaAprox = 'cifra aproximada del inventario de la Bóveda (mar-2026); con
 		color: var(--lols-verde-oscuro);
 	}
 
-	/* Detalle: la cifra en grande a la izquierda y qué incluye a la derecha. */
+	/* Detalle: la categoría en grande a la izquierda y qué incluye a la derecha. */
 	.detalle {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
 		gap: clamp(1.5rem, 5vw, 4rem);
 		align-items: start;
 	}
-	.titulo-categoria {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		margin: 0 0 1rem;
-		font-family: var(--fuente-titulos);
-		font-size: 1.1rem;
-		font-weight: 700;
-		color: var(--lols-verde-oscuro);
-	}
 	.titulo-ficha {
 		display: flex;
-		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
 		margin: 0;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(2rem, 1.4rem + 2.5vw, 3.25rem);
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		line-height: 1.05;
+	}
+	.titulo-ficha :global(.pictograma) {
+		flex-shrink: 0;
+		width: 0.9em;
+		height: 0.9em;
+		color: var(--lols-verde);
 	}
 	.titulo-ficha:focus {
 		outline: none;
-	}
-	.grande {
-		font-family: var(--fuente-titulos);
-		font-size: clamp(3.5rem, 2rem + 5vw, 6rem);
-		font-weight: 700;
-		letter-spacing: -0.05em;
-		line-height: 0.95;
-		font-variant-numeric: tabular-nums;
-	}
-	.unidad-grande {
-		margin-top: 0.5rem;
-		font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
-		font-weight: 600;
-		letter-spacing: -0.01em;
-	}
-	.nota {
-		margin: 0.75rem 0 0;
-		font-size: 0.9rem;
-		color: var(--gris-medio);
 	}
 	.lista {
 		list-style: none;

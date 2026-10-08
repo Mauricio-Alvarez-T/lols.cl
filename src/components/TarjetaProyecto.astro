@@ -5,7 +5,7 @@
 // enlace. Al hacer clic, su foto viaja a la portada de la ficha (view transition).
 import Pendiente from './Pendiente.astro';
 import Pictograma from './Pictograma.astro';
-import { plantilla, estados, pictogramaDeTipo, type Estado, type Proyecto } from '../data/proyectos';
+import { plantilla, estados, pictogramaDeTipo, fotoPrincipal, type Estado, type Proyecto } from '../data/proyectos';
 import type { ImagenReferencial } from '../data/referencia';
 import Referencial from './Referencial.astro';
 
@@ -19,7 +19,7 @@ interface Props {
 const { proyecto, referencia, lamina, destacada = false } = Astro.props;
 const estado = proyecto?.estado ?? Astro.props.estado ?? 'terminado';
 const enObra = estado === 'en-curso';
-const foto = proyecto?.fotos[0];
+const foto = proyecto ? fotoPrincipal(proyecto) : undefined;
 // Las tarjetas de muestra llevan a la ficha de ejemplo mientras no haya proyectos reales.
 const href = `/proyectos/${proyecto?.slug ?? plantilla.slug}/`;
 const ej = referencia?.ejemplo;

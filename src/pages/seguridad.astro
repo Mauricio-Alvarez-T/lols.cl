@@ -1,70 +1,37 @@
 ---
-// Seguridad y calidad: responde lo que pregunta un mandante al precalificar a un contratista
-// (indicadores certificados por la mutualidad, ISO, registros). Cifras y sellos en grande,
-// pocos párrafos (docs/estructura.md § Mostrar, no contar).
+// Seguridad y calidad: responde lo que pregunta un mandante al precalificar a un contratista.
+// Don Luis (08-10-2026): sin indicadores ni certificado de la mutual, sin certificaciones ISO
+// (LOLS no las tiene) y sin registros de contratistas: solo la mutual. Sí va la Política de
+// Seguridad y Salud en el Trabajo, que exige el Decreto Supremo 44 desde febrero de 2025.
 // Casi ningún sitio del rubro lo muestra: es el diferenciador (docs/investigacion-secciones.md).
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import ObraPortada from '../components/ObraPortada.astro';
 import Contacto from '../components/Contacto.astro';
+import { empresa } from '../data/empresa';
 import { videos } from '../data/referencia';
-import { ejemplosSeguridad as ej } from '../data/ejemplos';
 ---
 
-<Base title="Seguridad y calidad" description="Indicadores de seguridad, certificaciones y registros de LOLS Ingeniería.">
+<Base title="Seguridad y calidad" description="Política de Seguridad y Salud en el Trabajo y mutualidad de LOLS Ingeniería.">
 	<ObraPortada video={videos.seguridad}>
 		<p class="etiqueta">Seguridad y calidad</p>
 		<h1 class="display">Cada faena, con las personas primero<span class="punto">.</span></h1>
-		<p class="bajada">
-			Indicadores, certificaciones y registros para que su área de contratos precalifique a LOLS sin
-			perseguir documentos.
-		</p>
+		<p class="bajada">Lo que su área de contratos necesita para precalificar a LOLS, sin perseguir documentos.</p>
 	</ObraPortada>
 
-	<section class="seccion contenedor">
-		<div class="cabecera"><h2>Nuestro desempeño en seguridad</h2></div>
-		<div class="indicadores">
-			{
-				ej.indicadores.map((i) => (
-					<div>
-						<p class="numero">
-							<Pendiente texto="indicador real certificado por la mutualidad">{i.valor}</Pendiente>
-						</p>
-						<p>{i.etiqueta}</p>
-					</div>
-				))
-			}
+	<section id="politica" class="seccion contenedor ancla">
+		<div class="cabecera"><h2>Política de Seguridad y Salud en el Trabajo</h2></div>
+		<div class="politica">
+			<p>La política que guía la seguridad de cada obra de LOLS, según el Decreto Supremo 44.</p>
+			<Pendiente bloque texto="documento de la política (PDF) para descargar" />
 		</div>
-		<p class="fuente"><Pendiente texto="período y fuente de los indicadores">{ej.fuenteIndicadores}</Pendiente></p>
 	</section>
 
 	<section class="seccion gris">
 		<div class="contenedor">
-			<div class="cabecera"><h2>Sistemas de gestión certificados</h2></div>
-			<ul class="certificaciones">
-				{
-					ej.certificaciones.map((c) => (
-						<li>
-							<Pendiente bloque texto="certificación real: emisor, alcance y vigencia (y PDF)">
-								<p class="sello">{c.nombre}</p>
-								<p class="alcance">{c.alcance}</p>
-								<dl>
-									<div><dt>Emisor</dt><dd>{c.emisor}</dd></div>
-									<div><dt>Vigente hasta</dt><dd>{c.vigencia}</dd></div>
-								</dl>
-							</Pendiente>
-						</li>
-					))
-				}
-			</ul>
+			<div class="cabecera"><h2>Mutualidad</h2></div>
+			<ul class="registros"><li>{empresa.mutual}</li></ul>
 		</div>
-	</section>
-
-	<section class="seccion contenedor">
-		<div class="cabecera"><h2>Inscritos en</h2></div>
-		<Pendiente bloque texto="registros de contratistas y mutualidad reales">
-			<ul class="registros">{ej.registros.map((r) => <li>{r}</li>)}</ul>
-		</Pendiente>
 	</section>
 
 	<section class="seccion contenedor documentos">
@@ -81,71 +48,25 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 	.punto {
 		color: var(--lols-verde);
 	}
-	.indicadores {
+	.ancla {
+		scroll-margin-top: 5rem;
+	}
+	.politica {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 1.5rem;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: clamp(1.5rem, 4vw, 3rem);
+		align-items: center;
 	}
-	.indicadores > div {
-		padding-top: 1.25rem;
-		border-top: 3px solid var(--lols-verde);
-	}
-	.indicadores p {
+	.politica p {
 		margin: 0;
-		color: var(--gris-medio);
-	}
-	.indicadores .numero {
-		margin-bottom: 0.35rem;
-		font-family: var(--fuente-titulos);
-		font-size: clamp(2.75rem, 6vw, 4.5rem);
-		font-weight: 700;
-		letter-spacing: -0.04em;
-		line-height: 1;
-		color: var(--lols-carbon);
-	}
-	.fuente {
-		margin: 1.5rem 0 0;
-		font-size: 0.9rem;
-		color: var(--gris-medio);
-	}
-	.certificaciones {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 1.25rem;
-	}
-	.certificaciones li {
-		padding: 1.75rem;
-		background: var(--lols-blanco);
-		border-top: 4px solid var(--lols-verde);
-	}
-	.sello {
-		margin: 0 0 0.25rem;
-		font-family: var(--fuente-titulos);
-		font-size: 1.75rem;
-		font-weight: 700;
-		letter-spacing: -0.03em;
-	}
-	.alcance {
+		max-width: 36rem;
+		font-size: 1.15rem;
 		color: var(--lols-gris);
 	}
-	.certificaciones dl {
-		display: flex;
-		gap: 1.5rem;
-		margin: 1rem 0 0;
-		font-size: 0.9rem;
-	}
-	.certificaciones dt {
-		color: var(--gris-medio);
-		font-size: 0.8rem;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-	}
-	.certificaciones dd {
-		margin: 0.2rem 0 0;
-		font-weight: 600;
+	@media (max-width: 760px) {
+		.politica {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 	.registros {
 		list-style: none;
@@ -176,15 +97,5 @@ import { ejemplosSeguridad as ej } from '../data/ejemplos';
 	.documentos h2 {
 		font-size: clamp(1.5rem, 3vw, 2rem);
 		margin-bottom: 0.4rem;
-	}
-	@media (max-width: 860px) {
-		.certificaciones {
-			grid-template-columns: minmax(0, 1fr);
-		}
-	}
-	@media (max-width: 640px) {
-		.indicadores {
-			grid-template-columns: minmax(0, 1fr);
-		}
 	}
 </style>

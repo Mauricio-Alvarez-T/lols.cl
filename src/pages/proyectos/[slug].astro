@@ -7,7 +7,7 @@ import Pendiente from '../../components/Pendiente.astro';
 import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
 import Contacto from '../../components/Contacto.astro';
 import FichaObra from '../../components/FichaObra.astro';
-import { proyectos, plantilla, type Proyecto } from '../../data/proyectos';
+import { proyectos, plantilla, fotoPrincipal, type Proyecto } from '../../data/proyectos';
 import Referencial from '../../components/Referencial.astro';
 import { bandas } from '../../data/referencia';
 import { ejemploProyecto as ej } from '../../data/ejemplos';
@@ -20,8 +20,8 @@ export function getStaticPaths() {
 }
 
 const { proyecto: p } = Astro.props as { proyecto: Proyecto };
-const portada = p.fotos[0];
 const esEjemplo = p.slug === plantilla.slug;
+const portada = esEjemplo ? p.fotos[0] : fotoPrincipal(p);
 const otros = proyectos.filter((o) => o.slug !== p.slug).slice(0, 2);
 ---
 
