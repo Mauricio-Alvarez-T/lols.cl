@@ -27,7 +27,7 @@ reunión, y cómo se llevaron al sitio. Las trajo Marcos.
 | Horario: lunes a viernes, de 9:00 a 17:00 (confirmado: se empieza a las 9) | `empresa.horario`: Contacto y pie |
 | Política de privacidad: aprobada | Sin cambios |
 | Certificado de la mutual: no. Registros (MOP, MINVU, CChC…): no. Solo la mutual | Seguridad: sin indicadores, sin ISO (LOLS no las tiene) y sin registros; queda la Mutual de Seguridad CChC |
-| Publicar la Política de Seguridad y Salud en el Trabajo: sí, sin hacer ningún documento | Sección "Política de Seguridad y Salud en el Trabajo" en Seguridad, en la portada y en el pie, sin documento para descargar |
+| Publicar la Política de Seguridad y Salud en el Trabajo: sí, sin hacer ningún documento | Sección "Política de Seguridad y Salud en el Trabajo" en Seguridad (con un texto de ejemplo, marcado, hasta tener el real), en la portada y en el pie, sin documento para descargar |
 | Proveedores: sacar la sección | Sin página /proveedores/ ni enlaces a ella |
 | Preguntas frecuentes: no | No hay |
 

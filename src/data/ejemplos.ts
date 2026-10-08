@@ -54,6 +54,24 @@ export const ejemploProceso = [
 
 export const ejemploFichaExtra = { rol: 'Contratista principal' };
 
+// Política de Seguridad y Salud en el Trabajo de EJEMPLO (Marcos, 08-10-2026: "algo de relleno
+// para saber" cómo se ve). Sigue lo que pide el Decreto Supremo 44: compromiso de la empresa,
+// cumplimiento de la normativa, participación de los trabajadores y mejora continua. El texto
+// real lo define LOLS; sin nombres de personas en la firma.
+export const ejemploPoliticaSST = {
+	intro:
+		'En LOLS Ingeniería, la seguridad y la salud de las personas van antes que el plazo y el costo de cualquier obra. Esta política guía el trabajo de todos los que participan en nuestras faenas, propios y de empresas contratistas.',
+	compromisos: [
+		'Proteger la vida y la salud de todas las personas que trabajan en nuestras obras.',
+		'Cumplir la normativa de seguridad y salud en el trabajo, en especial la Ley 16.744 y el Decreto Supremo 44.',
+		'Identificar los peligros y evaluar los riesgos de cada faena antes de empezar, y controlarlos mientras dure la obra.',
+		'Promover la participación de los trabajadores y del Comité Paritario en la planificación, el control y la mejora de la prevención.',
+		'Capacitar a nuestros equipos y entregarles los elementos de protección que cada faena requiere.',
+		'Revisar y mejorar de forma continua nuestra gestión preventiva.',
+	],
+	firma: 'Gerencia General · LOLS Ingeniería · octubre de 2026',
+};
+
 export const ejemplosTrabaja = {
 	bajada: 'Buscamos personas que quieran construir bien, con seguridad y en equipo.',
 	motivos: [
