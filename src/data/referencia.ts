@@ -7,7 +7,7 @@
 //               pero de ~370 px: sirven para tarjetas, no para bandas grandes. Las 7
 //               "en construcción" de 2018 son renders, no fotos.
 
-export type Origen = 'unsplash' | 'lols-2018';
+export type Origen = 'unsplash' | 'lols-2018' | 'render-2018';
 
 export interface ImagenReferencial {
 	src: string;
@@ -40,6 +40,14 @@ const lols = (archivo: string, alt: string, ejemplo?: ImagenReferencial['ejemplo
 	ejemplo,
 });
 
+// Render de una obra de LOLS del sitio de 2018 (las "en construcción" de entonces). Hace de foto de
+// la obra terminada hasta tener la real.
+export const render2018 = (archivo: string, alt: string): ImagenReferencial => ({
+	src: `/referencia/obras-2018/${archivo}`,
+	alt,
+	origen: 'render-2018',
+});
+
 export const bandas = {
 	portada: unsplash('1599707254554-027aeb4deacd', 'Grúas sobre un edificio en construcción'),
 	empresa: unsplash('1541888946425-d81bb19240f5', 'Equipo de obra sobre una losa'),
@@ -47,7 +55,6 @@ export const bandas = {
 	// Cabeceras de páginas interiores (ObraPortada con imagen).
 	proyectos: unsplash('1466803136990-7c174b34ff32', 'Vista aérea de una obra de edificación en la ciudad'),
 	contacto: unsplash('1774599730788-a74cd9253b56', 'Equipo revisando planos en terreno'),
-	proveedores: unsplash('1763926025477-423847028860', 'Estanterías con barras y perfiles metálicos'),
 	error: unsplash('1603465410243-af3e840367dd', 'Maquinaria en una obra detenida'),
 	privacidad: unsplash('1487491424367-7571f9afbb30', 'Vista aérea de edificios de altura'),
 };
@@ -92,7 +99,31 @@ export const obrasEnCurso = [
 	},
 ] satisfies ImagenReferencial[];
 
+// Obras terminadas de EJEMPLO, una por año de 2021 a 2025 (Marcos, 08-10-2026: "inventa fotos hasta
+// que nos pasen las fotos reales"). Nombre, tipo, comuna, superficie y año también son de ejemplo.
+export const obrasEjemplo = [
+	{ ...unsplash('1776179806507-b70623e680a2', 'Edificio comercial de fachada blanca y roja'), ejemplo: { nombre: 'Locales comerciales Estación Central', tipo: 'Edificio comercial', comuna: 'Estación Central', superficie: '1.400 m²', anio: '2025' } },
+	{ ...unsplash('1766793110924-98e05b48eadc', 'Bodega de fachada metálica con portón'), ejemplo: { nombre: 'Bodegas Cerrillos', tipo: 'Bodegaje', comuna: 'Cerrillos', superficie: '2.200 m²', anio: '2024' } },
+	{ ...unsplash('1543892607-04657ef3a279', 'Edificio de oficinas de tres pisos con ventanales'), ejemplo: { nombre: 'Oficinas Santiago Centro', tipo: 'Edificio de oficinas', comuna: 'Santiago', superficie: '1.900 m²', anio: '2023' } },
+	{ ...unsplash('1759310347467-578dfd846229', 'Nave industrial de planchas metálicas junto a la calle'), ejemplo: { nombre: 'Nave industrial Quilicura', tipo: 'Industrial', comuna: 'Quilicura', superficie: '3.500 m²', anio: '2022' } },
+	{ ...unsplash('1611570884860-6f9d61c3a64d', 'Edificio de fachada oscura con ventanales'), ejemplo: { nombre: 'Edificio comercial Independencia', tipo: 'Edificio comercial', comuna: 'Independencia', superficie: '1.100 m²', anio: '2021' } },
+] satisfies ImagenReferencial[];
+
 // Equipamiento propio (reunión con don Luis): fotos de stock hasta tener las reales.
+// Fotos de EJEMPLO de obras reales que aún no tienen la suya (las terminadas en 2026).
+export const fotosObrasEjemplo: Record<string, ImagenReferencial> = {
+	'abate-molina-676': unsplash('1587994990528-14263e4ee443', 'Edificio de fachada blanca con ventanas verticales'),
+	'abate-molina-80': unsplash('1623051786552-e46ef84e6c07', 'Edificio de fachada vidriada'),
+};
+
+// Tipos de andamio que se usan en Chile y que calzan con las piezas del inventario de la Bóveda
+// (verticales, horizontales y diagonales; andamio saliente y ménsulas; ruedas). Fotos de ejemplo.
+export const fotosAndamios: Record<string, ImagenReferencial> = {
+	multidireccional: unsplash('1762248576542-f98e883f3fbd', 'Unión de un andamio multidireccional: vertical con roseta y horizontales'),
+	saliente: unsplash('1636362006544-22445420703f', 'Trabajador sobre la plataforma de un andamio en el borde de un edificio'),
+	movil: unsplash('1702392183172-17fdef8002b4', 'Torre de andamio liviana junto a un muro'),
+};
+
 export const fotosEquipamiento: Record<string, ImagenReferencial> = {
 	alzaprimas: unsplash('1666796776547-5c25a077d9af', 'Alzaprimas y vigas bajo el moldaje de una losa'),
 	moldajes: unsplash('1575971637203-d6255d9947a9', 'Paneles de moldaje para muros en una obra'),

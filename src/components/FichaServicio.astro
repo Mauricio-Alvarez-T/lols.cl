@@ -42,7 +42,7 @@ const fotos = proyectos
 				fotos.length
 					? fotos.map((f) => (
 							<div class="marco">
-								<img src={f.src} alt={f.alt} loading="lazy" />
+								{'origen' in f ? <Referencial imagen={f} sizes="(max-width: 640px) 50vw, 25vw" /> : <img src={f.src} alt={f.alt} loading="lazy" />}
 							</div>
 						))
 					: obras2018.slice(0, 3).map((f) => (

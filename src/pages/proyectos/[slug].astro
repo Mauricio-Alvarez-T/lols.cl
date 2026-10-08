@@ -28,7 +28,9 @@ const otros = proyectos.filter((o) => o.slug !== p.slug).slice(0, 2);
 <Base title={p.nombre ?? ej.nombre}>
 	<div class="portada marco" style="view-transition-name: foto-proyecto">
 		{
-			portada ? (
+			portada && 'origen' in portada ? (
+				<Referencial imagen={portada} carga="eager" />
+			) : portada ? (
 				<img src={portada.src} alt={portada.alt} />
 			) : esEjemplo ? (
 				<Referencial imagen={bandas.fichaEjemplo} carga="eager" />

@@ -18,11 +18,11 @@ import { ejemploBajadaHero, ejemplosContratados } from '../data/ejemplos';
 
 const enObra = proyectosPorEstado('en-curso').slice(0, 3);
 const contratados = proyectosPorEstado('contratado');
-// Años (fundación 1995) y trabajadores (200, don Luis, 08-10-2026): datos reales. Las obras
-// ejecutadas siguen de ejemplo. Sin m² construidos: no hay registro (don Luis).
+// Datos reales: años (fundación 1995), trabajadores (200, don Luis) y obras ejecutadas (70+,
+// Marcos, 08-10-2026). Sin m² construidos: no hay registro (don Luis).
 const cifras = [
 	{ etiqueta: `años de trayectoria, desde ${fundacion}`, valor: String(aniosTrayectoria) },
-	{ etiqueta: 'obras ejecutadas', pendiente: 'n.º de obras', ejemplo: '150+' },
+	{ etiqueta: 'obras ejecutadas', valor: '70+' },
 	{ etiqueta: 'trabajadores', valor: '200' },
 ];
 ---
@@ -41,7 +41,7 @@ const cifras = [
 		{
 			cifras.map((c) => (
 				<div>
-					<p class="numero">{c.valor ?? <Pendiente texto={c.pendiente}>{c.ejemplo}</Pendiente>}</p>
+					<p class="numero">{c.valor}</p>
 					<p>{c.etiqueta}</p>
 				</div>
 			))

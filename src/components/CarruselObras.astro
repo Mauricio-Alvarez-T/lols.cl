@@ -31,6 +31,7 @@ export interface ObraCarrusel {
 	nombre: string | null;
 	comuna: string | null;
 	superficie: string | null;
+	anio?: string | null; // terminadas: año de término (el portafolio va una obra por año)
 	ejemplo?: boolean; // datos de muestra: se marcan con Pendiente
 	ficha: { proyecto: Proyecto; muestra?: EjemploTarjeta };
 }
@@ -84,6 +85,12 @@ const idFicha = (o: ObraCarrusel, i: number) => `obra-${o.id ?? `${seccion}-${i 
 									<>
 										{' · '}
 										{o.ejemplo ? <Pendiente texto="m² construidos">{o.superficie}</Pendiente> : o.superficie}
+									</>
+								)}
+								{o.anio && (
+									<>
+										{' · '}
+										{o.ejemplo ? <Pendiente texto="año">{o.anio}</Pendiente> : o.anio}
 									</>
 								)}
 							</p>

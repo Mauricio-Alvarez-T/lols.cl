@@ -31,10 +31,12 @@ export const aniosTrayectoria = new Date().getFullYear() - fundacion;
 // (ítem 115, camión Hyundai con pluma hidráulica).
 // Sin cantidades y sin repetir en cada ítem el nombre de la categoría (don Luis, 08-10-2026).
 // Un ítem con `revisar` se muestra marcado hasta que se confirme que es equipo propio.
+// `tipos`: variantes con foto de ejemplo (src/data/referencia.ts, mismas claves).
 export interface CategoriaEquipo {
 	clave: string;
 	titulo: string;
 	pictograma: NombrePictograma;
+	tipos?: { clave: string; nombre: string; texto: string }[];
 	items: (string | { texto: string; revisar: string })[];
 }
 
@@ -55,14 +57,14 @@ export const equipamiento: CategoriaEquipo[] = [
 		clave: 'andamios',
 		titulo: 'Andamios',
 		pictograma: 'andamio',
-		items: [
-			{ texto: 'Tipo europeo', revisar: 'don Luis pidió verificarlo; no figura así en el inventario de la Bóveda' },
-			'Verticales de pata regulable',
-			'Salientes y escuadras',
-			'Horizontales y diagonales',
-			'Bandejas, tablones y escaleras',
-			'Ruedas y malla de seguridad',
+		// Sin "tipo europeo" (Marcos, 08-10-2026): los tipos que se usan en Chile y que calzan con las
+		// piezas del inventario de la Bóveda.
+		tipos: [
+			{ clave: 'multidireccional', nombre: 'Multidireccional', texto: 'Verticales, horizontales y diagonales para armar en altura alrededor de la obra.' },
+			{ clave: 'saliente', nombre: 'Saliente', texto: 'Apoyado en ménsulas, para trabajar en el borde de losas y fachadas.' },
+			{ clave: 'movil', nombre: 'Móvil', texto: 'Torre sobre ruedas que se traslada por la obra, para interiores y terminaciones.' },
 		],
+		items: ['Patas regulables', 'Bandejas, tablones y escaleras', 'Malla de seguridad'],
 	},
 	{
 		clave: 'maquinaria',
@@ -133,7 +135,5 @@ export const navegacion = [
 ];
 
 // Rutas para públicos que no son clientes: van en el pie para no saturar el canal comercial.
-export const otrosPublicos = [
-	{ href: '/trabaja-con-nosotros/', texto: 'Trabaja con nosotros' },
-	{ href: '/proveedores/', texto: 'Proveedores' },
-];
+// Sin Proveedores (Marcos, 08-10-2026): una sección de compras puede hacer pensar que LOLS vende.
+export const otrosPublicos = [{ href: '/trabaja-con-nosotros/', texto: 'Trabaja con nosotros' }];

@@ -63,11 +63,6 @@ export const ejemplosTrabaja = {
 	perfiles: ['Maestros de obra y jornales', 'Soldadores y montajistas', 'Electricistas con licencia SEC', 'Carpinteros', 'Prevencionistas de riesgos'],
 };
 
-export const ejemplosProveedores = {
-	bajada: 'Trabajamos con proveedores de materiales, equipos y servicios que cumplan plazos y estándares de seguridad.',
-	requisitos: ['Inicio de actividades y documentación tributaria al día', 'Certificado de la mutualidad (si presta servicios en obra)', 'Catálogo o lista de precios', 'Referencias de clientes'],
-};
-
 
 // Obras contratadas que aún no parten (reunión con don Luis: mostrar los proyectos futuros).
 export const ejemplosContratados = [

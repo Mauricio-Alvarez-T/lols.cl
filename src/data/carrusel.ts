@@ -12,6 +12,7 @@ export const deProyecto = (p: Proyecto): ObraCarrusel => ({
 	nombre: p.nombre,
 	comuna: p.comuna,
 	superficie: p.superficie,
+	anio: p.estado === 'terminado' && p.anio ? String(p.anio) : null,
 	ficha: { proyecto: p },
 });
 
@@ -24,6 +25,7 @@ export const deMuestra = (r: ImagenReferencial): ObraCarrusel => ({
 	nombre: r.ejemplo?.nombre ?? null,
 	comuna: r.ejemplo?.comuna ?? null,
 	superficie: r.ejemplo?.superficie ?? null,
+	anio: r.ejemplo?.anio ?? null,
 	ejemplo: true,
 	ficha: { proyecto: plantilla, muestra: r.ejemplo },
 });

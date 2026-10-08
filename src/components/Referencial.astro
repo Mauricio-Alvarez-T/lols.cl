@@ -13,7 +13,12 @@ const { imagen, sizes = '100vw', carga = 'lazy' } = Astro.props;
 if (Astro.site?.hostname === 'lols.cl') {
 	throw new Error(`Imagen referencial sin reemplazar en ${Astro.url.pathname}: ${imagen.src}`);
 }
-const etiqueta = imagen.origen === 'unsplash' ? 'Imagen referencial · Unsplash' : 'Obra LOLS · foto de 2018, baja resolución';
+const etiquetas: Record<ImagenReferencial['origen'], string> = {
+	unsplash: 'Imagen referencial · Unsplash',
+	'lols-2018': 'Obra LOLS · foto de 2018, baja resolución',
+	'render-2018': 'Render de la obra · sitio de 2018',
+};
+const etiqueta = etiquetas[imagen.origen];
 ---
 
 <img src={imagen.src} srcset={imagen.srcset} sizes={imagen.srcset ? sizes : undefined} alt={imagen.alt} loading={carga} decoding="async" />

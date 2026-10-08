@@ -9,6 +9,7 @@
 // cambiar su `estado` a 'terminado' y completar el año y el relato.
 
 import type { NombrePictograma } from './pictogramas';
+import { render2018, fotosObrasEjemplo, type ImagenReferencial } from './referencia';
 
 // 'en-curso' conserva el valor de las URLs viejas (/proyectos-en-construccion/ → ?estado=en-curso).
 export type Estado = 'en-curso' | 'contratado' | 'terminado';
@@ -63,8 +64,9 @@ export interface Proyecto {
 	solucion: string | null;
 	resultado: string | null;
 	// Terminadas: fotos de la obra terminada. En construcción y contratadas: el render de lo que
-	// se hará (don Luis, 08-10-2026: nada de fotos por etapa ni videos de avance).
-	fotos: { src: string; alt: string }[];
+	// se hará (don Luis, 08-10-2026: nada de fotos por etapa ni videos de avance). Una imagen
+	// referencial (con `origen`) se muestra con su etiqueta hasta tener la foto real.
+	fotos: ({ src: string; alt: string } | ImagenReferencial)[];
 }
 
 // Datos que no se saben de una obra real quedan en null (la ficha no los muestra).
@@ -112,10 +114,29 @@ export const proyectos: Proyecto[] = [
 	obra({ slug: 'union-latinoamericana-325', nombre: 'Unión Latinoamericana 325', estado: 'en-curso', direccion: 'Unión Latinoamericana 325' }),
 	obra({ slug: 'gorbea-3082', nombre: 'Gorbea 3082', estado: 'en-curso', direccion: 'Gorbea 3082' }),
 	obra({ slug: 'toesca-2074', nombre: 'Toesca 2074', estado: 'en-curso', direccion: 'Toesca 2074' }),
-	// Terminadas en 2026 (Bóveda: fecha de fin mayo y junio de 2026). Faltan las fotos.
-	obra({ slug: 'abate-molina-676', nombre: 'Abate Molina 676', estado: 'terminado', anio: 2026, direccion: 'Abate Molina 676' }),
-	obra({ slug: 'abate-molina-80', nombre: 'Abate Molina 80', estado: 'terminado', anio: 2026, direccion: 'Abate Molina 80' }),
-	// De 2019 a 2025 falta la obra de cada año (la elige don Luis).
+	// Terminadas en 2026 (Bóveda: fecha de fin mayo y junio de 2026). Foto de ejemplo hasta tener la real.
+	obra({ slug: 'abate-molina-676', nombre: 'Abate Molina 676', estado: 'terminado', anio: 2026, direccion: 'Abate Molina 676', fotos: [fotosObrasEjemplo['abate-molina-676']] }),
+	obra({ slug: 'abate-molina-80', nombre: 'Abate Molina 80', estado: 'terminado', anio: 2026, direccion: 'Abate Molina 80', fotos: [fotosObrasEjemplo['abate-molina-80']] }),
+	// 2019 y 2020: obras que el sitio de 2018 tenía en construcción, con la entrega prevista para esos
+	// años (respaldo-wp/: ula444 y zhu_sa616). Imagen: el render de entonces, hasta tener la foto real.
+	// De 2021 a 2025 van obras de ejemplo (obrasEjemplo en referencia.ts), hasta tener las reales.
+	obra({
+		slug: 'san-alfonso-616',
+		nombre: 'San Alfonso 616',
+		estado: 'terminado',
+		anio: 2020,
+		direccion: 'San Alfonso 616, esquina Claudio Gay',
+		fotos: [render2018('zhu_gay.jpg', 'Render del edificio de San Alfonso 616, esquina Claudio Gay')],
+	}),
+	obra({
+		slug: 'union-latinoamericana-444',
+		nombre: 'Unión Latinoamericana 444',
+		estado: 'terminado',
+		anio: 2019,
+		mandante: 'Comercial Eiffel Ltda.',
+		direccion: 'Unión Latinoamericana 444',
+		fotos: [render2018('ula444.jpg', 'Render del edificio de Unión Latinoamericana 444')],
+	}),
 	...obras2018Reales
 		.filter((o) => o.portafolio)
 		.reverse()

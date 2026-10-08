@@ -13,7 +13,7 @@ import { deProyecto, deMuestra } from '../../data/carrusel';
 import Contacto from '../../components/Contacto.astro';
 import Pictograma from '../../components/Pictograma.astro';
 import { proyectosPorEstado, pictogramaDeTipo } from '../../data/proyectos';
-import { obras2018, obrasEnCurso } from '../../data/referencia';
+import { obras2018, obrasEnCurso, obrasEjemplo } from '../../data/referencia';
 import { ejemplosContratados } from '../../data/ejemplos';
 
 const enCurso = proyectosPorEstado('en-curso');
@@ -22,15 +22,23 @@ const terminados = proyectosPorEstado('terminado');
 const hayReales = enCurso.length + contratados.length + terminados.length > 0;
 // Las contratadas pueden faltar aunque haya obras reales: mientras tanto, la tabla de muestra.
 const contratadosMuestra = contratados.length === 0;
+// Terminadas: las reales y, entre medio, las de ejemplo de los años que faltan (2021 a 2025),
+// de la más nueva a la más antigua.
+const terminadasCarrusel = [
+	...terminados.map((p) => ({ anio: p.anio ?? 0, obra: deProyecto(p) })),
+	...obrasEjemplo.map((r) => ({ anio: Number(r.ejemplo.anio), obra: deMuestra(r) })),
+]
+	.sort((a, b) => b.anio - a.anio)
+	.map((t) => t.obra);
 
 // Cantidades del índice: las reales, o las de las muestras mientras no haya proyectos.
 const cuenta = hayReales
-	? { enCurso: enCurso.length, contratados: contratados.length || ejemplosContratados.length, terminados: terminados.length }
+	? { enCurso: enCurso.length, contratados: contratados.length || ejemplosContratados.length, terminados: terminadasCarrusel.length }
 	: { enCurso: obrasEnCurso.length, contratados: ejemplosContratados.length, terminados: obras2018.length };
 const bloques = [
 	{ id: 'en-construccion', estado: 'en-curso', titulo: 'En construcción', n: cuenta.enCurso, muestra: !hayReales },
 	{ id: 'contratados', estado: 'contratado', titulo: 'Contratados', n: cuenta.contratados, muestra: contratadosMuestra },
-	{ id: 'terminados', estado: 'terminado', titulo: 'Terminados', n: cuenta.terminados, muestra: !hayReales },
+	{ id: 'terminados', estado: 'terminado', titulo: 'Terminados', n: cuenta.terminados, muestra: !hayReales || obrasEjemplo.length > 0 },
 ];
 import ObraPortada from '../../components/ObraPortada.astro';
 import { bandas } from '../../data/referencia';
@@ -126,8 +134,8 @@ import { bandas } from '../../data/referencia';
 
 	{
 		hayReales ? (
-			<CarruselObras id="terminados" titulo="Terminados" nota="Las más recientes y una obra por año de las anteriores." obras={terminados.map(deProyecto)}>
-				<Pendiente texto="la obra de cada año de 2019 a 2025 (la elige don Luis) y fotos de las terminadas en 2026" />
+			<CarruselObras id="terminados" titulo="Terminados" nota="Las más recientes y una obra por año de las anteriores." obras={terminadasCarrusel}>
+				<Pendiente texto="la obra real de cada año de 2021 a 2025 (las que se ven son de ejemplo) y fotos reales de las terminadas desde 2019" />
 			</CarruselObras>
 		) : (
 			<CarruselObras id="terminados" titulo="Terminados" obras={obras2018.map(deMuestra)}>

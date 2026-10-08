@@ -29,7 +29,7 @@ const tipo = proyecto?.tipo ?? ej?.tipo;
 <article class:list={['tarjeta', { destacada, 'en-obra': enObra }]} data-estado={estado}>
 	<a href={href} class="vinculo">
 		<div class="foto marco">
-			{foto ? <img src={foto.src} alt={foto.alt} loading="lazy" /> : referencia ? <Referencial imagen={referencia} /> : <Pendiente bloque texto="foto" />}
+			{foto && 'origen' in foto ? <Referencial imagen={foto} /> : foto ? <img src={foto.src} alt={foto.alt} loading="lazy" /> : referencia ? <Referencial imagen={referencia} /> : <Pendiente bloque texto="foto" />}
 			{enObra && <span class="sello">{estados['en-curso']}</span>}
 		</div>
 		<div class="titulo">

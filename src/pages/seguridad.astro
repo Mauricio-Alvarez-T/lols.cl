@@ -2,10 +2,10 @@
 // Seguridad y calidad: responde lo que pregunta un mandante al precalificar a un contratista.
 // Don Luis (08-10-2026): sin indicadores ni certificado de la mutual, sin certificaciones ISO
 // (LOLS no las tiene) y sin registros de contratistas: solo la mutual. Sí va la Política de
-// Seguridad y Salud en el Trabajo, que exige el Decreto Supremo 44 desde febrero de 2025.
+// Seguridad y Salud en el Trabajo, que exige el Decreto Supremo 44 desde febrero de 2025, sin
+// documento para descargar (Marcos, 08-10-2026: no hacer ningún documento de la política).
 // Casi ningún sitio del rubro lo muestra: es el diferenciador (docs/investigacion-secciones.md).
 import Base from '../layouts/Base.astro';
-import Pendiente from '../components/Pendiente.astro';
 import ObraPortada from '../components/ObraPortada.astro';
 import Contacto from '../components/Contacto.astro';
 import { empresa } from '../data/empresa';
@@ -21,10 +21,7 @@ import { videos } from '../data/referencia';
 
 	<section id="politica" class="seccion contenedor ancla">
 		<div class="cabecera"><h2>Política de Seguridad y Salud en el Trabajo</h2></div>
-		<div class="politica">
-			<p>La política que guía la seguridad de cada obra de LOLS, según el Decreto Supremo 44.</p>
-			<Pendiente bloque texto="documento de la política (PDF) para descargar" />
-		</div>
+		<p class="politica">La política que guía la seguridad de cada obra de LOLS, según el Decreto Supremo 44.</p>
 	</section>
 
 	<section class="seccion gris">
@@ -52,21 +49,10 @@ import { videos } from '../data/referencia';
 		scroll-margin-top: 5rem;
 	}
 	.politica {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: clamp(1.5rem, 4vw, 3rem);
-		align-items: center;
-	}
-	.politica p {
 		margin: 0;
-		max-width: 36rem;
+		max-width: 40rem;
 		font-size: 1.15rem;
 		color: var(--lols-gris);
-	}
-	@media (max-width: 760px) {
-		.politica {
-			grid-template-columns: minmax(0, 1fr);
-		}
 	}
 	.registros {
 		list-style: none;
