@@ -1,0 +1,11 @@
+<svg viewBox="0 0 220 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LOLS">
+  <!-- Fuente: boveda.lols.cl/favicon.svg. Corregido: el original usaba strokeWidth (sintaxis React), inválido en SVG puro. -->
+  <g fill="#029E4D">
+    <rect x="20" y="20" width="180" height="12"/>
+    <rect x="20" y="208" width="180" height="12"/>
+    <rect x="20" y="48" width="75" height="144"/>
+    <rect x="119" y="52" width="77" height="32" fill="none" stroke="#029E4D" stroke-width="8"/>
+    <rect x="119" y="104" width="77" height="32" fill="none" stroke="#029E4D" stroke-width="8"/>
+    <rect x="115" y="152" width="85" height="40"/>
+  </g>
+</svg>
