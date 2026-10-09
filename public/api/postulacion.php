@@ -36,11 +36,10 @@ $telefono = unaLinea(campo('telefono', 40));
 $correo = unaLinea(campo('correo', 160));
 $comuna = unaLinea(campo('comuna', 80));
 $experiencia = opcion('experiencia', $datos['experiencia']);
-$aCargo = opcion('personas_a_cargo', $datos['personasACargo']);
 $mensaje = campo('mensaje', 3000);
 $consiente = ($_POST['consentimiento'] ?? '') === 'si';
 
-if (!is_array($cargo) || $nombre === '' || $telefono === '' || !$experiencia || !$aCargo) {
+if (!is_array($cargo) || $nombre === '' || $telefono === '' || !$experiencia) {
     responder(false, 'datos', 422);
 }
 if ($correo !== '' && !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
@@ -96,9 +95,7 @@ $cuerpo = implode("\n", array_merge([
     'Correo:      ' . ($correo ?: '—'),
     'Comuna:      ' . ($comuna ?: '—'),
     '',
-    'Experiencia:       ' . $datos['experiencia'][$experiencia],
-    'Personas a cargo:  ' . $datos['personasACargo'][$aCargo],
-    '',
+    'Experiencia: ' . $datos['experiencia'][$experiencia],
 ], $respuestas, [
     '',
     'CV y adjuntos: ' . ($archivos ? implode(', ', array_column($archivos, 'nombre')) : 'no adjuntó'),

@@ -1,7 +1,7 @@
 ---
 // Postular en tres pasos (Marcos, 09-10-2026): 1) "En obra" o "Profesionales y oficina técnica";
 // 2) los cargos de ese grupo; 3) al apretar "Postular", un formulario corto con los datos de la
-// persona, su experiencia, si ha tenido gente a cargo y las preguntas propias de ese cargo.
+// persona, sus años de experiencia y una o dos preguntas simples de ese cargo.
 // Cada paso queda en la dirección (#en-obra, #carpintero…): el botón atrás del celular vuelve al
 // paso anterior y cada cargo tiene su enlace para compartir.
 //
@@ -11,14 +11,11 @@
 import Pendiente from './Pendiente.astro';
 import Pictograma from './Pictograma.astro';
 import { empresa } from '../data/empresa';
-import { grupos, aniosExperiencia, personasACargo, campoPregunta } from '../data/postulaciones';
+import { grupos, aniosExperiencia, campoPregunta } from '../data/postulaciones';
 import '../styles/formulario.css';
 
 const pictogramas = { 'en-obra': 'faena', profesionales: 'edificio-oficinas' } as const;
-const comunes = [
-	{ nombre: 'experiencia', titulo: 'Años de experiencia', opciones: aniosExperiencia },
-	{ nombre: 'personas_a_cargo', titulo: '¿Ha tenido personas a cargo?', opciones: personasACargo },
-];
+const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opciones: aniosExperiencia }];
 ---
 
 <script is:inline>document.documentElement.classList.add('postula-js');</script>

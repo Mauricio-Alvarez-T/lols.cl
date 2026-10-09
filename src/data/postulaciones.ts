@@ -1,8 +1,8 @@
 // Postulaciones de "Trabaja con nosotros" (Marcos, 09-10-2026): dos grupos, "En obra" y
 // "Profesionales y oficina técnica". Al elegir uno se ven sus cargos; al apretar "Postular"
-// aparece un formulario corto con los datos de la persona, sus años de experiencia, si ha
-// tenido gente a cargo y las preguntas propias de ESE cargo (no es lo mismo un arquitecto que un
-// carpintero). Así las postulaciones llegan separadas por cargo.
+// aparece un formulario corto con los datos de la persona, sus años de experiencia y una o dos
+// preguntas simples de ESE cargo (no es lo mismo un arquitecto que un carpintero). Así las
+// postulaciones llegan separadas por cargo.
 //
 // En obra van los oficios sin especialidad (carpintero, albañil…); el CV es opcional, porque
 // muchos maestros no tienen. En profesionales el CV es obligatorio.
@@ -42,17 +42,8 @@ const siNo: Opcion[] = [
 	['si', 'Sí'],
 	['no', 'No'],
 ];
-const leePlanos: Pregunta = {
-	id: 'lee-planos',
-	texto: '¿Lee planos?',
-	opciones: [
-		['si', 'Sí'],
-		['un-poco', 'Un poco'],
-		['no', 'No'],
-	],
-};
 
-/** Preguntas de todos los cargos */
+/** Pregunta de todos los cargos */
 export const aniosExperiencia: Opcion[] = [
 	['menos-1', 'Menos de 1 año'],
 	['1-3', '1 a 3 años'],
@@ -60,13 +51,20 @@ export const aniosExperiencia: Opcion[] = [
 	['5-10', '5 a 10 años'],
 	['mas-10', 'Más de 10 años'],
 ];
-export const personasACargo: Opcion[] = [
-	['no', 'No'],
-	['1-5', 'Sí, hasta 5'],
-	['6-15', 'Sí, de 6 a 15'],
-	['16-50', 'Sí, de 16 a 50'],
-	['mas-50', 'Sí, más de 50'],
-];
+
+// Preguntas simples, una o dos por cargo (Marcos, 09-10-2026: "más tranqui", como título y años
+// dirigiendo obras para el jefe de obra). En obra todos preguntan si ha tenido gente a cargo.
+const aCargo: Pregunta = {
+	id: 'a-cargo',
+	texto: '¿Ha tenido personas a cargo?',
+	opciones: [
+		['no', 'No'],
+		['hasta-5', 'Sí, hasta 5'],
+		['6-15', 'Sí, de 6 a 15'],
+		['mas-15', 'Sí, más de 15'],
+	],
+};
+const oficio = (id: string, nombre: string, ...otras: Pregunta[]): Cargo => ({ id, nombre, preguntas: [aCargo, ...otras] });
 
 export const grupos: Grupo[] = [
 	{
@@ -75,67 +73,23 @@ export const grupos: Grupo[] = [
 		bajada: 'Capataces, maestros y ayudantes. No necesita CV.',
 		cvObligatorio: false,
 		cargos: [
-			{ id: 'capataz', nombre: 'Capataz', preguntas: [leePlanos] },
-			{
-				id: 'carpintero',
-				nombre: 'Carpintero',
-				preguntas: [
-					{ id: 'herramientas', texto: '¿Tiene herramientas propias?', opciones: siNo },
-					{ id: 'moldajes', texto: '¿Ha trabajado con moldajes?', opciones: siNo },
+			oficio('capataz', 'Capataz'),
+			oficio('carpintero', 'Carpintero'),
+			oficio('albanil', 'Albañil'),
+			oficio('enfierrador', 'Enfierrador'),
+			oficio('soldador', 'Soldador', { id: 'certificacion', texto: '¿Tiene certificación de soldadura?', opciones: siNo }),
+			oficio('electricista', 'Electricista', {
+				id: 'licencia-sec',
+				texto: '¿Tiene licencia SEC?',
+				opciones: [
+					['a', 'Clase A'],
+					['b', 'Clase B'],
+					['c', 'Clase C'],
+					['d', 'Clase D'],
+					['no', 'No tengo'],
 				],
-			},
-			{
-				id: 'albanil',
-				nombre: 'Albañil',
-				preguntas: [leePlanos, { id: 'altura', texto: '¿Ha trabajado en altura, sobre andamios?', opciones: siNo }],
-			},
-			{
-				id: 'enfierrador',
-				nombre: 'Enfierrador',
-				preguntas: [
-					{ ...leePlanos, texto: '¿Lee planos de armadura?' },
-					{ id: 'maquinas', texto: '¿Ha usado cortadora y dobladora de fierro?', opciones: siNo },
-				],
-			},
-			{
-				id: 'soldador',
-				nombre: 'Soldador',
-				preguntas: [
-					{
-						id: 'procesos',
-						texto: '¿Qué procesos domina?',
-						varias: true,
-						opciones: [
-							['arco', 'Arco manual'],
-							['mig', 'MIG'],
-							['tig', 'TIG'],
-						],
-					},
-					{ id: 'certificacion', texto: '¿Tiene certificación de soldadura?', opciones: siNo },
-				],
-			},
-			{
-				id: 'electricista',
-				nombre: 'Electricista',
-				preguntas: [
-					{
-						id: 'licencia-sec',
-						texto: '¿Tiene licencia SEC?',
-						opciones: [
-							['a', 'Clase A'],
-							['b', 'Clase B'],
-							['c', 'Clase C'],
-							['d', 'Clase D'],
-							['no', 'No tengo'],
-						],
-					},
-				],
-			},
-			{
-				id: 'jornal',
-				nombre: 'Jornal',
-				preguntas: [{ id: 'curso-altura', texto: '¿Tiene curso de trabajo en altura?', opciones: siNo }],
-			},
+			}),
+			oficio('jornal', 'Jornal'),
 		],
 	},
 	{
@@ -155,18 +109,17 @@ export const grupos: Grupo[] = [
 						opciones: [
 							['constructor-civil', 'Constructor civil'],
 							['ingeniero-constructor', 'Ingeniero constructor'],
-							['ingeniero-civil', 'Ingeniero civil'],
 							['arquitecto', 'Arquitecto'],
 							['otro', 'Otro'],
 						],
 					},
 					{
-						id: 'obra-mayor',
-						texto: '¿Cuál es la obra más grande que ha dirigido?',
+						id: 'anios-dirigiendo',
+						texto: '¿Cuántos años ha dirigido obras?',
 						opciones: [
-							['hasta-1000', 'Hasta 1.000 m²'],
-							['1000-5000', '1.000 a 5.000 m²'],
-							['mas-5000', 'Más de 5.000 m²'],
+							['menos-2', 'Menos de 2'],
+							['2-5', '2 a 5'],
+							['mas-5', 'Más de 5'],
 						],
 					},
 				],
@@ -177,63 +130,27 @@ export const grupos: Grupo[] = [
 				texto: 'Seguridad en obra: charlas, inspecciones y documentos.',
 				preguntas: [
 					{
-						id: 'registro-seremi',
-						texto: '¿Qué registro tiene en la SEREMI de Salud?',
+						id: 'titulo',
+						texto: '¿Qué título tiene?',
 						opciones: [
-							['tecnico', 'Técnico'],
-							['profesional', 'Profesional'],
-							['en-tramite', 'En trámite'],
-							['no', 'No tengo'],
+							['tecnico', 'Técnico en prevención'],
+							['ingeniero', 'Ingeniero en prevención'],
+							['otro', 'Otro'],
 						],
 					},
-					{ id: 'comite-paritario', texto: '¿Ha trabajado con Comité Paritario?', opciones: siNo },
 				],
 			},
 			{
 				id: 'arquitecto',
 				nombre: 'Arquitecto',
 				texto: 'Proyectos, planos y permisos municipales.',
-				preguntas: [
-					{ id: 'permisos-dom', texto: '¿Ha tramitado permisos de edificación en la DOM?', opciones: siNo },
-					{
-						id: 'programas',
-						texto: '¿Qué programas usa?',
-						varias: true,
-						opciones: [
-							['autocad', 'AutoCAD'],
-							['revit', 'Revit'],
-							['sketchup', 'SketchUp'],
-							['archicad', 'ArchiCAD'],
-						],
-					},
-				],
+				preguntas: [{ id: 'obras', texto: '¿Ha trabajado en obras de construcción?', opciones: siNo }],
 			},
 			{
 				id: 'administrativo',
 				nombre: 'Administrativo',
 				texto: 'Bodega, documentos de obra y control de asistencia.',
-				preguntas: [
-					{
-						id: 'experiencia-en',
-						texto: '¿En qué ha trabajado?',
-						varias: true,
-						opciones: [
-							['bodega', 'Bodega'],
-							['asistencia', 'Control de asistencia'],
-							['documentos', 'Documentos de obra'],
-							['remuneraciones', 'Remuneraciones'],
-						],
-					},
-					{
-						id: 'excel',
-						texto: '¿Qué nivel de Excel tiene?',
-						opciones: [
-							['basico', 'Básico'],
-							['intermedio', 'Intermedio'],
-							['avanzado', 'Avanzado'],
-						],
-					},
-				],
+				preguntas: [{ id: 'constructora', texto: '¿Ha trabajado antes en una constructora?', opciones: siNo }],
 			},
 		],
 	},
