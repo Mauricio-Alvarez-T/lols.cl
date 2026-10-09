@@ -2,7 +2,8 @@
 // Portafolio en tres bloques (las obras en construcción y las terminadas, en carrusel como
 // los destacados de Ramboll), en el orden que pidió don Luis (docs/reunion-inicial.md):
 //   1. En construcción: lo que LOLS está haciendo hoy, con tipo, superficie, comuna y dirección.
-//   2. Contratados: obras firmadas que aún no parten (muestran cartera y continuidad).
+//   2. Contratados: obras firmadas que aún no parten (muestran cartera y continuidad), en fichas
+//      con el render de lo que se hará (de ejemplo mientras no estén los reales).
 //   3. Terminados: el portafolio de siempre.
 // Arriba, un índice con la cantidad de cada bloque. Las URLs viejas (?estado=...) saltan al
 // bloque que corresponde.
@@ -12,16 +13,21 @@ import CarruselObras from '../../components/CarruselObras.astro';
 import { deProyecto, deMuestra } from '../../data/carrusel';
 import Contacto from '../../components/Contacto.astro';
 import Pictograma from '../../components/Pictograma.astro';
-import { proyectosPorEstado, pictogramaDeTipo } from '../../data/proyectos';
-import { obras2018, obrasEnCurso, obrasEjemplo } from '../../data/referencia';
+import { proyectosPorEstado, pictogramaDeTipo, fotoPrincipal } from '../../data/proyectos';
+import Referencial from '../../components/Referencial.astro';
+import { obras2018, obrasEnCurso, obrasEjemplo, rendersContratados } from '../../data/referencia';
 import { ejemplosContratados } from '../../data/ejemplos';
 
 const enCurso = proyectosPorEstado('en-curso');
 const contratados = proyectosPorEstado('contratado');
 const terminados = proyectosPorEstado('terminado');
 const hayReales = enCurso.length + contratados.length + terminados.length > 0;
-// Las contratadas pueden faltar aunque haya obras reales: mientras tanto, la tabla de muestra.
+// Las contratadas pueden faltar aunque haya obras reales: mientras tanto, las fichas de muestra.
 const contratadosMuestra = contratados.length === 0;
+// Fichas de las contratadas: las reales o, mientras no haya, las de muestra con su render de ejemplo.
+const fichasContratadas = contratadosMuestra
+	? ejemplosContratados.map((c, i) => ({ ...c, imagen: rendersContratados[i], ejemplo: true }))
+	: contratados.map((p) => ({ nombre: p.nombre, tipo: p.tipo, comuna: p.comuna, superficie: p.superficie, inicio: p.inicio, imagen: fotoPrincipal(p), ejemplo: false }));
 // Terminadas: las reales y, entre medio, las de ejemplo de los años que faltan (2021 a 2025),
 // de la más nueva a la más antigua.
 const terminadasCarrusel = [
@@ -83,52 +89,33 @@ import { bandas } from '../../data/referencia';
 				<p class="nota">Obras adjudicadas que parten en los próximos meses.</p>
 			</div>
 			{contratadosMuestra && <Pendiente texto="obras contratadas que aún no parten, con su render o plano" />}
-			<div class="tabla-envoltura">
-				<table class="cartera">
-					<thead>
-						<tr>
-							<th scope="col">Proyecto</th>
-							<th scope="col">Tipo</th>
-							<th scope="col">Comuna</th>
-							<th scope="col" class="num">Superficie</th>
-							<th scope="col">Inicio previsto</th>
-						</tr>
-					</thead>
-					<tbody>
-						{
-							!contratadosMuestra
-								? contratados.map((p) => (
-										<tr>
-											<th scope="row">
-												<span class="obra">
-													<span class="picto"><Pictograma nombre={pictogramaDeTipo(p.tipo)} /></span>
-													{p.nombre ?? <Pendiente texto="nombre" />}
-												</span>
-											</th>
-											<td>{p.tipo ?? <Pendiente texto="tipo" />}</td>
-											<td>{p.comuna ?? <Pendiente texto="comuna" />}</td>
-											<td class="num">{p.superficie ?? <Pendiente texto="m²" />}</td>
-											<td class="inicio">{p.inicio ?? <Pendiente texto="inicio" />}</td>
-										</tr>
-									))
-								: ejemplosContratados.map((c) => (
-										<tr>
-											<th scope="row">
-												<span class="obra">
-													<span class="picto"><Pictograma nombre={pictogramaDeTipo(c.tipo)} /></span>
-													<Pendiente texto="nombre">{c.nombre}</Pendiente>
-												</span>
-											</th>
-											<td><Pendiente texto="tipo">{c.tipo}</Pendiente></td>
-											<td><Pendiente texto="comuna">{c.comuna}</Pendiente></td>
-											<td class="num"><Pendiente texto="m²">{c.superficie}</Pendiente></td>
-											<td class="inicio"><Pendiente texto="inicio previsto">{c.inicio}</Pendiente></td>
-										</tr>
-									))
-						}
-					</tbody>
-				</table>
-			</div>
+			<ul class="contratadas">
+				{
+					fichasContratadas.map((f) => (
+						<li>
+							<div class="marco foto">
+								{'origen' in f.imagen ? (
+									<Referencial imagen={f.imagen} sizes="(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw" />
+								) : (
+									<img src={f.imagen.src} alt={f.imagen.alt} loading="lazy" />
+								)}
+							</div>
+							<p class="inicio">
+								Inicio previsto: {f.ejemplo ? <Pendiente texto="inicio previsto">{f.inicio}</Pendiente> : (f.inicio ?? <Pendiente texto="inicio" />)}
+							</p>
+							<h3 class="obra">
+								<span class="picto"><Pictograma nombre={pictogramaDeTipo(f.tipo)} /></span>
+								{f.ejemplo ? <Pendiente texto="nombre">{f.nombre}</Pendiente> : (f.nombre ?? <Pendiente texto="nombre" />)}
+							</h3>
+							<p class="datos-obra">
+								{f.ejemplo ? <Pendiente texto="tipo">{f.tipo}</Pendiente> : f.tipo}
+								{(f.ejemplo || f.comuna) && <> · {f.ejemplo ? <Pendiente texto="comuna">{f.comuna}</Pendiente> : f.comuna}</>}
+								{(f.ejemplo || f.superficie) && <> · {f.ejemplo ? <Pendiente texto="m²">{f.superficie}</Pendiente> : f.superficie}</>}
+							</p>
+						</li>
+					))
+				}
+			</ul>
 		</div>
 	</section>
 
@@ -197,40 +184,37 @@ import { bandas } from '../../data/referencia';
 		color: var(--gris-medio);
 	}
 
-	/* Cartera contratada: tabla tipo cuadro de obras de un plano (sin fotos: aún no hay obra). */
-	.tabla-envoltura {
-		overflow-x: auto;
+	/* Contratadas: fichas con el render de lo que se hará, el inicio y los datos de la obra. */
+	.contratadas {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2vw, 1.5rem);
 	}
-	.cartera {
-		width: 100%;
-		min-width: 40rem;
-		border-collapse: collapse;
-		border-top: 2px solid var(--lols-carbon);
+	.contratadas .foto {
+		aspect-ratio: 4 / 3;
+		margin-bottom: 1rem;
 	}
-	.cartera th,
-	.cartera td {
-		padding: 0.9rem 1rem 0.9rem 0;
-		border-bottom: 1px solid var(--linea);
-		text-align: left;
-		vertical-align: baseline;
-	}
-	.cartera thead th {
+	.inicio {
+		margin: 0 0 0.4rem;
 		font-family: var(--fuente-datos);
-		font-size: 0.78rem;
-		font-weight: 500;
-		color: var(--gris-medio);
-	}
-	.cartera tbody th {
-		font-family: var(--fuente-titulos);
-		font-size: 1.1rem;
-		font-weight: 700;
+		font-size: 0.85rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--lols-verde-oscuro);
 	}
 	.obra {
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
+		margin: 0 0 0.4rem;
+		font-size: 1.25rem;
+		letter-spacing: -0.02em;
 	}
-	.cartera .picto {
+	.picto {
 		display: grid;
 		place-items: center;
 		flex-shrink: 0;
@@ -239,17 +223,18 @@ import { bandas } from '../../data/referencia';
 		border: 1.5px solid var(--lols-verde);
 		color: var(--lols-verde);
 	}
-	.cartera .picto :global(.pictograma) {
+	.picto :global(.pictograma) {
 		width: 1.4rem;
 		height: 1.4rem;
 	}
-	.cartera .num {
-		text-align: right;
-		font-variant-numeric: tabular-nums;
+	.datos-obra {
+		margin: 0;
+		color: var(--lols-gris);
 	}
-	.cartera .inicio {
-		color: var(--lols-verde-oscuro);
-		font-weight: 600;
+	@media (max-width: 960px) {
+		.contratadas {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 	}
 
 	@media (max-width: 640px) {
@@ -261,37 +246,8 @@ import { bandas } from '../../data/referencia';
 			border-left: 0;
 			border-top: 1px solid var(--linea);
 		}
-		/* En celular la tabla pasa a fichas apiladas (sin scroll lateral). */
-		.cartera {
-			min-width: 0;
-		}
-		.cartera thead {
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			overflow: hidden;
-			clip-path: inset(50%);
-		}
-		.cartera tr {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 0.25rem 1rem;
-			padding: 1rem 0;
-			border-bottom: 1px solid var(--linea);
-		}
-		.cartera th,
-		.cartera td {
-			padding: 0;
-			border: 0;
-		}
-		.cartera tbody th {
-			grid-column: 1 / -1;
-		}
-		.cartera .num {
-			text-align: left;
-		}
-		.cartera .inicio::before {
-			content: 'Inicio: ';
+		.contratadas {
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 </style>

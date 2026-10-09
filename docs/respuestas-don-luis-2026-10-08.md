@@ -28,6 +28,7 @@ reunión, y cómo se llevaron al sitio. Las trajo Marcos.
 | Política de privacidad: aprobada | Sin cambios |
 | Certificado de la mutual: no. Registros (MOP, MINVU, CChC…): no. Solo la mutual | Seguridad: sin indicadores, sin ISO (LOLS no las tiene) y sin registros; queda la Mutual de Seguridad CChC |
 | Publicar la Política de Seguridad y Salud en el Trabajo: sí, sin hacer ningún documento | Sección "Política de Seguridad y Salud en el Trabajo" en Seguridad (con un texto de ejemplo, marcado, hasta tener el real), en la portada y en el pie, sin documento para descargar |
+| Contratados: imágenes de ejemplo de las obras que vienen, para dar confianza de que se sigue construyendo | Fichas con render de ejemplo (`rendersContratados`), inicio previsto y datos, en vez de la tabla |
 | Proveedores: sacar la sección | Sin página /proveedores/ ni enlaces a ella |
 | Preguntas frecuentes: no | No hay |
 

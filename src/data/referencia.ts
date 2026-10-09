@@ -121,6 +121,14 @@ export const rendersEjemplo: Record<string, ImagenReferencial> = {
 	'toesca-2074': unsplash('1678388583153-f0e667c97288', 'Render de ejemplo: edificio de oficinas rodeado de árboles'),
 };
 
+// Renders de EJEMPLO de las obras contratadas de muestra (ejemplosContratados en ejemplos.ts, mismo
+// orden): dan la idea de que vienen obras nuevas (Marcos, 09-10-2026).
+export const rendersContratados: ImagenReferencial[] = [
+	unsplash('1669003153363-6d7ba8e20c7e', 'Imagen de ejemplo: centro de bodegas con patio de camiones'),
+	unsplash('1789977506689-826642b4d546', 'Imagen de ejemplo: edificio de oficinas de fachada blanca curva'),
+	unsplash('1780417819796-c28f3951a39c', 'Imagen de ejemplo: planta industrial con fachada metálica y árboles'),
+];
+
 // Fotos de EJEMPLO de obras reales que aún no tienen la suya (las terminadas en 2026).
 export const fotosObrasEjemplo: Record<string, ImagenReferencial> = {
 	'abate-molina-676': unsplash('1587994990528-14263e4ee443', 'Edificio de fachada blanca con ventanas verticales'),
