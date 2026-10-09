@@ -2,10 +2,38 @@
 // Formulario de cotización → /api/contacto.php (public/api/). Funciona sin JavaScript
 // (POST normal + redirección con ?enviado=1 o ?error=); con JavaScript envía por fetch y
 // muestra el resultado sin recargar. Consentimiento sin marcar por defecto (Ley 21.719).
+// Terreno, etapa, inicio y hasta 2 fotos o planos (Marcos, 09-10-2026): las opciones y los
+// límites de los adjuntos están repetidos en public/api/contacto.php; cambiarlos en ambos.
 import { servicios } from '../data/empresa';
+
+const terrenos = [
+	['plano', 'Plano'],
+	['pendiente', 'Con pendiente'],
+	['construccion-existente', 'Con una construcción existente'],
+	['relleno', 'Relleno o suelo blando'],
+	['no-sabe', 'No lo sé'],
+];
+const etapas = [
+	['idea', 'Solo una idea'],
+	['planos', 'Tiene planos'],
+	['permisos', 'Tiene permisos'],
+	['licitacion', 'Es una licitación'],
+];
+const inicios = [
+	['pronto', 'Lo antes posible'],
+	['1-3', '1 a 3 meses'],
+	['3-6', '3 a 6 meses'],
+	['mas-6', 'Más de 6 meses'],
+	['no-sabe', 'No lo sé'],
+];
+const preguntas = [
+	{ nombre: 'terreno', titulo: 'Tipo de terreno', opciones: terrenos },
+	{ nombre: 'etapa', titulo: '¿En qué etapa está su proyecto?', opciones: etapas },
+	{ nombre: 'inicio', titulo: '¿Cuándo le gustaría empezar?', opciones: inicios },
+];
 ---
 
-<form id="formulario" class="formulario" action="/api/contacto.php" method="post" novalidate>
+<form id="formulario" class="formulario" action="/api/contacto.php" method="post" enctype="multipart/form-data" novalidate>
 	<div class="fila">
 		<label for="f-nombre">
 			<span>Nombre <abbr title="obligatorio">*</abbr></span>
@@ -48,10 +76,30 @@ import { servicios } from '../data/empresa';
 				<input id="f-superficie" name="superficie" type="text" inputmode="decimal" maxlength="40" placeholder="Ej.: 1.500" />
 			</label>
 		</div>
+		{
+			preguntas.map((p) => (
+				<fieldset class="opciones">
+					<legend>{p.titulo}</legend>
+					<div class="chips">
+						{p.opciones.map(([valor, texto]) => (
+							<label class="chip">
+								<input type="radio" name={p.nombre} value={valor} />
+								<span>{texto}</span>
+							</label>
+						))}
+					</div>
+				</fieldset>
+			))
+		}
 		<label for="f-mensaje">
 			<span>Cuéntenos su proyecto <abbr title="obligatorio">*</abbr></span>
-			<textarea id="f-mensaje" name="mensaje" rows="6" maxlength="5000" required placeholder="A grandes rasgos: qué quiere construir, instalar o mantener, para cuándo y en qué etapa está (terreno, permisos, diseño…)."></textarea>
+			<textarea id="f-mensaje" name="mensaje" rows="6" maxlength="5000" required placeholder="A grandes rasgos: qué quiere construir o instalar y para qué lo usará."></textarea>
 		</label>
+		<label for="f-archivos">
+			<span>Fotos o planos</span>
+			<input id="f-archivos" name="archivos[]" type="file" multiple accept="image/*,.pdf" aria-describedby="f-archivos-ayuda" />
+		</label>
+		<p id="f-archivos-ayuda" class="ayuda">Hasta 2 archivos (fotos o PDF), de 5 MB cada uno, como referencia de lo que quiere.</p>
 	</fieldset>
 
 	<!-- Trampa para bots: oculto a las personas y a los lectores de pantalla. -->
@@ -63,7 +111,7 @@ import { servicios } from '../data/empresa';
 	<label for="f-consentimiento" class="consentimiento">
 		<input id="f-consentimiento" name="consentimiento" type="checkbox" value="si" required />
 		<span>
-			Acepto que LOLS Ingeniería use estos datos para responder mi solicitud, según su
+			Acepto que LOLS Ingeniería use estos datos para responder mi solicitud, según su{' '}
 			<a href="/privacidad/">política de privacidad</a>. <abbr title="obligatorio">*</abbr>
 		</span>
 	</label>
@@ -83,6 +131,7 @@ import { servicios } from '../data/empresa';
 	const mensajes: Record<string, string> = {
 		enviado: 'Gracias. Recibimos su solicitud y le responderemos a la brevedad.',
 		datos: 'Revise los campos marcados: nombre, un correo válido y la descripción del proyecto son obligatorios.',
+		archivos: 'Puede adjuntar hasta 2 archivos (fotos o PDF) de hasta 5 MB cada uno.',
 		consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
 		limite: 'Recibimos varias solicitudes desde su conexión. Intente de nuevo en una hora.',
 		'no-configurado': 'El formulario aún no está habilitado. Escríbanos directamente por correo.',
@@ -112,6 +161,24 @@ import { servicios } from '../data/empresa';
 	if (params.has('enviado')) mostrar('enviado', true);
 	else if (params.has('error')) mostrar(params.get('error')!);
 
+	// Fotos o planos: máximo 2, de 5 MB cada uno (el servidor vuelve a revisarlo).
+	const archivos = form.querySelector<HTMLInputElement>('#f-archivos')!;
+	const MAX_ARCHIVOS = 2;
+	const MAX_BYTES = 5 * 1024 * 1024;
+	const archivosValidos = () => {
+		const lista = [...(archivos.files ?? [])];
+		return lista.length <= MAX_ARCHIVOS && lista.every((f) => f.size <= MAX_BYTES);
+	};
+	archivos.addEventListener('change', () => {
+		if (archivosValidos()) {
+			archivos.removeAttribute('aria-invalid');
+			if (estado.dataset.tipo === 'error') estado.textContent = '';
+		} else {
+			archivos.setAttribute('aria-invalid', 'true');
+			mostrar('archivos');
+		}
+	});
+
 	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
 		for (const campo of form.querySelectorAll<HTMLInputElement>('[required]')) campo.removeAttribute('aria-invalid');
@@ -122,6 +189,12 @@ import { servicios } from '../data/empresa';
 			invalidos[0].focus();
 			return;
 		}
+		if (!archivosValidos()) {
+			archivos.setAttribute('aria-invalid', 'true');
+			mostrar('archivos');
+			archivos.focus();
+			return;
+		}
 		boton.disabled = true;
 		estado.textContent = 'Enviando…';
 		delete estado.dataset.tipo;
@@ -130,6 +203,7 @@ import { servicios } from '../data/empresa';
 			const datos = await r.json().catch(() => ({ ok: false, error: 'otro' }));
 			if (datos.ok) {
 				form.reset();
+				archivos.removeAttribute('aria-invalid');
 				mostrar('enviado', true);
 			} else {
 				mostrar(datos.error ?? 'otro');
@@ -199,6 +273,76 @@ import { servicios } from '../data/empresa';
 	textarea {
 		resize: vertical;
 		min-height: 9rem;
+	}
+	input[type='file'] {
+		padding: 0.6rem 0.85rem;
+		cursor: pointer;
+	}
+	.ayuda {
+		margin: -0.75rem 0 0;
+		font-size: 0.9rem;
+		color: var(--lols-gris);
+	}
+	/* Preguntas de una opción: botones que se marcan (44 px de alto, cómodos en el celular). */
+	.opciones {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+	/* Sin la línea ni el tamaño de la leyenda "Su proyecto" (.proyecto legend). */
+	.opciones legend {
+		width: auto;
+		margin-bottom: 0.6rem;
+		padding: 0;
+		border-top: 0;
+		letter-spacing: normal;
+		font-family: var(--fuente-titulos);
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+	.chip {
+		display: block;
+		position: relative;
+	}
+	.chip input {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		min-height: 0;
+		margin: 0;
+		padding: 0;
+		opacity: 0;
+		cursor: pointer;
+	}
+	.chip span {
+		display: flex;
+		align-items: center;
+		min-height: 2.75rem;
+		padding: 0.45rem 1rem;
+		border: 1px solid #b5b5b5;
+		background: var(--lols-blanco);
+		font-family: var(--fuente-texto);
+		font-weight: 500;
+		font-size: 0.95rem;
+	}
+	.chip:hover span {
+		border-color: var(--lols-verde-oscuro);
+	}
+	.chip input:checked + span {
+		border-color: var(--lols-verde-oscuro);
+		background: var(--lols-verde-oscuro);
+		color: var(--lols-blanco);
+	}
+	.chip input:focus-visible + span {
+		outline: 3px solid var(--lols-verde-oscuro);
+		outline-offset: 2px;
 	}
 	input:focus-visible,
 	select:focus-visible,

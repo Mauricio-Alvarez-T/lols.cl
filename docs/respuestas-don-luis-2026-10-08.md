@@ -22,6 +22,7 @@ reunión, y cómo se llevaron al sitio. Las trajo Marcos.
 | Los presupuestos son en UF | Paso "Cotización" de "Qué pasa después" |
 | Después de que LOLS recibe una solicitud, se pone en contacto con usted. Plazo de respuesta: sin plazo | Bajada de Contacto y primer paso de "Qué pasa después" |
 | Eliminar el apartado de presupuesto estimado | El formulario no tiene ese campo |
+| Formulario de cotización (Marcos, 09-10-2026): tipo de terreno, etapa del proyecto, cuándo quiere empezar y hasta 2 fotos o planos | Botones de una opción y campo de adjuntos en `FormularioContacto.astro`; `public/api/contacto.php` valida las opciones, revisa que los archivos sean fotos o PDF (por sus primeros bytes) y los manda adjuntos en el correo |
 | Correo de cotizaciones: lols@lols.cl y contacto@lols.cl | Destinatario del formulario: se configura en el servidor (`config.ini`, ver `docs/DEPLOY.md`) |
 | Correo de los CV: lols@lols.cl. Crear un correo propio para CV | Trabaja con nosotros envía a lols@lols.cl hasta que exista el correo nuevo |
 | Horario: lunes a viernes, de 9:00 a 17:00 (confirmado: se empieza a las 9) | `empresa.horario`: Contacto y pie |
