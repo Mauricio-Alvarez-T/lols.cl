@@ -9,7 +9,7 @@
 // cambiar su `estado` a 'terminado' y completar el año y el relato.
 
 import type { NombrePictograma } from './pictogramas';
-import { render2018, fotosObrasEjemplo, type ImagenReferencial } from './referencia';
+import { render2018, fotosObrasEjemplo, rendersEjemplo, type ImagenReferencial } from './referencia';
 
 // 'en-curso' conserva el valor de las URLs viejas (/proyectos-en-construccion/ → ?estado=en-curso).
 export type Estado = 'en-curso' | 'contratado' | 'terminado';
@@ -106,14 +106,15 @@ export const obras2018Reales = [
 
 export const proyectos: Proyecto[] = [
 	// En construcción: obras activas de la Bóveda LOLS (tabla `obras`, octubre de 2026), con la
-	// dirección registrada ahí. Faltan el render, el tipo, la superficie y el inicio de cada una.
+	// dirección registrada ahí. Render de ejemplo hasta tener el real; faltan el tipo, la superficie y
+	// el inicio de cada una.
 	// Quedaron fuera las activas sin dirección en la Bóveda: Blanco Encalada, Rivas Vicuña y Domeyko.
-	obra({ slug: 'escobar-williams-195', nombre: 'Escobar Williams 195', estado: 'en-curso', comuna: 'Cerrillos', direccion: 'Escobar Williams 195' }),
-	obra({ slug: 'conferencia-622', nombre: 'Conferencia 622', estado: 'en-curso', direccion: 'Conferencia 622' }),
-	obra({ slug: 'bascunan-guerrero-661', nombre: 'Bascuñán Guerrero 661', estado: 'en-curso', direccion: 'Bascuñán Guerrero 661' }),
-	obra({ slug: 'union-latinoamericana-325', nombre: 'Unión Latinoamericana 325', estado: 'en-curso', direccion: 'Unión Latinoamericana 325' }),
-	obra({ slug: 'gorbea-3082', nombre: 'Gorbea 3082', estado: 'en-curso', direccion: 'Gorbea 3082' }),
-	obra({ slug: 'toesca-2074', nombre: 'Toesca 2074', estado: 'en-curso', direccion: 'Toesca 2074' }),
+	obra({ slug: 'escobar-williams-195', nombre: 'Escobar Williams 195', estado: 'en-curso', comuna: 'Cerrillos', direccion: 'Escobar Williams 195', fotos: [rendersEjemplo['escobar-williams-195']] }),
+	obra({ slug: 'conferencia-622', nombre: 'Conferencia 622', estado: 'en-curso', direccion: 'Conferencia 622', fotos: [rendersEjemplo['conferencia-622']] }),
+	obra({ slug: 'bascunan-guerrero-661', nombre: 'Bascuñán Guerrero 661', estado: 'en-curso', direccion: 'Bascuñán Guerrero 661', fotos: [rendersEjemplo['bascunan-guerrero-661']] }),
+	obra({ slug: 'union-latinoamericana-325', nombre: 'Unión Latinoamericana 325', estado: 'en-curso', direccion: 'Unión Latinoamericana 325', fotos: [rendersEjemplo['union-latinoamericana-325']] }),
+	obra({ slug: 'gorbea-3082', nombre: 'Gorbea 3082', estado: 'en-curso', direccion: 'Gorbea 3082', fotos: [rendersEjemplo['gorbea-3082']] }),
+	obra({ slug: 'toesca-2074', nombre: 'Toesca 2074', estado: 'en-curso', direccion: 'Toesca 2074', fotos: [rendersEjemplo['toesca-2074']] }),
 	// Terminadas en 2026 (Bóveda: fecha de fin mayo y junio de 2026). Foto de ejemplo hasta tener la real.
 	obra({ slug: 'abate-molina-676', nombre: 'Abate Molina 676', estado: 'terminado', anio: 2026, direccion: 'Abate Molina 676', fotos: [fotosObrasEjemplo['abate-molina-676']] }),
 	obra({ slug: 'abate-molina-80', nombre: 'Abate Molina 80', estado: 'terminado', anio: 2026, direccion: 'Abate Molina 80', fotos: [fotosObrasEjemplo['abate-molina-80']] }),

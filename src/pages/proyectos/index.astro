@@ -67,7 +67,7 @@ import { bandas } from '../../data/referencia';
 	{
 		hayReales ? (
 			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={enCurso.map(deProyecto)}>
-				<Pendiente texto="render, tipo de obra, superficie e inicio de cada obra en construcción" />
+				<Pendiente texto="render real (los que se ven son de ejemplo), tipo de obra, superficie e inicio de cada obra en construcción" />
 			</CarruselObras>
 		) : (
 			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={obrasEnCurso.map(deMuestra)}>

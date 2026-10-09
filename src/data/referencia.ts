@@ -110,6 +110,17 @@ export const obrasEjemplo = [
 ] satisfies ImagenReferencial[];
 
 // Equipamiento propio (reunión con don Luis): fotos de stock hasta tener las reales.
+// Renders de EJEMPLO para las obras en construcción, hasta tener el render real de cada una
+// (Marcos, 09-10-2026). Imágenes de edificios terminados, nunca de obra a medio hacer.
+export const rendersEjemplo: Record<string, ImagenReferencial> = {
+	'escobar-williams-195': unsplash('1790005332509-0b4723519472', 'Render de ejemplo: edificio de cinco pisos con fachada de malla metálica'),
+	'conferencia-622': unsplash('1654230163544-b69049014b60', 'Render de ejemplo: edificio comercial vidriado con locales en el primer piso'),
+	'bascunan-guerrero-661': unsplash('1758448617677-2f8bebc56d9e', 'Render de ejemplo: edificio de varios pisos con acceso vidriado'),
+	'union-latinoamericana-325': unsplash('1790214120372-4b3b06e2360a', 'Render de ejemplo: edificio comercial de tres pisos con celosías de madera'),
+	'gorbea-3082': unsplash('1784894690165-8c6fe7dae24d', 'Render de ejemplo: edificio de cinco pisos con balcones y locales'),
+	'toesca-2074': unsplash('1678388583153-f0e667c97288', 'Render de ejemplo: edificio de oficinas rodeado de árboles'),
+};
+
 // Fotos de EJEMPLO de obras reales que aún no tienen la suya (las terminadas en 2026).
 export const fotosObrasEjemplo: Record<string, ImagenReferencial> = {
 	'abate-molina-676': unsplash('1587994990528-14263e4ee443', 'Edificio de fachada blanca con ventanas verticales'),
