@@ -29,7 +29,7 @@ Fuera de producción el sitio se ve como el final: cada `<Pendiente texto="…">
 
 ## Formulario de contacto
 
-`src/components/FormularioContacto.astro` → `public/api/contacto.php` (PHP en el mismo hosting, `mail()`). El destinatario se configura en el servidor, fuera del repo: ver [docs/DEPLOY.md § Formulario de contacto](docs/DEPLOY.md#formulario-de-contacto-php).
+`src/components/FormularioContacto.astro` → `public/api/contacto.php` (cotizaciones) y `src/components/FormularioPostulacion.astro` → `public/api/postulacion.php` (postulaciones con CV), PHP en el mismo hosting con `mail()`. Los destinatarios se configuran en el servidor, fuera del repo: ver [docs/DEPLOY.md § Formulario de contacto](docs/DEPLOY.md#formulario-de-contacto-php).
 
 ## Contenido heredado
 

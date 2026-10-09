@@ -1,0 +1,560 @@
+---
+// Postular en tres pasos (Marcos, 09-10-2026): 1) "En obra" o "Profesionales y oficina técnica";
+// 2) los cargos de ese grupo; 3) al apretar "Postular", un formulario corto con los datos de la
+// persona, su experiencia, si ha tenido gente a cargo y las preguntas propias de ese cargo.
+// Cada paso queda en la dirección (#en-obra, #carpintero…): el botón atrás del celular vuelve al
+// paso anterior y cada cargo tiene su enlace para compartir.
+//
+// Envía a /api/postulacion.php (public/api/), igual que la cotización: sin JavaScript se ve todo
+// junto y el cargo se elige en una lista; con JavaScript, por pasos y por fetch.
+// Cargos y preguntas: src/data/postulaciones.ts.
+import Pendiente from './Pendiente.astro';
+import Pictograma from './Pictograma.astro';
+import { empresa } from '../data/empresa';
+import { grupos, aniosExperiencia, personasACargo, campoPregunta } from '../data/postulaciones';
+import '../styles/formulario.css';
+
+const pictogramas = { 'en-obra': 'faena', profesionales: 'edificio-oficinas' } as const;
+const comunes = [
+	{ nombre: 'experiencia', titulo: 'Años de experiencia', opciones: aniosExperiencia },
+	{ nombre: 'personas_a_cargo', titulo: '¿Ha tenido personas a cargo?', opciones: personasACargo },
+];
+---
+
+<script is:inline>document.documentElement.classList.add('postula-js');</script>
+<div class="postula" data-postula>
+	<div class="grupos" id="grupos">
+		{
+			grupos.map((g) => (
+				<a class="grupo" href={`#${g.id}`} data-ir={g.id} aria-expanded="false" aria-controls={`cargos-${g.id}`}>
+					<span class="grupo-picto">
+						<Pictograma nombre={pictogramas[g.id]} />
+					</span>
+					<span class="grupo-texto">
+						<b>{g.nombre}</b>
+						<span>{g.bajada}</span>
+					</span>
+					<span class="grupo-n">
+						{g.cargos.length} cargos <span aria-hidden="true">→</span>
+					</span>
+				</a>
+			))
+		}
+	</div>
+
+	{
+		grupos.map((g) => (
+			<div class="cargos" id={`cargos-${g.id}`} data-panel={g.id}>
+				<div class="cargos-cabeza">
+					<h3>{g.nombre}</h3>
+					<a href="#grupos" data-ir="" class="volver">
+						<span aria-hidden="true">←</span> Elegir otro grupo
+					</a>
+				</div>
+				<ul class="lista-cargos">
+					{g.cargos.map((c) => (
+						<li>
+							<div class="cargo-texto">
+								<b>{c.nombre}</b>
+								{c.texto && <span>{c.texto}</span>}
+							</div>
+							<a
+								class="boton secundario"
+								href="#formulario"
+								data-ir={c.id}
+								data-cargo={c.nombre}
+								data-grupo={g.id}
+								data-cv={g.cvObligatorio ? 'si' : 'no'}
+							>
+								Postular<span class="sr-only"> como {c.nombre}</span>
+							</a>
+						</li>
+					))}
+				</ul>
+				<p class="nota">
+					¿No encuentra su cargo? Escríbanos a <a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a>.
+				</p>
+			</div>
+		))
+	}
+
+	<div class="caja-form" data-form>
+		<div class="cabeza-form">
+			<p>Postulando a</p>
+			<b data-cab-cargo>un cargo</b>
+			<a href="#grupos" data-ir="" data-cambiar>Cambiar de cargo</a>
+		</div>
+		<form id="formulario" class="formulario" action="/api/postulacion.php" method="post" enctype="multipart/form-data" novalidate>
+			<!-- Sin JavaScript el cargo se elige aquí; con JavaScript lo pone el botón "Postular". -->
+			<label for="p-cargo" class="sin-js">
+				<span>Cargo <abbr title="obligatorio">*</abbr></span>
+				<select id="p-cargo" name="cargo" required>
+					<option value="">Seleccione…</option>
+					{
+						grupos.map((g) => (
+							<optgroup label={g.nombre}>
+								{g.cargos.map((c) => (
+									<option value={c.id}>{c.nombre}</option>
+								))}
+							</optgroup>
+						))
+					}
+				</select>
+			</label>
+			<div class="fila">
+				<label for="p-nombre">
+					<span>Nombre completo <abbr title="obligatorio">*</abbr></span>
+					<input id="p-nombre" name="nombre" type="text" autocomplete="name" maxlength="120" required />
+				</label>
+				<label for="p-telefono">
+					<span>Teléfono <abbr title="obligatorio">*</abbr></span>
+					<input id="p-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="40" required />
+				</label>
+			</div>
+			<div class="fila">
+				<label for="p-correo">
+					<span>Correo <span class="opcional" data-si-obra>(opcional)</span><abbr title="obligatorio" data-si-prof hidden>*</abbr></span>
+					<input id="p-correo" name="correo" type="email" autocomplete="email" maxlength="160" />
+				</label>
+				<label for="p-comuna">
+					<span>Comuna donde vive <span class="opcional">(opcional)</span></span>
+					<input id="p-comuna" name="comuna" type="text" autocomplete="address-level2" maxlength="80" />
+				</label>
+			</div>
+			{
+				comunes.map((p) => (
+					<fieldset class="opciones" data-grupo-opciones>
+						<legend>
+							{p.titulo} <abbr title="obligatorio">*</abbr>
+						</legend>
+						<div class="chips">
+							{p.opciones.map(([valor, texto]) => (
+								<label class="chip">
+									<input type="radio" name={p.nombre} value={valor} required />
+									<span>{texto}</span>
+								</label>
+							))}
+						</div>
+					</fieldset>
+				))
+			}
+
+			<!-- Preguntas propias de cada cargo: solo la del cargo elegido queda activa. -->
+			{
+				grupos.flatMap((g) => g.cargos).map((c) => (
+					<fieldset class="preguntas" data-preguntas={c.id}>
+						<legend class="titulo-preguntas">Preguntas para {c.nombre}</legend>
+						{c.preguntas.map((p) => (
+							<fieldset class="opciones" data-grupo-opciones>
+								<legend>
+									{p.texto} {p.varias ? <span class="opcional">(puede marcar varias)</span> : <abbr title="obligatorio">*</abbr>}
+								</legend>
+								<div class="chips">
+									{p.opciones.map(([valor, texto]) => (
+										<label class="chip">
+											<input type={p.varias ? 'checkbox' : 'radio'} name={campoPregunta(c, p)} value={valor} required={!p.varias} />
+											<span>{texto}</span>
+										</label>
+									))}
+								</div>
+							</fieldset>
+						))}
+					</fieldset>
+				))
+			}
+			<Pendiente texto="preguntas reales de cada cargo (estas son de ejemplo; las revisa la jefatura)" />
+
+			<label for="p-archivos">
+				<span>Su CV <span class="opcional" data-si-obra>(opcional)</span><abbr title="obligatorio" data-si-prof hidden>*</abbr></span>
+				<input id="p-archivos" name="archivos[]" type="file" multiple accept=".pdf,.doc,.docx,image/*" aria-describedby="p-archivos-ayuda" />
+			</label>
+			<p id="p-archivos-ayuda" class="ayuda">PDF, Word o una foto, hasta 2 archivos de 5 MB cada uno (por ejemplo, el CV y un certificado).</p>
+
+			<label for="p-mensaje">
+				<span>Algo más que quiera contarnos <span class="opcional">(opcional)</span></span>
+				<textarea id="p-mensaje" name="mensaje" rows="4" maxlength="3000"></textarea>
+			</label>
+
+			<!-- Trampa para bots: oculto a las personas y a los lectores de pantalla. -->
+			<div class="trampa" aria-hidden="true">
+				<label>Sitio web <input name="sitio_web" type="text" tabindex="-1" autocomplete="off" /></label>
+			</div>
+			<input type="hidden" name="t" value="" />
+
+			<!-- Ley 21.719: consentimiento propio para la selección de personal, sin marcar. -->
+			<label for="p-consentimiento" class="consentimiento">
+				<input id="p-consentimiento" name="consentimiento" type="checkbox" value="si" required />
+				<span>
+					Acepto que LOLS Ingeniería guarde mis datos y mi CV para sus procesos de selección de personal, según su{' '}
+					<a href="/privacidad/">política de privacidad</a>. <abbr title="obligatorio">*</abbr>
+				</span>
+			</label>
+
+			<div class="acciones">
+				<button type="submit" class="boton">Enviar postulación</button>
+				<p class="estado" role="status" aria-live="polite"></p>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script>
+	const raiz = document.querySelector<HTMLElement>('[data-postula]');
+	const form = document.querySelector<HTMLFormElement>('#formulario');
+	if (raiz && form) {
+		const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const tarjetas = [...raiz.querySelectorAll<HTMLAnchorElement>('.grupo')];
+		const paneles = [...raiz.querySelectorAll<HTMLElement>('[data-panel]')];
+		const cajaForm = raiz.querySelector<HTMLElement>('[data-form]')!;
+		const cabCargo = raiz.querySelector<HTMLElement>('[data-cab-cargo]')!;
+		const cambiar = raiz.querySelector<HTMLAnchorElement>('[data-cambiar]')!;
+		const preguntas = [...form.querySelectorAll<HTMLFieldSetElement>('[data-preguntas]')];
+		const cargo = form.querySelector<HTMLSelectElement>('#p-cargo')!;
+		const correo = form.querySelector<HTMLInputElement>('#p-correo')!;
+		const archivos = form.querySelector<HTMLInputElement>('#p-archivos')!;
+		// En obra el correo y el CV son opcionales; en profesionales, obligatorios.
+		const opcionales = [...form.querySelectorAll<HTMLElement>('[data-si-obra]')];
+		const obligatorios = [...form.querySelectorAll<HTMLElement>('[data-si-prof]')];
+		const estado = form.querySelector<HTMLParagraphElement>('.estado')!;
+		const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+		const botones = new Map([...raiz.querySelectorAll<HTMLAnchorElement>('a[data-cargo]')].map((b) => [b.dataset.ir!, b]));
+		const grupos = new Set(paneles.map((p) => p.dataset.panel!));
+		let cvObligatorio = false;
+		(form.elements.namedItem('t') as HTMLInputElement).value = String(Date.now());
+
+		const mensajes: Record<string, string> = {
+			enviado: 'Gracias. Recibimos su postulación; si su perfil calza con nuestras obras, lo llamaremos.',
+			datos: 'Revise los campos marcados: nombre, teléfono, años de experiencia y las preguntas del cargo son obligatorios.',
+			cv: 'Para este cargo, adjunte su CV (PDF, Word o una foto).',
+			archivos: 'Puede adjuntar hasta 2 archivos (PDF, Word o fotos) de hasta 5 MB cada uno.',
+			consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
+			limite: 'Recibimos varias postulaciones desde su conexión. Intente de nuevo en una hora.',
+			'no-configurado': 'El envío aún no está habilitado. Mientras tanto, mande su CV por correo.',
+			red: 'No pudimos conectar con el servidor. Revise su conexión e intente de nuevo.',
+			otro: 'No pudimos enviar la postulación. Intente de nuevo o mande su CV por correo.',
+		};
+		const mostrarEstado = (clave: string, ok = false) => {
+			estado.textContent = mensajes[clave] ?? mensajes.otro;
+			estado.dataset.tipo = ok ? 'ok' : 'error';
+		};
+
+		// Paso actual: '' (grupos), el id de un grupo (sus cargos) o el de un cargo (formulario).
+		const mostrar = (paso: string, mover: boolean) => {
+			const b = botones.get(paso);
+			const grupo = b ? b.dataset.grupo! : grupos.has(paso) ? paso : '';
+			tarjetas.forEach((t) => t.setAttribute('aria-expanded', String(t.dataset.ir === grupo)));
+			paneles.forEach((p) => p.classList.toggle('on', !b && p.dataset.panel === grupo));
+			cajaForm.classList.toggle('on', !!b);
+			preguntas.forEach((f) => (f.disabled = !b || f.dataset.preguntas !== paso));
+			if (b) {
+				cabCargo.textContent = b.dataset.cargo ?? '';
+				cargo.value = paso;
+				cvObligatorio = b.dataset.cv === 'si';
+				correo.required = cvObligatorio;
+				opcionales.forEach((o) => (o.hidden = cvObligatorio));
+				obligatorios.forEach((o) => (o.hidden = !cvObligatorio));
+				cambiar.href = `#${grupo}`;
+				cambiar.dataset.ir = grupo;
+			}
+			if (!mover) return;
+			const destino = b ? cajaForm : grupo ? raiz.querySelector(`[data-panel="${grupo}"]`) : raiz;
+			destino?.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'start' });
+			if (b) form.querySelector<HTMLInputElement>('#p-nombre')?.focus({ preventScroll: true });
+		};
+
+		raiz.addEventListener('click', (e) => {
+			const a = (e.target as Element).closest<HTMLAnchorElement>('a[data-ir]');
+			if (!a) return;
+			e.preventDefault();
+			const paso = a.dataset.ir ?? '';
+			history.pushState(null, '', paso ? `#${paso}` : location.pathname + location.search);
+			mostrar(paso, true);
+		});
+		addEventListener('popstate', () => mostrar(location.hash.slice(1), true));
+		const inicial = location.hash.slice(1);
+		mostrar(inicial, botones.has(inicial) || grupos.has(inicial));
+
+		// CV y adjuntos: máximo 2, de 5 MB cada uno (el servidor vuelve a revisarlo).
+		const archivosValidos = () => {
+			const lista = [...(archivos.files ?? [])];
+			return lista.length <= 2 && lista.every((f) => f.size <= 5 * 1024 * 1024);
+		};
+		archivos.addEventListener('change', () => {
+			if (archivosValidos()) {
+				archivos.removeAttribute('aria-invalid');
+				if (estado.dataset.tipo === 'error') estado.textContent = '';
+			} else {
+				archivos.setAttribute('aria-invalid', 'true');
+				mostrarEstado('archivos');
+			}
+		});
+		form.addEventListener('change', (e) => {
+			const grupo = (e.target as Element).closest('[data-grupo-opciones]');
+			grupo?.removeAttribute('aria-invalid');
+			(e.target as Element).removeAttribute('aria-invalid');
+		});
+
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			form.querySelectorAll('[aria-invalid]').forEach((c) => c.removeAttribute('aria-invalid'));
+			const invalidos = [...form.querySelectorAll<HTMLInputElement>('input[required], select[required]')].filter(
+				(c) => !c.disabled && !c.closest('fieldset:disabled') && !c.checkValidity(),
+			);
+			for (const c of invalidos) {
+				const grupo = c.closest('[data-grupo-opciones]');
+				(grupo ?? c).setAttribute('aria-invalid', 'true');
+			}
+			if (invalidos.length) {
+				mostrarEstado(invalidos.length === 1 && invalidos[0].name === 'consentimiento' ? 'consentimiento' : 'datos');
+				invalidos[0].focus();
+				return;
+			}
+			if (!archivosValidos()) {
+				archivos.setAttribute('aria-invalid', 'true');
+				mostrarEstado('archivos');
+				archivos.focus();
+				return;
+			}
+			if (cvObligatorio && !archivos.files?.length) {
+				archivos.setAttribute('aria-invalid', 'true');
+				mostrarEstado('cv');
+				archivos.focus();
+				return;
+			}
+			boton.disabled = true;
+			estado.textContent = 'Enviando…';
+			delete estado.dataset.tipo;
+			try {
+				const r = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+				const datos = await r.json().catch(() => ({ ok: false, error: 'otro' }));
+				if (datos.ok) {
+					const elegido = cargo.value;
+					form.reset();
+					cargo.value = elegido;
+					mostrarEstado('enviado', true);
+				} else {
+					mostrarEstado(datos.error ?? 'otro');
+				}
+			} catch {
+				mostrarEstado('red');
+			} finally {
+				boton.disabled = false;
+			}
+		});
+
+		// Resultado del envío sin JavaScript (redirección con ?enviado / ?error).
+		const params = new URLSearchParams(location.search);
+		if (params.has('enviado')) mostrarEstado('enviado', true);
+		else if (params.has('error')) mostrarEstado(params.get('error')!);
+	}
+</script>
+
+<style>
+	/* Paso 1: los dos grupos, como tarjetas grandes. */
+	.grupos {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: clamp(1rem, 2vw, 1.5rem);
+	}
+	.grupo {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		grid-template-areas: 'picto texto' 'picto n';
+		gap: 0.75rem 1.25rem;
+		padding: clamp(1.25rem, 3vw, 2rem);
+		background: var(--lols-blanco);
+		border: 1px solid var(--linea);
+		border-top: 4px solid var(--lols-verde);
+		color: var(--lols-carbon);
+		text-decoration: none;
+		transition: border-color 0.15s, transform 0.15s;
+	}
+	.grupo:hover {
+		border-color: var(--lols-verde-oscuro);
+		transform: translateY(-2px);
+	}
+	.grupo[aria-expanded='true'] {
+		border-color: var(--lols-verde-oscuro);
+		outline: 2px solid var(--lols-verde-oscuro);
+		outline-offset: -2px;
+	}
+	.grupo-picto {
+		grid-area: picto;
+		display: grid;
+		place-items: center;
+		width: 3.5rem;
+		height: 3.5rem;
+		background: var(--lols-verde-oscuro);
+		color: var(--lols-blanco);
+	}
+	.grupo-picto :global(.pictograma) {
+		width: 2rem;
+		height: 2rem;
+	}
+	.grupo-texto {
+		grid-area: texto;
+		display: grid;
+		gap: 0.35rem;
+	}
+	.grupo-texto b {
+		font-family: var(--fuente-titulos);
+		font-size: clamp(1.35rem, 1.1rem + 1vw, 1.75rem);
+		letter-spacing: -0.02em;
+		line-height: 1.15;
+	}
+	.grupo-texto span {
+		color: var(--lols-gris);
+	}
+	.grupo-n {
+		grid-area: n;
+		font-family: var(--fuente-datos);
+		font-size: 0.85rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--lols-verde-oscuro);
+	}
+
+	/* Paso 2: los cargos del grupo. */
+	.cargos {
+		margin-top: clamp(1.5rem, 4vw, 2.5rem);
+		scroll-margin-top: 6rem;
+	}
+	.cargos-cabeza {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem 1.5rem;
+		margin-bottom: 0.75rem;
+	}
+	.cargos-cabeza h3 {
+		margin: 0;
+		font-size: clamp(1.5rem, 3vw, 2rem);
+	}
+	.volver,
+	.cabeza-form a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		min-height: 2.75rem;
+		font-family: var(--fuente-titulos);
+		font-weight: 600;
+		color: var(--lols-verde-oscuro);
+	}
+	.lista-cargos {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 2px solid var(--lols-carbon);
+	}
+	/* Nombre a la izquierda y "Postular" a la derecha; si no cabe (texto largo en celular), el
+	   botón baja solo. */
+	.lista-cargos li {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.6rem 1rem;
+		padding: 0.9rem 0;
+		border-bottom: 1px solid var(--linea);
+	}
+	.cargo-texto {
+		flex: 1 1 14rem;
+		display: grid;
+		gap: 0.2rem;
+	}
+	.cargo-texto b {
+		font-family: var(--fuente-titulos);
+		font-size: 1.2rem;
+	}
+	.cargo-texto span {
+		color: var(--lols-gris);
+	}
+	.lista-cargos .boton {
+		flex-shrink: 0;
+		min-height: 2.75rem;
+		padding: 0.5rem 1.25rem;
+	}
+	.nota {
+		margin: 1rem 0 0;
+		color: var(--lols-gris);
+	}
+
+	/* Paso 3: el formulario del cargo, con una barra que dice a qué postula. */
+	.caja-form {
+		margin-top: clamp(1.5rem, 4vw, 2.5rem);
+		background: var(--lols-blanco);
+		border-top: 4px solid var(--lols-verde);
+		scroll-margin-top: 5rem;
+	}
+	.cabeza-form {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.25rem 1rem;
+		padding: 1rem clamp(1.25rem, 4vw, 2.5rem);
+		background: var(--lols-verde-oscuro);
+		color: var(--lols-blanco);
+	}
+	.cabeza-form p {
+		margin: 0;
+		font-family: var(--fuente-datos);
+		font-size: 0.85rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+	.cabeza-form b {
+		font-family: var(--fuente-titulos);
+		font-size: 1.4rem;
+	}
+	.cabeza-form a {
+		margin-left: auto;
+		color: var(--lols-blanco);
+	}
+	.caja-form .formulario {
+		padding: clamp(1.25rem, 4vw, 2.5rem);
+	}
+	.preguntas {
+		display: grid;
+		gap: 1.25rem;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+	/* Sin JavaScript se ven las preguntas de todos los cargos, cada grupo con su título; con
+	   JavaScript solo las del cargo elegido, y el título lo dice la barra de arriba. */
+	.titulo-preguntas {
+		padding: 1rem 0 0;
+		font-family: var(--fuente-titulos);
+		font-size: 1.15rem;
+		font-weight: 700;
+	}
+	:global(.postula-js) .titulo-preguntas {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	/* Con JavaScript, un paso a la vez; sin JavaScript se ve todo junto. */
+	:global(.postula-js) .cargos:not(.on),
+	:global(.postula-js) .caja-form:not(.on),
+	:global(.postula-js) .sin-js,
+	:global(.postula-js) .preguntas:disabled {
+		display: none;
+	}
+	:global(html:not(.postula-js)) .cabeza-form {
+		display: none;
+	}
+
+	@media (max-width: 760px) {
+		.grupos {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

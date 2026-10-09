@@ -78,7 +78,6 @@ export const ejemplosTrabaja = {
 		{ titulo: 'Seguridad primero', texto: 'Capacitación permanente y los elementos de protección que cada faena requiere.' },
 		{ titulo: 'Estabilidad', texto: 'Obras continuas para empresas e industria, con contrato y pagos al día.' },
 	],
-	perfiles: ['Maestros de obra y jornales', 'Soldadores y montajistas', 'Electricistas con licencia SEC', 'Carpinteros', 'Prevencionistas de riesgos'],
 };
 
 

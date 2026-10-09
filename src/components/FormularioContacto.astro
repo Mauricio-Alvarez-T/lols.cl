@@ -5,6 +5,7 @@
 // Terreno, etapa, inicio y hasta 2 fotos o planos (Marcos, 09-10-2026): las opciones y los
 // límites de los adjuntos están repetidos en public/api/contacto.php; cambiarlos en ambos.
 import { servicios } from '../data/empresa';
+import '../styles/formulario.css';
 
 const terrenos = [
 	['plano', 'Plano'],
@@ -217,19 +218,7 @@ const preguntas = [
 </script>
 
 <style>
-	.formulario {
-		display: grid;
-		gap: 1.25rem;
-	}
-	.fila {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1.25rem;
-	}
-	label {
-		display: grid;
-		gap: 0.4rem;
-	}
+	/* Los campos comparten estilos con la postulación: src/styles/formulario.css. */
 	.proyecto {
 		display: grid;
 		gap: 1.25rem;
@@ -239,7 +228,7 @@ const preguntas = [
 		min-width: 0;
 	}
 	/* La leyenda lleva la línea de arriba (el borde del fieldset la cortaría). */
-	.proyecto legend {
+	.proyecto > legend {
 		width: 100%;
 		margin-bottom: 1.25rem;
 		padding: 1.25rem 0 0;
@@ -248,160 +237,5 @@ const preguntas = [
 		font-size: 1.25rem;
 		font-weight: 700;
 		letter-spacing: -0.02em;
-	}
-	label > span {
-		font-family: var(--fuente-titulos);
-		font-weight: 600;
-		font-size: 0.95rem;
-	}
-	abbr {
-		color: var(--lols-verde-oscuro);
-		text-decoration: none;
-	}
-	input,
-	select,
-	textarea {
-		width: 100%;
-		min-height: 3rem;
-		padding: 0.7rem 0.85rem;
-		border: 1px solid #b5b5b5;
-		border-radius: 0;
-		background: var(--lols-blanco);
-		color: var(--lols-carbon);
-		font: inherit;
-	}
-	textarea {
-		resize: vertical;
-		min-height: 9rem;
-	}
-	input[type='file'] {
-		padding: 0.6rem 0.85rem;
-		cursor: pointer;
-	}
-	.ayuda {
-		margin: -0.75rem 0 0;
-		font-size: 0.9rem;
-		color: var(--lols-gris);
-	}
-	/* Preguntas de una opción: botones que se marcan (44 px de alto, cómodos en el celular). */
-	.opciones {
-		margin: 0;
-		padding: 0;
-		border: 0;
-		min-width: 0;
-	}
-	/* Sin la línea ni el tamaño de la leyenda "Su proyecto" (.proyecto legend). */
-	.opciones legend {
-		width: auto;
-		margin-bottom: 0.6rem;
-		padding: 0;
-		border-top: 0;
-		letter-spacing: normal;
-		font-family: var(--fuente-titulos);
-		font-weight: 600;
-		font-size: 0.95rem;
-	}
-	.chips {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-	.chip {
-		display: block;
-		position: relative;
-	}
-	.chip input {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		min-height: 0;
-		margin: 0;
-		padding: 0;
-		opacity: 0;
-		cursor: pointer;
-	}
-	.chip span {
-		display: flex;
-		align-items: center;
-		min-height: 2.75rem;
-		padding: 0.45rem 1rem;
-		border: 1px solid #b5b5b5;
-		background: var(--lols-blanco);
-		font-family: var(--fuente-texto);
-		font-weight: 500;
-		font-size: 0.95rem;
-	}
-	.chip:hover span {
-		border-color: var(--lols-verde-oscuro);
-	}
-	.chip input:checked + span {
-		border-color: var(--lols-verde-oscuro);
-		background: var(--lols-verde-oscuro);
-		color: var(--lols-blanco);
-	}
-	.chip input:focus-visible + span {
-		outline: 3px solid var(--lols-verde-oscuro);
-		outline-offset: 2px;
-	}
-	input:focus-visible,
-	select:focus-visible,
-	textarea:focus-visible {
-		outline: 3px solid var(--lols-verde-oscuro);
-		outline-offset: 0;
-		border-color: var(--lols-verde-oscuro);
-	}
-	[aria-invalid='true'] {
-		border-color: #b3261e;
-		outline-color: #b3261e;
-	}
-	.consentimiento {
-		grid-template-columns: auto 1fr;
-		align-items: start;
-		gap: 0.75rem;
-		font-size: 0.95rem;
-		color: var(--lols-gris);
-	}
-	.consentimiento input {
-		width: 1.25rem;
-		height: 1.25rem;
-		min-height: 0;
-		margin-top: 0.15rem;
-		accent-color: var(--lols-verde-oscuro);
-	}
-	.consentimiento span {
-		font: inherit;
-	}
-	.trampa {
-		position: absolute;
-		left: -9999px;
-		width: 1px;
-		height: 1px;
-		overflow: hidden;
-	}
-	.acciones {
-		display: flex;
-		align-items: center;
-		gap: 1.25rem;
-		flex-wrap: wrap;
-	}
-	.boton:disabled {
-		opacity: 0.6;
-		cursor: wait;
-	}
-	.estado {
-		margin: 0;
-		font-weight: 600;
-	}
-	.estado[data-tipo='ok'] {
-		color: var(--lols-verde-oscuro);
-	}
-	.estado[data-tipo='error'] {
-		color: #b3261e;
-	}
-	@media (max-width: 560px) {
-		.fila {
-			grid-template-columns: minmax(0, 1fr);
-		}
 	}
 </style>

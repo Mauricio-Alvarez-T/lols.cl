@@ -73,9 +73,12 @@ Plan de corte (se detalla cuando don Luis apruebe):
 
 ## Formulario de contacto (PHP)
 
-`public/api/contacto.php` recibe el formulario de `/contacto/` y envía un correo con `mail()`
-del servidor. No guarda datos personales (Ley 21.719); para el límite de 5 envíos por hora
-guarda un hash de la IP que se descarta a la hora.
+`public/api/contacto.php` recibe el formulario de cotización de `/contacto/` y
+`public/api/postulacion.php` las postulaciones de `/trabaja-con-nosotros/` (cargos y preguntas
+en `/api/cargos.json`, que se genera desde `src/data/postulaciones.ts`). Los dos envían un
+correo con `mail()` del servidor, con los archivos adjuntos (hasta 2, de 5 MB); lo común está
+en `public/api/lib/formulario.php`. No guardan datos personales (Ley 21.719); para el límite de
+5 envíos por hora guardan un hash de la IP que se descarta a la hora.
 
 **Configuración (una vez, en File Manager).** Vive fuera del repo (que es público) y fuera
 del docroot:
@@ -84,16 +87,21 @@ del docroot:
 2. Dentro, crear `config.ini`:
 
    ```ini
-   destinatario = "correo-que-recibe@lols.cl"
+   destinatario = "lols@lols.cl, contacto@lols.cl"
+   destinatario_cv = "lols@lols.cl"
    remitente = "no-responder@lols.cl"
    ```
 
-   - `destinatario`: durante la revisión, un correo propio para probar; al lanzar, el de
-     cotizaciones de la empresa.
+   - `destinatario`: correos que reciben las cotizaciones (uno o varios, separados por coma).
+     Don Luis pidió lols@lols.cl y contacto@lols.cl. Durante la revisión, conviene un correo
+     propio para probar.
+   - `destinatario_cv`: correos que reciben las postulaciones. Opcional: si falta, van a
+     `destinatario`. Don Luis pidió lols@lols.cl, hasta que se cree un correo para los CV.
    - `remitente`: una dirección del dominio lols.cl (así el correo pasa SPF). No hace falta
      que el buzón exista, pero conviene que exista para ver rebotes.
 
 Sin `config.ini` el formulario responde "aún no está habilitado" y no envía nada.
 
-**Verificar:** `curl -s https://nuevo.lols.cl/api/contacto.php` → `{"ok":false,"error":"metodo"}`
+**Verificar:** `curl -s https://nuevo.lols.cl/api/contacto.php` (y `postulacion.php`) →
+`{"ok":false,"error":"metodo"}`
 (PHP corre). Si responde el código fuente del PHP o un 404, el handler de PHP no está activo.

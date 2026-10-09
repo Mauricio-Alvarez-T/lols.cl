@@ -1,15 +1,14 @@
 ---
 // Ruta propia para postulantes: no pasan por el canal comercial (docs/investigacion-secciones.md).
-// Aquí el video de faena suma: muestra el trabajo real y la cultura. Los CV llegan a lols@lols.cl
-// (don Luis, 08-10-2026) hasta que se cree un correo propio para postulaciones.
+// Aquí el video de faena suma: muestra el trabajo real y la cultura. Se postula por cargo, en tres
+// pasos (FormularioPostulacion, Marcos 09-10-2026); las postulaciones llegan por correo a
+// destinatario_cv (lols@lols.cl según don Luis, hasta que se cree un correo propio).
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import ObraPortada from '../components/ObraPortada.astro';
-import { empresa } from '../data/empresa';
+import FormularioPostulacion from '../components/FormularioPostulacion.astro';
 import { videos } from '../data/referencia';
 import { ejemplosTrabaja as ej } from '../data/ejemplos';
-
-const asunto = encodeURIComponent('Postulación: [cargo]');
 ---
 
 <Base title="Trabaja con nosotros" description="Súmate al equipo de LOLS Ingeniería.">
@@ -34,25 +33,13 @@ const asunto = encodeURIComponent('Postulación: [cargo]');
 		</div>
 	</section>
 
-	<section class="seccion gris">
-		<div class="contenedor dos">
-			<div>
-				<h2>A quiénes buscamos</h2>
-				<Pendiente bloque texto="cargos que la empresa busca habitualmente">
-					<ul class="perfiles">{ej.perfiles.map((p) => <li>{p}</li>)}</ul>
-				</Pendiente>
+	<section class="seccion gris" id="postular">
+		<div class="contenedor">
+			<div class="cabecera">
+				<h2>¿Dónde quiere trabajar?</h2>
 			</div>
-			<div class="postular">
-				<h2>Cómo postular</h2>
-				<p>
-					Envíenos su CV indicando el cargo al que postula en el asunto. Revisamos todas las postulaciones y
-					contactamos a quienes calzan con las obras en curso.
-				</p>
-				<a class="boton" href={`mailto:${empresa.correo.valor}?subject=${asunto}`}>Enviar CV por correo</a>
-				<p class="nota">
-					Sus datos se usan solo para este proceso de selección. <a href="/privacidad/">Política de privacidad</a>.
-				</p>
-			</div>
+			<p class="intro">Elija su grupo, vea los cargos y postule al suyo.</p>
+			<FormularioPostulacion />
 		</div>
 	</section>
 </Base>
@@ -79,46 +66,13 @@ const asunto = encodeURIComponent('Postulación: [cargo]');
 	.motivos p:last-child {
 		color: var(--lols-gris);
 	}
-	.dos {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: clamp(2rem, 5vw, 4rem);
-		align-items: start;
-	}
-	.dos h2 {
-		font-size: clamp(1.6rem, 3vw, 2.25rem);
-	}
-	.perfiles {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.6rem;
-	}
-	.perfiles li {
-		padding: 0.55rem 1rem;
-		background: var(--lols-blanco);
-		border: 1px solid var(--linea);
-		border-radius: 999px;
-		font-family: var(--fuente-titulos);
-		font-weight: 600;
-	}
-	.postular {
-		padding: clamp(1.5rem, 4vw, 2.5rem);
-		background: var(--lols-blanco);
-		border-top: 4px solid var(--lols-verde);
-	}
-	.postular p {
+	.intro {
+		margin: 0 0 clamp(1.5rem, 3vw, 2rem);
+		font-size: 1.15rem;
 		color: var(--lols-gris);
 	}
-	.nota {
-		margin: 1.25rem 0 0;
-		font-size: 0.85rem;
-	}
 	@media (max-width: 860px) {
-		.motivos,
-		.dos {
+		.motivos {
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}
