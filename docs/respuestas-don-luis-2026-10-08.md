@@ -37,10 +37,35 @@ reunión, y cómo se llevaron al sitio. Las trajo Marcos.
 También se pusieron los datos confirmados por Marcos: dirección El Mirador 150, RUT
 77.085.560-8, razón social LOLS Empresa de Ingeniería Limitada y WhatsApp +56 652 710 609.
 
+## Currículum empresarial de LOLS 2026 (14-10-2026)
+
+Marcos trajo el currículum empresarial de LOLS 2026 (PDF de 23 páginas, no se sube al repo):
+tabla de 42 obras de 2018 a 2026 (dirección, pisos, m² construidos, usos, valor y fecha de
+entrega), fotos de 13 obras terminadas y renders de las obras en construcción y en proyecto.
+Con eso se reemplazaron las obras inventadas:
+
+- **En construcción**: las 8 del currículum (coinciden con la Bóveda), con m² y usos; render real
+  en Bascuñán Guerrero 661 (por confirmar: el render dice "Bascuñán Guerrero / Sazie"), Unión
+  Americana 325 y Toesca 2770-2774; el resto con render de ejemplo.
+- **En proyecto** (antes "Contratados"): Romero 3008, Buzeta 3810, Abate Molina 502, 626, 516 y 51
+  y el Portal Edwards (Alameda 2740), con su render (Abate Molina 51, de ejemplo).
+- **Terminadas**: las de 2026 todas, y una por año antes (la más grande con foto): 2025 Abate
+  Molina 321, 2022 Enfermera Lucía Vidal Arias 6679, 2020 Bascuñán Guerrero 818, 2019 Abate
+  Molina 221, 2018 Abate Molina 211 (Sazié 2605). En 2021, 2023 y 2024 el currículum no trae
+  obras: no se inventan.
+- **Han confiado en nosotros**: 12 fotos de obras terminadas del currículum.
+
+No se publican: los valores de cada obra, los nombres del equipo ni el correo personal del
+currículum. Diferencias a confirmar: Toesca 2770 y 2774 (en la Bóveda, "Toesca 2074"); Unión
+Americana 325 (en la Bóveda, "Unión Latinoamericana"); Abate Molina 221 (sitio de 2018: entrega
+en 2018; currículum: 2019); Buzeta 3810 (tabla: Estación Central; foto: Cerrillos); y el teléfono
+del currículum (9 8972 2715), distinto del que usa el sitio (+56 652 710 609).
+
 ## Lo que falta
 
 - Render, tipo, superficie e inicio de cada obra en construcción, y las que parten pronto.
-- La obra real de cada año de 2021 a 2025, y fotos reales de las terminadas desde 2019.
+- Fotos reales de las terminadas en 2025 y 2026 y renders de las obras en construcción que no
+  traen render en el currículum.
 - Fotos reales de los andamios y del resto del equipamiento.
 - El correo propio para las postulaciones.
 - LinkedIn y perfil de Google: don Luis dijo que sí; se crean fuera del sitio.

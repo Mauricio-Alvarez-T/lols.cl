@@ -2,8 +2,8 @@
 // Portafolio en tres bloques (las obras en construcción y las terminadas, en carrusel como
 // los destacados de Ramboll), en el orden que pidió don Luis (docs/reunion-inicial.md):
 //   1. En construcción: lo que LOLS está haciendo hoy, con tipo, superficie, comuna y dirección.
-//   2. Contratados: obras firmadas que aún no parten (muestran cartera y continuidad), en fichas
-//      con el render de lo que se hará (de ejemplo mientras no estén los reales).
+//   2. En proyecto (antes "Contratados"): obras en etapa de proyecto, las próximas en construirse
+//      (muestran cartera y continuidad), en fichas con el render de lo que se hará.
 //   3. Terminados: el portafolio de siempre.
 // Arriba, un índice con la cantidad de cada bloque. Las URLs viejas (?estado=...) saltan al
 // bloque que corresponde.
@@ -15,7 +15,7 @@ import Contacto from '../../components/Contacto.astro';
 import Pictograma from '../../components/Pictograma.astro';
 import { proyectosPorEstado, pictogramaDeTipo, fotoPrincipal } from '../../data/proyectos';
 import Referencial from '../../components/Referencial.astro';
-import { obras2018, obrasEnCurso, obrasEjemplo, rendersContratados } from '../../data/referencia';
+import { obras2018, obrasEnCurso, rendersContratados } from '../../data/referencia';
 import { ejemplosContratados } from '../../data/ejemplos';
 
 const enCurso = proyectosPorEstado('en-curso');
@@ -28,14 +28,12 @@ const contratadosMuestra = contratados.length === 0;
 const fichasContratadas = contratadosMuestra
 	? ejemplosContratados.map((c, i) => ({ ...c, imagen: rendersContratados[i], ejemplo: true }))
 	: contratados.map((p) => ({ nombre: p.nombre, tipo: p.tipo, comuna: p.comuna, superficie: p.superficie, inicio: p.inicio, imagen: fotoPrincipal(p), ejemplo: false }));
-// Terminadas: las reales y, entre medio, las de ejemplo de los años que faltan (2021 a 2025),
-// de la más nueva a la más antigua.
-const terminadasCarrusel = [
-	...terminados.map((p) => ({ anio: p.anio ?? 0, obra: deProyecto(p) })),
-	...obrasEjemplo.map((r) => ({ anio: Number(r.ejemplo.anio), obra: deMuestra(r) })),
-]
-	.sort((a, b) => b.anio - a.anio)
-	.map((t) => t.obra);
+// Terminadas, de la más nueva a la más antigua (todas reales: currículum de LOLS y sitio de 2018);
+// en el mismo año, primero las que tienen imagen propia (no de ejemplo).
+const imagenPropia = (p: (typeof terminados)[number]) => (p.fotos[0] && !('origen' in p.fotos[0]) ? 1 : 0);
+const terminadasCarrusel = [...terminados]
+	.sort((a, b) => (b.anio ?? 0) - (a.anio ?? 0) || imagenPropia(b) - imagenPropia(a))
+	.map(deProyecto);
 
 // Cantidades del índice: las reales, o las de las muestras mientras no haya proyectos.
 const cuenta = hayReales
@@ -43,8 +41,8 @@ const cuenta = hayReales
 	: { enCurso: obrasEnCurso.length, contratados: ejemplosContratados.length, terminados: obras2018.length };
 const bloques = [
 	{ id: 'en-construccion', estado: 'en-curso', titulo: 'En construcción', n: cuenta.enCurso, muestra: !hayReales },
-	{ id: 'contratados', estado: 'contratado', titulo: 'Contratados', n: cuenta.contratados, muestra: contratadosMuestra },
-	{ id: 'terminados', estado: 'terminado', titulo: 'Terminados', n: cuenta.terminados, muestra: !hayReales || obrasEjemplo.length > 0 },
+	{ id: 'contratados', estado: 'contratado', titulo: 'En proyecto', n: cuenta.contratados, muestra: contratadosMuestra },
+	{ id: 'terminados', estado: 'terminado', titulo: 'Terminados', n: cuenta.terminados, muestra: !hayReales },
 ];
 import ObraPortada from '../../components/ObraPortada.astro';
 import { bandas } from '../../data/referencia';
@@ -73,7 +71,7 @@ import { bandas } from '../../data/referencia';
 	{
 		hayReales ? (
 			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={enCurso.map(deProyecto)}>
-				<Pendiente texto="render real (los que se ven son de ejemplo), tipo de obra, superficie e inicio de cada obra en construcción" />
+				<Pendiente texto="render real de las obras sin render en el currículum (los que se ven son de ejemplo) e inicio de cada una" />
 			</CarruselObras>
 		) : (
 			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={obrasEnCurso.map(deMuestra)}>
@@ -85,8 +83,8 @@ import { bandas } from '../../data/referencia';
 	<section id="contratados" class="seccion gris bloque">
 		<div class="contenedor">
 			<div class="cabecera">
-				<h2>Contratados</h2>
-				<p class="nota">Obras adjudicadas que parten en los próximos meses.</p>
+				<h2>En proyecto</h2>
+				<p class="nota">Obras en etapa de proyecto: las próximas en construirse.</p>
 			</div>
 			{contratadosMuestra && <Pendiente texto="obras contratadas que aún no parten, con su render o plano" />}
 			<ul class="contratadas">
@@ -101,7 +99,13 @@ import { bandas } from '../../data/referencia';
 								)}
 							</div>
 							<p class="inicio">
-								Inicio previsto: {f.ejemplo ? <Pendiente texto="inicio previsto">{f.inicio}</Pendiente> : (f.inicio ?? <Pendiente texto="inicio" />)}
+								{f.ejemplo ? (
+									<>Inicio previsto: <Pendiente texto="inicio previsto">{f.inicio}</Pendiente></>
+								) : f.inicio ? (
+									`Inicio previsto: ${f.inicio}`
+								) : (
+									'En etapa de proyecto'
+								)}
 							</p>
 							<h3 class="obra">
 								<span class="picto"><Pictograma nombre={pictogramaDeTipo(f.tipo)} /></span>
@@ -122,7 +126,7 @@ import { bandas } from '../../data/referencia';
 	{
 		hayReales ? (
 			<CarruselObras id="terminados" titulo="Terminados" nota="Las más recientes y una obra por año de las anteriores." obras={terminadasCarrusel}>
-				<Pendiente texto="la obra real de cada año de 2021 a 2025 (las que se ven son de ejemplo) y fotos reales de las terminadas desde 2019" />
+				<Pendiente texto="fotos reales de las terminadas en 2025 y 2026 (las que se ven son de ejemplo); en 2021, 2023 y 2024 el currículum no trae obras" />
 			</CarruselObras>
 		) : (
 			<CarruselObras id="terminados" titulo="Terminados" obras={obras2018.map(deMuestra)}>

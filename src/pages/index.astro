@@ -9,7 +9,7 @@ import CarruselObras from '../components/CarruselObras.astro';
 import { deProyecto, deMuestra } from '../data/carrusel';
 import Contacto from '../components/Contacto.astro';
 import { empresa, aniosTrayectoria, fundacion } from '../data/empresa';
-import { proyectosPorEstado, obras2018Reales } from '../data/proyectos';
+import { proyectosPorEstado, obrasConfianza } from '../data/proyectos';
 import MosaicoServicios from '../components/MosaicoServicios.astro';
 import { obrasEnCurso, videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
@@ -69,8 +69,8 @@ const cifras = [
 					{contratados.length || <Pendiente texto="n.º de obras contratadas">{ejemplosContratados.length}</Pendiente>}
 				</span>
 				<span class="cartera-texto">
-					obras contratadas que parten en los próximos meses
-					<span class="enlace-flecha">Ver la cartera</span>
+					obras en proyecto, las próximas en construirse
+					<span class="enlace-flecha">Ver cuáles</span>
 				</span>
 			</a>
 	</div>
@@ -83,12 +83,12 @@ const cifras = [
 			<h2 class="clientes-titulo">Han confiado en nosotros</h2>
 			<ul class="obras-clientes">
 				{
-					obras2018Reales.map((o) => (
+					obrasConfianza.map((o) => (
 						<li>
 							<div class="marco">
-								<img src={`/proyectos/${o.slug}/1.jpg`} alt={`Edificio en ${o.direccion}, Santiago`} loading="lazy" width="480" height="360" />
+								<img src={`/proyectos/${o.slug}/1.jpg`} alt={`Edificio en ${o.direccion}, ${o.comuna}`} loading="lazy" />
 							</div>
-							<p>{o.direccion}, Santiago</p>
+							<p>{o.direccion}, {o.comuna}</p>
 						</li>
 					))
 				}

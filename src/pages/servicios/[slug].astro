@@ -18,7 +18,12 @@ export function getStaticPaths() {
 }
 
 const { servicio: s } = Astro.props as { servicio: Servicio };
-const relacionados = proyectos.filter((p) => p.servicios.includes(s.slug)).slice(0, 3);
+// Primero las terminadas con foto propia, después el resto.
+const conFoto = (p: (typeof proyectos)[number]) => p.estado === 'terminado' && !!p.fotos[0] && !('origen' in p.fotos[0]);
+const relacionados = proyectos
+	.filter((p) => p.servicios.includes(s.slug))
+	.sort((a, b) => Number(conFoto(b)) - Number(conFoto(a)))
+	.slice(0, 3);
 const otros = servicios.filter((o) => o.slug !== s.slug);
 const ej = ejemplosServicio[s.slug];
 import ObraPortada from '../../components/ObraPortada.astro';

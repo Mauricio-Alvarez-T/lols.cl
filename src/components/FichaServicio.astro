@@ -17,8 +17,9 @@ interface Props {
 }
 const { servicio: s, titulo: Titulo, sub: Sub } = Astro.props;
 const ej = ejemplosServicio[s.slug];
+// Obras terminadas con foto propia (no de ejemplo) de este servicio.
 const fotos = proyectos
-	.filter((p) => p.servicios.includes(s.slug) && p.fotos[0])
+	.filter((p) => p.estado === 'terminado' && p.servicios.includes(s.slug) && p.fotos[0] && !('origen' in p.fotos[0]))
 	.slice(0, 3)
 	.map((p) => p.fotos[0]);
 ---

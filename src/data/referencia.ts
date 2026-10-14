@@ -99,26 +99,16 @@ export const obrasEnCurso = [
 	},
 ] satisfies ImagenReferencial[];
 
-// Obras terminadas de EJEMPLO, una por año de 2021 a 2025 (Marcos, 08-10-2026: "inventa fotos hasta
-// que nos pasen las fotos reales"). Nombre, tipo, comuna, superficie y año también son de ejemplo.
-export const obrasEjemplo = [
-	{ ...unsplash('1776179806507-b70623e680a2', 'Edificio comercial de fachada blanca y roja'), ejemplo: { nombre: 'Locales comerciales Estación Central', tipo: 'Edificio comercial', comuna: 'Estación Central', superficie: '1.400 m²', anio: '2025' } },
-	{ ...unsplash('1766793110924-98e05b48eadc', 'Bodega de fachada metálica con portón'), ejemplo: { nombre: 'Bodegas Cerrillos', tipo: 'Bodegaje', comuna: 'Cerrillos', superficie: '2.200 m²', anio: '2024' } },
-	{ ...unsplash('1543892607-04657ef3a279', 'Edificio de oficinas de tres pisos con ventanales'), ejemplo: { nombre: 'Oficinas Santiago Centro', tipo: 'Edificio de oficinas', comuna: 'Santiago', superficie: '1.900 m²', anio: '2023' } },
-	{ ...unsplash('1759310347467-578dfd846229', 'Nave industrial de planchas metálicas junto a la calle'), ejemplo: { nombre: 'Nave industrial Quilicura', tipo: 'Industrial', comuna: 'Quilicura', superficie: '3.500 m²', anio: '2022' } },
-	{ ...unsplash('1611570884860-6f9d61c3a64d', 'Edificio de fachada oscura con ventanales'), ejemplo: { nombre: 'Edificio comercial Independencia', tipo: 'Edificio comercial', comuna: 'Independencia', superficie: '1.100 m²', anio: '2021' } },
-] satisfies ImagenReferencial[];
 
 // Equipamiento propio (reunión con don Luis): fotos de stock hasta tener las reales.
-// Renders de EJEMPLO para las obras en construcción, hasta tener el render real de cada una
-// (Marcos, 09-10-2026). Imágenes de edificios terminados, nunca de obra a medio hacer.
+// Renders de EJEMPLO para las obras en construcción que no tienen render en el currículum de LOLS,
+// hasta tener el real (Marcos, 09-10-2026). Edificios terminados, nunca obra a medio hacer.
 export const rendersEjemplo: Record<string, ImagenReferencial> = {
 	'escobar-williams-195': unsplash('1790005332509-0b4723519472', 'Render de ejemplo: edificio de cinco pisos con fachada de malla metálica'),
 	'conferencia-622': unsplash('1654230163544-b69049014b60', 'Render de ejemplo: edificio comercial vidriado con locales en el primer piso'),
-	'bascunan-guerrero-661': unsplash('1758448617677-2f8bebc56d9e', 'Render de ejemplo: edificio de varios pisos con acceso vidriado'),
-	'union-latinoamericana-325': unsplash('1790214120372-4b3b06e2360a', 'Render de ejemplo: edificio comercial de tres pisos con celosías de madera'),
 	'gorbea-3082': unsplash('1784894690165-8c6fe7dae24d', 'Render de ejemplo: edificio de cinco pisos con balcones y locales'),
-	'toesca-2074': unsplash('1678388583153-f0e667c97288', 'Render de ejemplo: edificio de oficinas rodeado de árboles'),
+	'domeyko-2432': unsplash('1790214120372-4b3b06e2360a', 'Render de ejemplo: edificio comercial de tres pisos con celosías de madera'),
+	'maipu-40': unsplash('1758448617677-2f8bebc56d9e', 'Render de ejemplo: edificio de varios pisos con acceso vidriado'),
 };
 
 // Renders de EJEMPLO de las obras contratadas de muestra (ejemplosContratados en ejemplos.ts, mismo
@@ -129,10 +119,12 @@ export const rendersContratados: ImagenReferencial[] = [
 	unsplash('1780417819796-c28f3951a39c', 'Imagen de ejemplo: planta industrial con fachada metálica y árboles'),
 ];
 
-// Fotos de EJEMPLO de obras reales que aún no tienen la suya (las terminadas en 2026).
+// Fotos de EJEMPLO de obras terminadas reales que aún no tienen la suya.
 export const fotosObrasEjemplo: Record<string, ImagenReferencial> = {
 	'abate-molina-676': unsplash('1587994990528-14263e4ee443', 'Edificio de fachada blanca con ventanas verticales'),
 	'abate-molina-80': unsplash('1623051786552-e46ef84e6c07', 'Edificio de fachada vidriada'),
+	'san-alfonso-607': unsplash('1776179806507-b70623e680a2', 'Edificio comercial de fachada blanca y roja'),
+	'abate-molina-321': unsplash('1543892607-04657ef3a279', 'Edificio de tres pisos con ventanales'),
 };
 
 // Tipos de andamio que se usan en Chile y que calzan con las piezas del inventario de la Bóveda
