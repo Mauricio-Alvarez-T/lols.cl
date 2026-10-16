@@ -1,15 +1,21 @@
 ---
 // Portada: mostrar, no contar (docs/estructura.md § Mostrar, no contar). Cada sección es
 // imagen + título y lleva a su página, donde está el detalle:
-//   obra en video con el lema → cifras → servicios en fotos → obras en construcción →
-//   seguridad (video + dos datos) → obras de clientes (foto y dirección) → contacto.
+//   obra en video con el lema → qué hacemos en tres líneas → cifras → servicios en fotos →
+//   obras en construcción → la próxima obra en grande y la cartera → seguridad (video + dos
+//   datos) → obras de clientes (foto y dirección) → contacto.
+// Movimiento al estilo de las páginas de producto de Apple (pedido de Marcos, 16-10-2026;
+// docs/estructura.md § Dirección visual): la obra se achica a lámina al bajar, el texto se
+// enciende por líneas, las cifras suben, la próxima obra se expande y las obras de clientes
+// van en un carril lateral. Todo con CSS ligado al scroll; sin soporte o con "reducir
+// movimiento" se ve quieto y completo.
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import CarruselObras from '../components/CarruselObras.astro';
 import { deProyecto, deMuestra } from '../data/carrusel';
 import Contacto from '../components/Contacto.astro';
-import { empresa, aniosTrayectoria, fundacion } from '../data/empresa';
-import { proyectosPorEstado, obrasConfianza } from '../data/proyectos';
+import { empresa, aniosTrayectoria, fundacion, servicios } from '../data/empresa';
+import { proyectos, proyectosPorEstado, obrasConfianza } from '../data/proyectos';
 import MosaicoServicios from '../components/MosaicoServicios.astro';
 import { obrasEnCurso, videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
@@ -25,30 +31,49 @@ const cifras = [
 	{ etiqueta: 'obras ejecutadas', valor: '70+' },
 	{ etiqueta: 'trabajadores', valor: '200' },
 ];
+
+// "Construcción, montaje industrial y electricidad." con los servicios vigentes.
+const nombresServicios = servicios.map((s, i) => (i === 0 ? s.nombre : s.nombre.toLowerCase()));
+const queHacemos = `${nombresServicios.slice(0, -1).join(', ')} y ${nombresServicios.at(-1)}.`;
+
+// La próxima obra en grande: la contratada más grande, con su render.
+const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 ---
 
 <Base title="LOLS Ingeniería" description={`${empresa.razonSocial}. ${empresa.lema}.`}>
-	<ObraPortada video={videos.portada}>
-		<h1 class="display">{empresa.lema}<span class="punto">.</span></h1>
-		<p class="bajada"><Pendiente texto="una frase: qué hace LOLS, para quién y dónde">{ejemploBajadaHero}</Pendiente></p>
-		<div class="acciones">
-			<a href="/proyectos/" class="boton">Ver proyectos</a>
-			<a href="/contacto/" class="boton secundario">Cotizar</a>
-		</div>
-	</ObraPortada>
+	<div class="portada-fija">
+		<ObraPortada video={videos.portada}>
+			<h1 class="display">{empresa.lema}<span class="punto">.</span></h1>
+			<p class="bajada"><Pendiente texto="una frase: qué hace LOLS, para quién y dónde">{ejemploBajadaHero}</Pendiente></p>
+			<div class="acciones">
+				<a href="/proyectos/" class="boton">Ver proyectos</a>
+				<a href="/contacto/" class="boton secundario">Cotizar</a>
+			</div>
+		</ObraPortada>
+	</div>
 
-	<section class="cifras contenedor" aria-label="LOLS en cifras">
-		{
-			cifras.map((c) => (
-				<div>
-					<p class="numero">{c.valor}</p>
-					<p>{c.etiqueta}</p>
-				</div>
-			))
-		}
+	<section class="manifiesto contenedor" aria-label="Qué hacemos">
+		<p class="manifiesto-texto">
+			<span class="linea">{queHacemos}</span>
+			<span class="linea">Desde {fundacion}, en Santiago.</span>
+			<span class="linea">Con 200 trabajadores y equipos propios.</span>
+		</p>
 	</section>
 
-	<section class="seccion">
+	<section class="seccion oscura cifras-seccion" aria-label="LOLS en cifras">
+		<div class="contenedor cifras">
+			{
+				cifras.map((c) => (
+					<div class="cifra">
+						<p class="numero">{c.valor}</p>
+						<p class="cifra-texto">{c.etiqueta}</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="seccion servicios-portada">
 		<div class="contenedor">
 			<div class="cabecera">
 				<h2>Servicios</h2>
@@ -63,6 +88,19 @@ const cifras = [
 		enlace={{ href: '/proyectos/#en-construccion', texto: 'Todos los proyectos' }}
 		obras={enObra.length ? enObra.map(deProyecto) : obrasEnCurso.map(deMuestra)}
 	/>
+
+	{
+		proxima && (
+			<section class="proxima" aria-label="La próxima obra">
+				<figure class="proxima-foto marco">
+					<img src={`/proyectos/${proxima.slug}/1.jpg`} alt={`Render del ${(proxima.tipo ?? 'proyecto').toLowerCase()} de ${proxima.nombre}`} loading="lazy" />
+				</figure>
+				<p class="contenedor proxima-pie">
+					{[proxima.nombre, proxima.tipo, proxima.comuna, proxima.superficie].filter(Boolean).join(' · ')} · render del proyecto
+				</p>
+			</section>
+		)
+	}
 	<div class="contenedor cartera-fila">
 			<a href="/proyectos/#contratados" class="cartera">
 				<span class="cartera-n">
@@ -81,64 +119,123 @@ const cifras = [
 	<section class="seccion clientes">
 		<div class="contenedor">
 			<h2 class="clientes-titulo">Han confiado en nosotros</h2>
-			<ul class="obras-clientes">
-				{
-					obrasConfianza.map((o) => (
-						<li>
-							<div class="marco">
-								<img src={`/proyectos/${o.slug}/1.jpg`} alt={`Edificio en ${o.direccion}, ${o.comuna}`} loading="lazy" />
-							</div>
-							<p>{o.direccion}, {o.comuna}</p>
-						</li>
-					))
-				}
-			</ul>
+		</div>
+		<ul class="obras-clientes" data-carril tabindex="0" aria-label="Edificios de clientes de LOLS">
+			{
+				obrasConfianza.map((o) => (
+					<li>
+						<div class="marco">
+							<img src={`/proyectos/${o.slug}/1.jpg`} alt={`Edificio en ${o.direccion}, ${o.comuna}`} loading="lazy" />
+						</div>
+						<p>{o.direccion}, {o.comuna}</p>
+					</li>
+				))
+			}
+		</ul>
+		<div class="contenedor carril-controles">
+			<button type="button" class="carril-flecha" data-mover="-1" aria-label="Ver obras anteriores">
+				<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"></path></svg>
+			</button>
+			<button type="button" class="carril-flecha" data-mover="1" aria-label="Ver más obras">
+				<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"></path></svg>
+			</button>
 		</div>
 	</section>
 
 	<Contacto />
 </Base>
 
+<script>
+	// Carril de obras de clientes: las flechas avanzan una foto (con el dedo o el trackpad se
+	// desliza igual; sin JS queda el desplazamiento lateral).
+	const carril = document.querySelector<HTMLElement>('[data-carril]');
+	for (const boton of document.querySelectorAll<HTMLButtonElement>('[data-mover]')) {
+		boton.addEventListener('click', () => {
+			if (!carril) return;
+			const item = carril.querySelector<HTMLElement>('li');
+			const paso = item ? item.offsetWidth + 20 : carril.clientWidth * 0.8;
+			carril.scrollBy({ left: Number(boton.dataset.mover) * paso, behavior: 'smooth' });
+		});
+	}
+</script>
+
 <style>
 	.punto {
 		color: var(--lols-verde);
 	}
 
-	.banda {
-		aspect-ratio: 21 / 9;
-		max-height: 80vh;
-		width: 100%;
-		background: #2a2a2a;
+	/* Qué hacemos: tres líneas grandes, como en las páginas de producto de Apple. */
+	.manifiesto {
+		padding-block: clamp(5rem, 14vw, 10rem);
+	}
+	.manifiesto-texto {
+		margin: 0;
+		max-width: 21ch;
+		font-family: var(--fuente-titulos);
+		font-optical-sizing: auto;
+		font-size: clamp(2rem, 0.9rem + 4.2vw, 4.5rem);
+		font-weight: 750;
+		line-height: 1.06;
+		letter-spacing: -0.04em;
+		text-wrap: balance;
+		color: var(--lols-carbon);
+	}
+	.linea {
+		display: block;
+		margin-bottom: 0.2em;
 	}
 
+	/* Cifras: grandes, sobre carbón, con el verde de la marca hacia el lima. */
 	.cifras {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		padding-block: clamp(2.5rem, 6vw, 4rem) 0;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
-	.cifras > div {
-		padding: 0 1.5rem;
-		border-left: 1px solid var(--linea);
+	.cifra {
+		padding: 0 clamp(1rem, 3vw, 2.5rem);
+		border-left: 1px solid #343b36;
 	}
-	.cifras > div:first-child {
+	.cifra:first-child {
 		padding-left: 0;
 		border-left: 0;
 	}
 	.cifras p {
 		margin: 0;
-		color: var(--gris-medio);
 	}
 	.cifras .numero {
-		min-height: 4.5rem;
-		display: flex;
-		align-items: center;
 		font-family: var(--fuente-titulos);
-		font-size: clamp(2.25rem, 5vw, 4.25rem);
-		font-weight: 700;
-		letter-spacing: -0.04em;
-		color: var(--lols-carbon);
+		font-optical-sizing: auto;
+		font-size: clamp(4rem, 1.5rem + 8vw, 10rem);
+		font-weight: 800;
+		line-height: 0.95;
+		letter-spacing: -0.06em;
+		font-variant-numeric: tabular-nums;
+		background: linear-gradient(120deg, var(--lols-verde) 10%, var(--lols-lima) 90%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+	}
+	.cifras .cifra-texto {
+		margin-top: 0.75rem;
+		font-family: var(--fuente-titulos);
+		font-size: clamp(1.05rem, 0.9rem + 0.6vw, 1.4rem);
+		font-weight: 600;
+		color: #c9cfca;
 	}
 
+	/* La próxima obra: la foto entra angosta y se abre a todo el ancho. */
+	.proxima {
+		padding-bottom: clamp(2rem, 4vw, 3rem);
+	}
+	.proxima-foto {
+		margin: 0;
+		height: clamp(18rem, 56vw, 44rem);
+	}
+	.proxima-pie {
+		margin-top: 0.75rem;
+		font-family: var(--fuente-datos);
+		font-size: 0.95rem;
+		color: var(--gris-medio);
+	}
 
 	.cartera-fila {
 		padding-bottom: var(--seccion);
@@ -178,52 +275,201 @@ const cifras = [
 		font-size: 1rem;
 	}
 
+	/* Obras de clientes: carril lateral de fotos grandes que se desliza con el dedo. */
 	.clientes-titulo {
 		font-size: clamp(1.75rem, 3vw, 2.25rem);
 		margin-bottom: 2rem;
 	}
 	.obras-clientes {
+		--borde: max(var(--gutter), calc((100vw - var(--ancho)) / 2 + var(--gutter)));
 		list-style: none;
 		margin: 0;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: clamp(1.5rem, 3vw, 2rem) clamp(1rem, 2vw, 1.5rem);
+		padding: 0 var(--borde) 0.5rem;
+		display: flex;
+		gap: 20px;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scroll-padding-inline: var(--borde);
+		scrollbar-width: none;
+	}
+	.obras-clientes::-webkit-scrollbar {
+		display: none;
+	}
+	.obras-clientes:focus-visible {
+		outline: 2px solid var(--lols-verde-oscuro);
+		outline-offset: 4px;
+	}
+	.obras-clientes li {
+		flex: 0 0 min(78vw, 22rem);
+		scroll-snap-align: start;
 	}
 	.obras-clientes .marco {
-		aspect-ratio: 4 / 3;
+		aspect-ratio: 4 / 5;
 		margin-bottom: 0.75rem;
-	}
-	.obras-clientes img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
 	}
 	.obras-clientes p {
 		margin: 0;
 		font-size: 0.95rem;
 		color: var(--lols-gris);
 	}
+	.carril-controles {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.75rem;
+		margin-top: 1.25rem;
+	}
+	.carril-flecha {
+		display: grid;
+		place-items: center;
+		width: 44px;
+		height: 44px;
+		border: 1px solid var(--lols-carbon);
+		background: transparent;
+		color: var(--lols-carbon);
+		cursor: pointer;
+		transition:
+			background-color 0.2s,
+			color 0.2s;
+	}
+	.carril-flecha:hover {
+		background: var(--lols-carbon);
+		color: var(--lols-blanco);
+	}
+	.carril-flecha:focus-visible {
+		outline: 2px solid var(--lols-verde-oscuro);
+		outline-offset: 2px;
+	}
 
-	@media (max-width: 960px) {
+	@media (max-width: 760px) {
 		.cifras {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			row-gap: 2rem;
+			grid-template-columns: 1fr;
+			row-gap: 2.5rem;
 		}
-		.cifras > div:nth-child(3) {
-			padding-left: 0;
+		.cifra {
+			padding: 2.5rem 0 0;
 			border-left: 0;
+			border-top: 1px solid #343b36;
 		}
-		.obras-clientes {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+		.cifra:first-child {
+			padding-top: 0;
+			border-top: 0;
+		}
+		.carril-controles {
+			justify-content: center;
 		}
 	}
-	@media (max-width: 560px) {
-		.banda {
-			aspect-ratio: 4 / 3;
+
+	/* ---------- Movimiento ligado al scroll ----------
+	   Solo si el navegador lo soporta y no se pidió reducir movimiento (html.anim, Base.astro).
+	   Sin eso, todo queda quieto y completo: ningún contenido depende de JS ni de llegar a él
+	   para verse. Solo opacity y transform (fluido en celulares modestos). Propiedades sueltas, sin el atajo
+	   "animation": el minificador lo junta con animation-timeline y Chrome descarta la línea. */
+	@supports (animation-timeline: view()) {
+		/* La obra de la portada queda fija y se achica a lámina mientras el texto se va. */
+		:global(.anim) .portada-fija {
+			height: 175svh;
+			view-timeline: --portada block;
 		}
-		.obras-clientes {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+		:global(.anim) .portada-fija :global(.hero-obra) {
+			position: sticky;
+			top: 0;
+			/* Mientras queda fija ocupa la pantalla entera: si no, asoma una franja vacía abajo. */
+			min-height: 100svh;
+			/* Se achica hacia abajo para que el borde de arriba no quede bajo el encabezado. */
+			transform-origin: 50% 80%;
+			animation-name: portada-achicar;
+			animation-timeline: --portada;
+			animation-range: contain 0% contain 100%;
+		}
+		:global(.anim) .portada-fija :global(.hero-obra > .contenido) {
+			animation-name: portada-salir;
+			animation-timeline: --portada;
+			animation-range: contain 0% contain 50%;
+		}
+		/* En celular la barra de contacto ocupa el borde de abajo: el texto sube sobre ella. */
+		@media (max-width: 767px) {
+			:global(.anim) .portada-fija :global(.hero-obra > .contenido) {
+				padding-bottom: calc(clamp(3rem, 8vw, 5.5rem) + 4.5rem);
+			}
+		}
+		:global(.anim) .portada-fija :global(.hero-obra),
+		:global(.anim) .portada-fija :global(.hero-obra > .contenido),
+		:global(.anim) .linea,
+		:global(.anim) .cifra,
+		:global(.anim) .servicios-portada :global(.mosaico > .item),
+		:global(.anim) .proxima-foto,
+		:global(.anim) .proxima-foto img,
+		:global(.anim) .obras-clientes li {
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+		}
+		/* Qué hacemos: cada línea pasa de gris a carbón al llegar al centro. */
+		:global(.anim) .linea {
+			animation-name: encender;
+			animation-timeline: view();
+			animation-range: entry 40% cover 50%;
+		}
+		:global(.anim) .cifra,
+		:global(.anim) .servicios-portada :global(.mosaico > .item) {
+			animation-name: subir-scroll;
+			animation-timeline: view();
+			animation-range: entry 0% cover 30%;
+		}
+		:global(.anim) .proxima-foto {
+			animation-name: abrir;
+			animation-timeline: view();
+			animation-range: entry 0% cover 50%;
+		}
+		:global(.anim) .proxima-foto img {
+			animation-name: acomodar;
+			animation-timeline: view();
+			animation-range: entry 0% exit 100%;
+		}
+		:global(.anim) .obras-clientes li {
+			animation-name: acercar;
+			animation-timeline: view(inline);
+			animation-range: entry 0% cover 35%;
+		}
+	}
+	@keyframes portada-achicar {
+		to {
+			transform: scale(0.86);
+		}
+	}
+	@keyframes portada-salir {
+		to {
+			opacity: 0;
+			transform: translateY(-8vh);
+		}
+	}
+	@keyframes encender {
+		from {
+			opacity: 0.22;
+		}
+	}
+	@keyframes subir-scroll {
+		from {
+			opacity: 0;
+			transform: translateY(8vh);
+		}
+	}
+	@keyframes abrir {
+		from {
+			transform: scale(0.78);
+		}
+	}
+	@keyframes acomodar {
+		from {
+			transform: scale(1.18);
+		}
+		to {
+			transform: scale(1);
+		}
+	}
+	@keyframes acercar {
+		from {
+			opacity: 0.5;
+			transform: scale(0.92);
 		}
 	}
 </style>

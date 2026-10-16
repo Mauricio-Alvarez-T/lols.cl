@@ -62,9 +62,15 @@ WebKit/Chrome sobre view transitions.
 - **Fuera el "template chrome":** rótulos en mayúsculas espaciadas sobre cada sección (ahora un
   rótulo discreto solo donde informa), flechas "→" en enlaces (ahora subrayado que crece),
   numeración 01/02/03 donde no hay secuencia (queda en el proceso y la línea de tiempo).
-- **Movimiento:** un solo momento al cargar la portada; sin revelado al hacer scroll (el
-  contenido está completo en reposo); transiciones entre páginas con CSS nativo (la foto de la
-  tarjeta viaja a la ficha; el encabezado queda fijo). Respeta "reducir movimiento".
+- **Movimiento:** un solo momento al cargar la portada; transiciones entre páginas con CSS
+  nativo (la foto de la tarjeta viaja a la ficha; el encabezado queda fijo). Respeta "reducir
+  movimiento".
+  - **En la portada, movimiento ligado al scroll** (pedido de Marcos, 16-10-2026, al estilo de
+    las páginas de producto de Apple): la obra se achica a lámina al bajar, el texto "qué
+    hacemos" se enciende por líneas, las cifras y los servicios suben, la próxima obra se abre
+    a todo el ancho y las obras de clientes van en un carril lateral. Solo CSS ("scroll-driven
+    animations"): sin soporte o con "reducir movimiento" todo queda quieto y completo, así que
+    el contenido sigue completo en reposo. Esquinas rectas y fotos con el tratamiento común.
 - **Jerarquía:** la primera obra de cada grilla es más grande.
 - **Pie:** columnas de contacto, sitio, otros públicos y certificaciones; marca en grande; RUT.
 
