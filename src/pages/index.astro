@@ -423,7 +423,9 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		:global(.anim) .proxima-foto img {
 			animation-name: acomodar;
 			animation-timeline: view();
-			animation-range: entry 0% exit 100%;
+			/* "cover" = de que asoma a que sale (escrito como "entry 0% exit 100%" el
+			   minificador lo corta en "exit 0%"). */
+			animation-range: cover 0% cover 100%;
 		}
 		:global(.anim) .obras-clientes li {
 			animation-name: acercar;
