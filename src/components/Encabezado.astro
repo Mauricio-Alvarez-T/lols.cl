@@ -5,27 +5,6 @@ import { navegacion, fundacion } from '../data/empresa';
 const ruta = Astro.url.pathname;
 ---
 
-<!--
-	PRUEBA TEMPORAL (Marcos, 19-10-2026): cuatro formas de abrir el menú en celular para elegir una,
-	copiadas de sitios grandes. Se elige con ?menu= y queda guardada mientras se navega:
-	  completo  = pantalla completa con letras grandes (Apple, Siemens, Skanska)
-	  lateral   = panel que entra desde la derecha, con la página oscurecida detrás (Amazon, Nike)
-	  abajo     = hoja que sube desde abajo, cerca del dedo, como en una app (Airbnb, Google Maps)
-	  pestanas  = sin botón: secciones siempre a la vista en una fila deslizable (The Guardian)
-	Sin ?menu= (o con ?menu=actual) queda el menú de siempre. Al elegir, dejar solo esa y borrar
-	esto. Va antes del encabezado para que la de pestañas no salte al cargar.
--->
-<script is:inline>
-	(function () {
-		var m = new URLSearchParams(location.search).get('menu');
-		try {
-			if (m) sessionStorage.setItem('lols-menu', m);
-			else m = sessionStorage.getItem('lols-menu');
-		} catch (e) {}
-		if (['completo', 'lateral', 'abajo', 'pestanas'].indexOf(m) >= 0) document.documentElement.dataset.menu = m;
-	})();
-</script>
-
 <header class="encabezado">
 	<div class="contenedor fila">
 		<a href="/" class="marca" aria-label={`LOLS Ingeniería, desde ${fundacion}, inicio`}>
@@ -68,12 +47,11 @@ const ruta = Astro.url.pathname;
 			boton.focus();
 		}
 	});
-	// Pestañas: la sección actual queda a la vista en la fila deslizable.
-	if (document.documentElement.dataset.menu === 'pestanas') {
-		const fila = encabezado.querySelector<HTMLElement>('nav ul');
-		const actual = fila?.querySelector<HTMLElement>('[aria-current="page"]');
-		if (fila && actual) fila.scrollLeft = actual.offsetLeft - fila.offsetLeft - 16;
-	}
+	// Al volver con "atrás" el navegador puede restaurar la página tal como quedó: con el panel
+	// abierto. Se cierra.
+	window.addEventListener('pageshow', (e) => {
+		if (e.persisted) abrir(false);
+	});
 </script>
 
 <style>
@@ -254,22 +232,68 @@ const ruta = Astro.url.pathname;
 			transform: translateY(-7px) rotate(-45deg);
 		}
 
+		/* Panel lateral (Marcos lo eligió el 19-10-2026 entre cuatro pruebas; como Amazon o Nike):
+		   entra desde la derecha y deja ver la página oscurecida a la izquierda, sin taparla
+		   entera. Tocar lo oscurecido o Escape lo cierra (script de arriba). Siempre está armado y
+		   se muestra con transform (fluido en celular); abierto, la página de atrás no se mueve. */
+		:global(html:has(.menu-boton[aria-expanded='true'])) {
+			overflow: hidden;
+		}
+		.encabezado:has([aria-expanded='true']) {
+			z-index: 40; /* sobre la barra Llamar/WhatsApp/Cotizar */
+		}
 		nav {
-			display: none;
-			position: absolute;
-			top: 100%;
-			left: 0;
+			position: fixed;
+			top: 0;
 			right: 0;
+			bottom: 0;
+			z-index: 2;
 			flex-direction: column;
 			align-items: stretch;
 			gap: 1rem;
-			padding: 1rem var(--gutter) 1.5rem;
+			width: min(86vw, 24rem);
+			padding: calc(4.5rem + 5px + 0.5rem) 1.5rem calc(1.5rem + env(safe-area-inset-bottom));
+			overflow-y: auto;
+			overscroll-behavior: contain;
 			background: var(--fondo);
-			border-bottom: 1px solid var(--linea);
-			box-shadow: 0 12px 24px rgb(0 0 0 / 0.08);
+			border-top: 4px solid var(--lols-verde);
+			box-shadow: -12px 0 32px rgb(0 0 0 / 0.18);
+			visibility: hidden;
+			transform: translateX(100%);
 		}
 		.menu-boton[aria-expanded='true'] + nav {
-			display: flex;
+			visibility: visible;
+			transform: none;
+		}
+		:global(.anim) nav {
+			transition:
+				transform 0.35s var(--suave),
+				visibility 0s 0.35s;
+		}
+		:global(.anim) .menu-boton[aria-expanded='true'] + nav {
+			transition: transform 0.35s var(--suave);
+		}
+		/* La página oscurecida detrás del panel; la X queda encima de todo. */
+		.encabezado::after {
+			content: '';
+			position: fixed;
+			inset: 0;
+			z-index: 1;
+			background: rgb(20 20 20 / 0.5);
+			opacity: 0;
+			visibility: hidden;
+			transition:
+				opacity 0.3s,
+				visibility 0s 0.3s;
+		}
+		.encabezado:has([aria-expanded='true'])::after {
+			opacity: 1;
+			visibility: visible;
+			transition: opacity 0.3s;
+		}
+		.menu-boton {
+			position: relative;
+			z-index: 3;
 		}
 		nav ul {
 			flex-direction: column;
@@ -286,235 +310,8 @@ const ruta = Astro.url.pathname;
 		nav ul a[aria-current='page'] {
 			color: var(--lols-verde-oscuro);
 		}
-
-		/* ---------- PRUEBA TEMPORAL de menús (ver el comentario de arriba del encabezado) ----------
-		   Completo, lateral y abajo: el menú siempre está armado y se muestra/oculta con
-		   transform y opacity (fluido en celular); con el menú abierto la página no se mueve. */
-		:global(html[data-menu='completo']:has(.menu-boton[aria-expanded='true'])),
-		:global(html[data-menu='lateral']:has(.menu-boton[aria-expanded='true'])),
-		:global(html[data-menu='abajo']:has(.menu-boton[aria-expanded='true'])) {
-			overflow: hidden;
-		}
-		:global(html[data-menu='completo']) .encabezado:has([aria-expanded='true']),
-		:global(html[data-menu='lateral']) .encabezado:has([aria-expanded='true']),
-		:global(html[data-menu='abajo']) .encabezado:has([aria-expanded='true']) {
-			z-index: 40; /* sobre la barra Llamar/WhatsApp/Cotizar */
-		}
-		:global(html[data-menu='completo']) nav,
-		:global(html[data-menu='lateral']) nav,
-		:global(html[data-menu='abajo']) nav {
-			display: flex;
-			position: fixed;
-			visibility: hidden;
-			overflow-y: auto;
-			overscroll-behavior: contain;
-			background: var(--fondo);
-			border-bottom: 0;
-		}
-		:global(html[data-menu='completo']) .menu-boton[aria-expanded='true'] + nav,
-		:global(html[data-menu='lateral']) .menu-boton[aria-expanded='true'] + nav,
-		:global(html[data-menu='abajo']) .menu-boton[aria-expanded='true'] + nav {
-			visibility: visible;
-			opacity: 1;
-			transform: none;
-		}
-		:global(html.anim[data-menu='completo']) nav,
-		:global(html.anim[data-menu='lateral']) nav,
-		:global(html.anim[data-menu='abajo']) nav {
-			transition:
-				transform 0.35s var(--suave),
-				opacity 0.25s,
-				visibility 0s 0.35s;
-		}
-		:global(html.anim[data-menu='completo']) .menu-boton[aria-expanded='true'] + nav,
-		:global(html.anim[data-menu='lateral']) .menu-boton[aria-expanded='true'] + nav,
-		:global(html.anim[data-menu='abajo']) .menu-boton[aria-expanded='true'] + nav {
-			transition:
-				transform 0.35s var(--suave),
-				opacity 0.25s;
-		}
-		/* Lateral y abajo: la página queda oscurecida detrás; tocarla cierra el menú. */
-		:global(html[data-menu='lateral']) .encabezado::after,
-		:global(html[data-menu='abajo']) .encabezado::after {
-			content: '';
-			position: fixed;
-			inset: 0;
-			z-index: 1;
-			background: rgb(20 20 20 / 0.5);
-			opacity: 0;
-			visibility: hidden;
-			transition:
-				opacity 0.3s,
-				visibility 0s 0.3s;
-		}
-		:global(html[data-menu='lateral']) .encabezado:has([aria-expanded='true'])::after,
-		:global(html[data-menu='abajo']) .encabezado:has([aria-expanded='true'])::after {
-			opacity: 1;
-			visibility: visible;
-			transition: opacity 0.3s;
-		}
-		:global(html[data-menu='lateral']) nav,
-		:global(html[data-menu='abajo']) nav {
-			z-index: 2;
-		}
-		:global(html[data-menu='lateral']) .menu-boton,
-		:global(html[data-menu='abajo']) .menu-boton {
-			position: relative;
-			z-index: 3;
-		}
-
-		/* 1. Pantalla completa (Apple, Siemens, Skanska): letras grandes que entran una tras otra;
-		   el logo y la X quedan arriba (el menú va por debajo de ellos, z-index -1). */
-		:global(html[data-menu='completo']) nav {
-			inset: 0;
-			z-index: -1;
-			gap: 2rem;
-			padding: calc(4.5rem + 5px + 1.25rem) var(--gutter) calc(1.5rem + env(safe-area-inset-bottom));
-			border-top: 4px solid var(--lols-verde);
-			box-shadow: none;
-			opacity: 0;
-		}
-		:global(html[data-menu='completo']) nav ul a {
-			padding-block: 0.45rem;
-			border-bottom: 0;
-			font-size: clamp(1.75rem, 8vw, 2.4rem);
-			font-weight: 700;
-			letter-spacing: -0.02em;
-		}
-		:global(html[data-menu='completo']) nav .boton {
+		nav .boton {
 			margin-top: auto;
-		}
-		:global(html.anim[data-menu='completo']) .menu-boton[aria-expanded='true'] + nav li {
-			animation: menu-linea 0.4s var(--suave) both;
-		}
-		:global(html.anim[data-menu='completo']) .menu-boton[aria-expanded='true'] + nav li:nth-child(2) { animation-delay: 0.04s; }
-		:global(html.anim[data-menu='completo']) .menu-boton[aria-expanded='true'] + nav li:nth-child(3) { animation-delay: 0.08s; }
-		:global(html.anim[data-menu='completo']) .menu-boton[aria-expanded='true'] + nav li:nth-child(4) { animation-delay: 0.12s; }
-		:global(html.anim[data-menu='completo']) .menu-boton[aria-expanded='true'] + nav li:nth-child(5) { animation-delay: 0.16s; }
-		:global(html.anim[data-menu='completo']) .menu-boton[aria-expanded='true'] + nav li:nth-child(6) { animation-delay: 0.2s; }
-
-		/* 2. Panel lateral (Amazon, Nike): entra desde la derecha y deja ver la página a la izquierda. */
-		:global(html[data-menu='lateral']) nav {
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: auto;
-			width: min(86vw, 24rem);
-			padding: calc(4.5rem + 5px + 0.5rem) 1.5rem calc(1.5rem + env(safe-area-inset-bottom));
-			border-top: 4px solid var(--lols-verde);
-			box-shadow: -12px 0 32px rgb(0 0 0 / 0.18);
-			transform: translateX(100%);
-		}
-		:global(html[data-menu='lateral']) nav .boton {
-			margin-top: auto;
-		}
-
-		/* 3. Desde abajo (Airbnb, Google Maps): una hoja con esquinas redondeadas, al alcance del
-		   pulgar; arriba se sigue viendo la página. La X queda en un círculo claro para leerse. */
-		:global(html[data-menu='abajo']) nav {
-			top: auto;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			max-height: 85svh;
-			padding: 2rem var(--gutter) calc(1.25rem + env(safe-area-inset-bottom));
-			border-radius: 1.25rem 1.25rem 0 0;
-			box-shadow: 0 -12px 32px rgb(0 0 0 / 0.18);
-			transform: translateY(100%);
-		}
-		:global(html[data-menu='abajo']) nav::before {
-			content: '';
-			position: absolute;
-			top: 0.65rem;
-			left: calc(50% - 1.25rem);
-			width: 2.5rem;
-			height: 4px;
-			border-radius: 2px;
-			background: var(--linea);
-		}
-		:global(html[data-menu='abajo']) .menu-boton[aria-expanded='true'] {
-			background: var(--fondo);
-			border-radius: 50%;
-		}
-
-		/* 4. Pestañas (The Guardian): sin botón; una segunda fila con todas las secciones que se
-		   desliza de lado (el borde derecho se desvanece para que se note que hay más). La fila
-		   mide 2.75rem: lo que se acomoda bajo el encabezado suma esa altura. */
-		:global(html[data-menu='pestanas']) .menu-boton {
-			display: none;
-		}
-		:global(html[data-menu='pestanas']) .fila {
-			flex-wrap: wrap;
-			row-gap: 0;
-		}
-		:global(html[data-menu='pestanas']) nav {
-			display: flex;
-			position: static;
-			flex-direction: row;
-			align-items: center;
-			/* De borde a borde de la pantalla; min-width 0 para que la fila se deslice en vez de
-			   ensanchar el encabezado. */
-			flex-basis: calc(100% + 2 * var(--gutter));
-			min-width: 0;
-			gap: 1rem;
-			margin-inline: calc(-1 * var(--gutter));
-			padding: 0 var(--gutter) 0 0;
-			background: none;
-			border: 0;
-			box-shadow: none;
-		}
-		:global(html[data-menu='pestanas']) nav ul {
-			flex: 1;
-			flex-direction: row;
-			gap: 1.4rem;
-			min-width: 0;
-			padding-inline: var(--gutter);
-			overflow-x: auto;
-			scrollbar-width: none;
-			-webkit-mask-image: linear-gradient(to right, #000 85%, transparent);
-			mask-image: linear-gradient(to right, #000 85%, transparent);
-		}
-		:global(html[data-menu='pestanas']) nav ul::-webkit-scrollbar {
-			display: none;
-		}
-		:global(html[data-menu='pestanas']) nav ul a {
-			padding-block: 0.65rem;
-			line-height: 1.45rem;
-			border-bottom: 0;
-			font-size: 0.95rem;
-		}
-		:global(html[data-menu='pestanas']) nav ul a::after {
-			display: block;
-		}
-		:global(html[data-menu='pestanas']) nav .boton {
-			flex-shrink: 0;
-			min-height: 2.75rem;
-			padding: 0.4rem 1rem;
-			font-size: 0.9rem;
-		}
-		:global(html[data-menu='pestanas'].encabezado-flotante main) {
-			margin-top: calc(-7.25rem - 5px);
-		}
-		:global(html[data-menu='pestanas'] .ficha-barra) {
-			top: calc(7.25rem + 5px);
-		}
-		:global(html[data-menu='pestanas'].encabezado-flotante section.hero-obra .fondo-hero .pausa) {
-			margin-top: 8.25rem;
-		}
-	}
-	/* Pestañas en celular: Cotizar ya está en la barra de abajo. */
-	@media (max-width: 767px) {
-		:global(html[data-menu='pestanas']) nav {
-			padding-right: 0;
-		}
-		:global(html[data-menu='pestanas']) nav .boton {
-			display: none;
-		}
-	}
-	@keyframes menu-linea {
-		from {
-			opacity: 0;
-			transform: translateY(0.6rem);
 		}
 	}
 </style>
