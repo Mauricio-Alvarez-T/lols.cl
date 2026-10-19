@@ -101,6 +101,7 @@ const ruta = Astro.url.pathname;
 		font-family: var(--fuente-titulos);
 		font-weight: 600;
 		text-decoration: none;
+		white-space: nowrap;
 	}
 	nav ul a::after {
 		content: '';
@@ -169,7 +170,10 @@ const ruta = Astro.url.pathname;
 			display: none;
 		}
 	}
-	@media (max-width: 860px) {
+	/* Menú de celular (botón con 3 rayas) hasta 1200 px: con Trabaja con nosotros arriba (19-10-2026)
+	   el menú completo mide unos 860 px y, junto al logo, no cabe en una línea en tablets ni en
+	   notebooks chicos; antes de eso se cortaba en dos líneas o la página se movía de lado. */
+	@media (max-width: 1200px) {
 		.menu-boton {
 			display: grid;
 			place-items: center;

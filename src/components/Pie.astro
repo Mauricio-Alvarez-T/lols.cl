@@ -3,7 +3,7 @@
 // públicos, seguridad (la mutual; sin certificaciones que LOLS no tiene) y datos legales. Todo sobre el verde
 // de LOLS, para que cada página termine con la marca (como el pie rojo de Arup). La frase de
 // cierre la pone el bloque Contacto, justo antes.
-import { empresa, navegacion, otrosPublicos, telefonoHref, whatsappHref, fundacion } from '../data/empresa';
+import { empresa, navegacion, telefonoHref, whatsappHref, fundacion } from '../data/empresa';
 
 const anio = new Date().getFullYear();
 ---
@@ -29,7 +29,6 @@ const anio = new Date().getFullYear();
 		<nav aria-label="Otros públicos">
 			<h2>También</h2>
 			<ul>
-				{otrosPublicos.map((n) => <li><a href={n.href}>{n.texto}</a></li>)}
 				<li><a href="/privacidad/">Política de privacidad</a></li>
 			</ul>
 		</nav>

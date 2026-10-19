@@ -126,14 +126,14 @@ export const necesidadesRevisar = 'agrupación propuesta; confirmar';
 
 // Menú principal: las 4 secciones que tienen casi todos los sitios del rubro + Seguridad,
 // que casi ninguno muestra y es lo primero que revisa un mandante (docs/investigacion-secciones.md).
+// Trabaja con nosotros también va arriba (Marcos, 19-10-2026): LOLS busca gente seguido y desde
+// el pie casi no se encontraba. Antes de Contacto, para que Contacto y Cotizar queden juntos.
 export const navegacion = [
 	{ href: '/proyectos/', texto: 'Proyectos' },
 	{ href: '/servicios/', texto: 'Servicios' },
 	{ href: '/seguridad/', texto: 'Seguridad' },
 	{ href: '/empresa/', texto: 'Empresa' },
+	{ href: '/trabaja-con-nosotros/', texto: 'Trabaja con nosotros' },
 	{ href: '/contacto/', texto: 'Contacto' },
 ];
-
-// Rutas para públicos que no son clientes: van en el pie para no saturar el canal comercial.
 // Sin Proveedores (Marcos, 08-10-2026): una sección de compras puede hacer pensar que LOLS vende.
-export const otrosPublicos = [{ href: '/trabaja-con-nosotros/', texto: 'Trabaja con nosotros' }];
