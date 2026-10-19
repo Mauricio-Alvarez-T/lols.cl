@@ -105,7 +105,7 @@ Lema institucional ✅: **"Sus proyectos en las mejores manos"** (portada del si
 | Campo | Valor | Estado |
 |---|---|---|
 | Razón social | LOLS Ingeniería Limitada | ✅ |
-| Dirección | El Mirador 112-150, Cerrillos, Santiago | ⚠️ Confirmar vigencia |
+| Dirección | Philippi 36, Santiago (oficina) | ✅ Marcos, 19-10-2026 (antes El Mirador 112-150, Cerrillos) |
 | Teléfono | +56 652 710 609 | ⚠️ **Revisar:** el prefijo 65 es de Osorno, no de Santiago |
 | Correo | lols@lols.cl | ⚠️ Confirmar; idealmente un correo por área (cotizaciones, trabajo) |
 

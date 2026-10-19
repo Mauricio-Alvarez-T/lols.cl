@@ -8,7 +8,8 @@ export const empresa = {
 	rut: '77.085.560-8',
 	lema: 'Sus proyectos en las mejores manos',
 	directrices: 'Experiencia, seguridad y calidad son nuestras directrices.',
-	direccion: { valor: 'El Mirador 150, Cerrillos, Santiago' },
+	// Oficina (Marcos, 19-10-2026; antes El Mirador 150, Cerrillos). Calle Rodulfo Amado Philippi.
+	direccion: { valor: 'Philippi 36, Santiago' },
 	telefono: { valor: '+56 652 710 609' },
 	// También recibe las postulaciones (CV): don Luis, 08-10-2026.
 	correo: { valor: 'lols@lols.cl' },
