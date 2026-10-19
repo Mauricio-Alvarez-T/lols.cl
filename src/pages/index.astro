@@ -25,11 +25,12 @@ import { ejemploBajadaHero, ejemplosContratados } from '../data/ejemplos';
 const enObra = proyectosPorEstado('en-curso').slice(0, 3);
 const contratados = proyectosPorEstado('contratado');
 // Datos reales: años (fundación 1995), trabajadores (200, don Luis) y obras ejecutadas (70+,
-// Marcos, 08-10-2026). Sin m² construidos: no hay registro (don Luis).
+// Marcos, 08-10-2026). Sin m² construidos: no hay registro (don Luis). Al llegar a ellas cuentan
+// desde 0 (Marcos, 19-10-2026; script al final); el HTML ya trae el número final.
 const cifras = [
-	{ etiqueta: `años de trayectoria, desde ${fundacion}`, valor: String(aniosTrayectoria) },
-	{ etiqueta: 'obras ejecutadas', valor: '70+' },
-	{ etiqueta: 'trabajadores', valor: '200' },
+	{ etiqueta: `años de trayectoria, desde ${fundacion}`, valor: aniosTrayectoria, sufijo: '' },
+	{ etiqueta: 'obras ejecutadas', valor: 70, sufijo: '+' },
+	{ etiqueta: 'trabajadores', valor: 200, sufijo: '' },
 ];
 
 // "Construcción, montaje industrial y electricidad." con los servicios vigentes.
@@ -65,7 +66,10 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 			{
 				cifras.map((c) => (
 					<div class="cifra">
-						<p class="numero">{c.valor}</p>
+						<p class="numero">
+							<span class="sr-only">{c.valor}{c.sufijo}</span>
+							<span aria-hidden="true" data-contar={c.valor} data-sufijo={c.sufijo}>{c.valor}{c.sufijo}</span>
+						</p>
 						<p class="cifra-texto">{c.etiqueta}</p>
 					</div>
 				))
@@ -156,6 +160,41 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 			const paso = item ? item.offsetWidth + 20 : carril.clientWidth * 0.8;
 			carril.scrollBy({ left: Number(boton.dataset.mover) * paso, behavior: 'smooth' });
 		});
+	}
+
+	// Cifras: cuentan desde 0 hasta su valor cuando aparecen en pantalla, una sola vez por visita
+	// (el sufijo "+" llega al final). Sin JS, sin IntersectionObserver o con "reducir movimiento"
+	// (sin html.anim) se ve el número final de siempre. Los lectores de pantalla leen el número
+	// fijo de al lado (.sr-only), no la cuenta.
+	const contadores = document.querySelectorAll<HTMLElement>('[data-contar]');
+	if (contadores.length && 'IntersectionObserver' in window && document.documentElement.classList.contains('anim')) {
+		const duracion = 1600;
+		const contar = (el: HTMLElement) => {
+			const final = Number(el.dataset.contar);
+			const inicio = performance.now();
+			const paso = (ahora: number) => {
+				const t = Math.min((ahora - inicio) / duracion, 1);
+				// Rápido al principio y se frena al llegar (ease-out cúbico).
+				const valor = Math.round(final * (1 - Math.pow(1 - t, 3)));
+				el.textContent = t < 1 ? String(valor) : final + (el.dataset.sufijo ?? '');
+				if (t < 1) requestAnimationFrame(paso);
+			};
+			requestAnimationFrame(paso);
+		};
+		const observador = new IntersectionObserver(
+			(entradas) => {
+				for (const e of entradas) {
+					if (!e.isIntersecting) continue;
+					observador.unobserve(e.target);
+					contar(e.target as HTMLElement);
+				}
+			},
+			{ threshold: 0.6 },
+		);
+		for (const el of contadores) {
+			el.textContent = '0';
+			observador.observe(el);
+		}
 	}
 </script>
 
