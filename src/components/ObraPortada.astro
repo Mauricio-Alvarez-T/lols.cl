@@ -5,6 +5,8 @@
 // del plano se trazan al cargar y quedan muy tenues (animaciones.css).
 // El contenido (título, bajada, botones) llega por el slot desde la página. Con `centrado` va
 // al medio (la portada, Marcos 20-10-2026); las páginas interiores lo dejan a la izquierda.
+// Slot "pie" (la portada, 20-10-2026, patrón de Suffolk y Mortenson): una franja abajo con una
+// línea fina, un dato a la izquierda y un enlace a la derecha; el mensaje queda al medio.
 // Acepta video (portada, Empresa…) o imagen (páginas interiores): toda cabecera
 // lleva al menos una imagen, nunca solo texto (pedido del usuario, 30-sep).
 import VideoFondo from './VideoFondo.astro';
@@ -18,11 +20,12 @@ interface Props {
 	centrado?: boolean; // título, bajada y botones al medio
 }
 const { video, imagen, baja = false, centrado = false } = Astro.props;
+const conPie = Astro.slots.has('pie');
 const verticales = [25, 50, 75];
 const horizontales = [40];
 ---
 
-<section class:list={['hero-obra', { baja, centrado }]}>
+<section class:list={['hero-obra', { baja, centrado, 'con-pie': conPie }]}>
 	{video && <VideoFondo video={video} clase="fondo-hero" eager />}
 	{
 		!video && imagen && (
@@ -39,6 +42,15 @@ const horizontales = [40];
 	<div class="contenedor contenido">
 		<slot />
 	</div>
+	{
+		conPie && (
+			<div class="pie-hero">
+				<div class="contenedor pie-fila">
+					<slot name="pie" />
+				</div>
+			</div>
+		)
+	}
 </section>
 
 <style>
@@ -124,6 +136,60 @@ const horizontales = [40];
 	.centrado .contenido :global(.acciones) {
 		justify-content: center;
 	}
+
+	/* Con franja al pie: el mensaje al medio de la pantalla y la franja pegada abajo. */
+	.con-pie {
+		align-items: center;
+	}
+	.con-pie .contenido {
+		padding-block: 6rem;
+	}
+	.pie-hero {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+	.pie-fila {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem 2rem;
+		flex-wrap: wrap;
+		position: relative;
+		padding-block: 1.1rem clamp(1.25rem, 3vw, 2rem);
+		color: var(--lols-blanco);
+	}
+	/* La línea fina, del ancho del texto (no del margen del contenedor). */
+	.pie-fila::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: var(--gutter);
+		right: var(--gutter);
+		height: 1px;
+		background: rgb(255 255 255 / 0.28);
+	}
+	/* En nuevo.lols.cl el aviso de propuesta va fijo abajo a la izquierda: la franja sube sobre él. */
+	:global(html:has(.aviso)) .pie-fila {
+		padding-bottom: 4.5rem;
+	}
+	.pie-hero :global(.etiqueta) {
+		margin: 0;
+		color: rgb(255 255 255 / 0.92);
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		font-size: 0.85rem;
+	}
+	.pie-hero :global(.enlace-flecha) {
+		color: var(--lols-blanco);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		font-size: 0.9rem;
+	}
+	.pie-hero :global(.enlace-flecha:hover) {
+		color: var(--lols-lima);
+	}
 	/* Botones sobre la obra: primario blanco, secundario con contorno blanco. */
 	.contenido :global(.boton) {
 		background: var(--lols-blanco);
@@ -146,6 +212,17 @@ const horizontales = [40];
 	@media (max-width: 640px) {
 		.hero-obra {
 			min-height: calc(88svh - 4.5rem);
+		}
+		.con-pie .contenido {
+			padding-block: 4rem 7rem;
+		}
+		.pie-fila {
+			justify-content: center;
+			text-align: center;
+			gap: 0.6rem;
+		}
+		.pie-hero :global(.etiqueta) {
+			font-size: 0.78rem;
 		}
 		.eje-v:nth-child(odd) {
 			display: none;

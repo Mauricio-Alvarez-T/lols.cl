@@ -1,6 +1,11 @@
 ---
 // Portada: mostrar, no contar (docs/estructura.md § Mostrar, no contar). Cada sección es
-// imagen + título y lleva a su página, donde está el detalle:
+// imagen + título y lleva a su página, donde está el detalle.
+// Primera pantalla (Marcos 20-10-2026, tras revisar portadas con video de constructoras de
+// EE. UU., Europa y Chile — Suffolk, Mortenson, Turner, DPR, Bouygues, Ingevec…): sobre el video
+// solo el rótulo de los servicios y el lema; abajo, una franja con desde cuándo y dónde, y
+// «Ver proyectos». Sin bajada ni botones (Cotizar ya está en el encabezado) y sin WhatsApp
+// flotante. Después:
 //   obra en video con el lema → qué hacemos en tres líneas → cifras → servicios en fotos →
 //   obras en construcción → la próxima obra en grande y la cartera → obras de clientes (foto y
 //   dirección, en el mismo carrusel de las obras) → contacto. Sin bloque de seguridad (don Luis,
@@ -20,7 +25,7 @@ import { proyectos, proyectosPorEstado, obrasConfianza } from '../data/proyectos
 import MosaicoServicios from '../components/MosaicoServicios.astro';
 import { obrasEnCurso, videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
-import { ejemploBajadaHero, ejemplosContratados } from '../data/ejemplos';
+import { ejemplosContratados } from '../data/ejemplos';
 
 const enObra = proyectosPorEstado('en-curso').slice(0, 3);
 const contratados = proyectosPorEstado('contratado');
@@ -41,15 +46,15 @@ const queHacemos = `${nombresServicios.slice(0, -1).join(', ')} y ${nombresServi
 const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 ---
 
-<Base title="LOLS Ingeniería" description={`${empresa.razonSocial}. ${empresa.lema}.`}>
+<Base title="LOLS Ingeniería" description={`${empresa.razonSocial}. ${empresa.lema}.`} sinWhatsapp>
 	<div class="portada-fija">
 		<ObraPortada video={videos.portada} centrado>
+			<p class="rotulo-servicios">{servicios.map((s) => s.nombre).join(' · ')}</p>
 			<h1 class="display">{empresa.lema}<span class="punto">.</span></h1>
-			<p class="bajada"><Pendiente texto="una frase: qué hace LOLS, para quién y dónde">{ejemploBajadaHero}</Pendiente></p>
-			<div class="acciones">
-				<a href="/proyectos/" class="boton">Ver proyectos</a>
-				<a href="/contacto/" class="boton secundario">Cotizar</a>
-			</div>
+			<Fragment slot="pie">
+				<p class="etiqueta">Desde {fundacion} · Santiago, Chile</p>
+				<a href="/proyectos/" class="enlace-flecha">Ver proyectos</a>
+			</Fragment>
 		</ObraPortada>
 	</div>
 
@@ -164,6 +169,26 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 <style>
 	.punto {
 		color: var(--lols-verde);
+	}
+	/* Rótulo sobre el lema: los servicios en versalitas espaciadas (patrón Mortenson). */
+	.rotulo-servicios {
+		margin: 0 0 1.25rem;
+		font-family: var(--fuente-datos);
+		font-size: clamp(0.8rem, 0.7rem + 0.35vw, 1rem);
+		font-weight: 600;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: rgb(255 255 255 / 0.9);
+		text-shadow: 0 1px 12px rgb(0 0 0 / 0.35);
+	}
+	/* Celular: en una sola línea, más chico y menos espaciado (si se parte, un renglón empieza
+	   con el punto separador). */
+	@media (max-width: 640px) {
+		.rotulo-servicios {
+			font-size: 0.7rem;
+			letter-spacing: 0.08em;
+			white-space: nowrap;
+		}
 	}
 
 	/* Qué hacemos: tres líneas grandes, como en las páginas de producto de Apple. Centradas
@@ -325,7 +350,8 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 			animation-timeline: --portada;
 			animation-range: contain 0% contain 100%;
 		}
-		:global(.anim) .portada-fija :global(.hero-obra > .contenido) {
+		:global(.anim) .portada-fija :global(.hero-obra > .contenido),
+		:global(.anim) .portada-fija :global(.hero-obra > .pie-hero) {
 			animation-name: portada-salir;
 			animation-timeline: --portada;
 			animation-range: contain 0% contain 50%;
@@ -335,9 +361,14 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 			:global(.anim) .portada-fija :global(.hero-obra > .contenido) {
 				padding-bottom: calc(clamp(3rem, 8vw, 5.5rem) + 4.5rem);
 			}
+			/* La franja del pie, sobre la barra de contacto (que tapa el borde de abajo). */
+			:global(.anim) .portada-fija :global(.hero-obra > .pie-hero) {
+				bottom: calc(3.5rem + env(safe-area-inset-bottom));
+			}
 		}
 		:global(.anim) .portada-fija :global(.hero-obra),
 		:global(.anim) .portada-fija :global(.hero-obra > .contenido),
+		:global(.anim) .portada-fija :global(.hero-obra > .pie-hero),
 		:global(.anim) .linea,
 		:global(.anim) .cifra,
 		:global(.anim) .servicios-portada :global(.mosaico > .item),
