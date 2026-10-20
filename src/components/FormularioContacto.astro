@@ -4,9 +4,18 @@
 // muestra el resultado sin recargar. Consentimiento sin marcar por defecto (Ley 21.719).
 // Terreno, etapa, inicio y hasta 2 fotos o planos (Marcos, 09-10-2026): las opciones y los
 // límites de los adjuntos están repetidos en public/api/contacto.php; cambiarlos en ambos.
+//
+// En tres pasos (Marcos, 20-10-2026; idea del «Stepper» de React Bits, reescrita sin React):
+// 1) Qué necesita (servicio, etapa, cuándo empezar), 2) Su proyecto (dónde, cuánto, terreno,
+// descripción y adjuntos) y 3) Sus datos. Primero lo fácil, que se responde con toques, y los
+// datos personales al final: en el celular, una sola pantalla de 12 campos espanta. Una barra
+// arriba dice en qué paso va; cada paso revisa lo suyo antes de seguir, y el botón Atrás del
+// navegador (o del celular) vuelve al paso anterior. Todo sigue siendo UN solo <form>: sin
+// JavaScript se ven los tres pasos seguidos, con su título, y se envía igual que antes.
 import { servicios } from '../data/empresa';
 import '../styles/formulario.css';
 
+const necesidades = [...servicios.map((s) => [s.slug, s.nombre]), ['otro', 'Otro']];
 const terrenos = [
 	['plano', 'Plano'],
 	['pendiente', 'Con pendiente'],
@@ -27,58 +36,35 @@ const inicios = [
 	['mas-6', 'Más de 6 meses'],
 	['no-sabe', 'No lo sé'],
 ];
-const preguntas = [
-	{ nombre: 'terreno', titulo: 'Tipo de terreno', opciones: terrenos },
+const paso1 = [
+	{ nombre: 'servicio', titulo: 'Servicio', opciones: necesidades },
 	{ nombre: 'etapa', titulo: '¿En qué etapa está su proyecto?', opciones: etapas },
 	{ nombre: 'inicio', titulo: '¿Cuándo le gustaría empezar?', opciones: inicios },
 ];
+const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 ---
 
-<form id="formulario" class="formulario" action="/api/contacto.php" method="post" enctype="multipart/form-data" novalidate>
-	<div class="fila">
-		<label for="f-nombre">
-			<span>Nombre <abbr title="obligatorio">*</abbr></span>
-			<input id="f-nombre" name="nombre" type="text" autocomplete="name" maxlength="120" required />
-		</label>
-		<label for="f-empresa">
-			<span>Empresa</span>
-			<input id="f-empresa" name="empresa" type="text" autocomplete="organization" maxlength="120" />
-		</label>
-	</div>
-	<div class="fila">
-		<label for="f-correo">
-			<span>Correo <abbr title="obligatorio">*</abbr></span>
-			<input id="f-correo" name="correo" type="email" autocomplete="email" maxlength="160" required />
-		</label>
-		<label for="f-telefono">
-			<span>Teléfono</span>
-			<input id="f-telefono" name="telefono" type="tel" autocomplete="tel" maxlength="40" />
-		</label>
-	</div>
-	<!-- Su proyecto (reunión con don Luis): con dirección y m² ya se puede estimar el alcance
-	     y preparar la visita técnica sin una llamada previa. -->
-	<fieldset class="proyecto">
-		<legend>Su proyecto</legend>
-		<label for="f-servicio">
-			<span>Servicio</span>
-			<select id="f-servicio" name="servicio">
-				<option value="">Seleccione…</option>
-				{servicios.map((s) => <option value={s.slug}>{s.nombre}</option>)}
-				<option value="otro">Otro</option>
-			</select>
-		</label>
-		<div class="fila">
-			<label for="f-direccion">
-				<span>Dirección de la propiedad</span>
-				<input id="f-direccion" name="direccion" type="text" autocomplete="street-address" maxlength="200" placeholder="Calle, número y comuna" />
-			</label>
-			<label for="f-superficie">
-				<span>Superficie aproximada (m²)</span>
-				<input id="f-superficie" name="superficie" type="text" inputmode="decimal" maxlength="40" placeholder="Ej.: 1.500" />
-			</label>
-		</div>
+<script is:inline>document.documentElement.classList.add('cotiza-js');</script>
+<form id="formulario" class="formulario cotiza" action="/api/contacto.php" method="post" enctype="multipart/form-data" novalidate>
+	<!-- Avance: solo con JavaScript (sin él, los tres pasos van seguidos con su título). -->
+	<ol class="avance" data-avance>
 		{
-			preguntas.map((p) => (
+			pasos.map((t, i) => (
+				<li data-i={i + 1}>
+					<button type="button" data-ir-paso={i + 1} disabled>
+						<span class="avance-n" aria-hidden="true">{i + 1}</span>
+						<span class="avance-t">{t}</span>
+					</button>
+				</li>
+			))
+		}
+	</ol>
+	<p class="sr-only" aria-live="polite" data-anuncio></p>
+
+	<fieldset class="paso" data-paso="1" tabindex="-1">
+		<legend>Qué necesita</legend>
+		{
+			paso1.map((p) => (
 				<fieldset class="opciones">
 					<legend>{p.titulo}</legend>
 					<div class="chips">
@@ -92,9 +78,39 @@ const preguntas = [
 				</fieldset>
 			))
 		}
+		<p class="ayuda-paso">Elija una opción en cada pregunta. Si no lo sabe aún, puede seguir igual.</p>
+	</fieldset>
+
+	<!-- Su proyecto (reunión con don Luis): con dirección y m² ya se puede estimar el alcance
+	     y preparar la visita técnica sin una llamada previa. -->
+	<fieldset class="paso" data-paso="2" tabindex="-1">
+		<legend>Su proyecto</legend>
+		<div class="fila">
+			<label for="f-direccion">
+				<span>Dirección de la propiedad</span>
+				<input id="f-direccion" name="direccion" type="text" autocomplete="street-address" maxlength="200" placeholder="Calle, número y comuna" />
+			</label>
+			<label for="f-superficie">
+				<span>Superficie aproximada (m²)</span>
+				<input id="f-superficie" name="superficie" type="text" inputmode="decimal" maxlength="40" placeholder="Ej.: 1.500" />
+			</label>
+		</div>
+		<fieldset class="opciones">
+			<legend>Tipo de terreno</legend>
+			<div class="chips">
+				{
+					terrenos.map(([valor, texto]) => (
+						<label class="chip">
+							<input type="radio" name="terreno" value={valor} />
+							<span>{texto}</span>
+						</label>
+					))
+				}
+			</div>
+		</fieldset>
 		<label for="f-mensaje">
 			<span>Cuéntenos su proyecto <abbr title="obligatorio">*</abbr></span>
-			<textarea id="f-mensaje" name="mensaje" rows="6" maxlength="5000" required placeholder="A grandes rasgos: qué quiere construir o instalar y para qué lo usará."></textarea>
+			<textarea id="f-mensaje" name="mensaje" rows="5" maxlength="5000" required placeholder="A grandes rasgos: qué quiere construir o instalar y para qué lo usará."></textarea>
 		</label>
 		<label for="f-archivos">
 			<span>Fotos o planos</span>
@@ -103,35 +119,75 @@ const preguntas = [
 		<p id="f-archivos-ayuda" class="ayuda">Hasta 2 archivos (fotos o PDF), de 5 MB cada uno, como referencia de lo que quiere.</p>
 	</fieldset>
 
+	<fieldset class="paso" data-paso="3" tabindex="-1">
+		<legend>Sus datos</legend>
+		<div class="fila">
+			<label for="f-nombre">
+				<span>Nombre <abbr title="obligatorio">*</abbr></span>
+				<input id="f-nombre" name="nombre" type="text" autocomplete="name" maxlength="120" required />
+			</label>
+			<label for="f-empresa">
+				<span>Empresa</span>
+				<input id="f-empresa" name="empresa" type="text" autocomplete="organization" maxlength="120" />
+			</label>
+		</div>
+		<div class="fila">
+			<label for="f-correo">
+				<span>Correo <abbr title="obligatorio">*</abbr></span>
+				<input id="f-correo" name="correo" type="email" autocomplete="email" maxlength="160" required />
+			</label>
+			<label for="f-telefono">
+				<span>Teléfono</span>
+				<input id="f-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="40" />
+			</label>
+		</div>
+		<label for="f-consentimiento" class="consentimiento">
+			<input id="f-consentimiento" name="consentimiento" type="checkbox" value="si" required />
+			<span>
+				Acepto que LOLS Ingeniería use estos datos para responder mi solicitud, según su{' '}
+				<a href="/privacidad/">política de privacidad</a>. <abbr title="obligatorio">*</abbr>
+			</span>
+		</label>
+	</fieldset>
+
 	<!-- Trampa para bots: oculto a las personas y a los lectores de pantalla. -->
 	<div class="trampa" aria-hidden="true">
 		<label>Sitio web <input name="sitio_web" type="text" tabindex="-1" autocomplete="off" /></label>
 	</div>
 	<input type="hidden" name="t" value="" />
 
-	<label for="f-consentimiento" class="consentimiento">
-		<input id="f-consentimiento" name="consentimiento" type="checkbox" value="si" required />
-		<span>
-			Acepto que LOLS Ingeniería use estos datos para responder mi solicitud, según su{' '}
-			<a href="/privacidad/">política de privacidad</a>. <abbr title="obligatorio">*</abbr>
-		</span>
-	</label>
-
 	<div class="acciones">
-		<button type="submit" class="boton">Enviar solicitud</button>
+		<button type="button" class="atras" data-atras><span aria-hidden="true">←</span> Atrás</button>
+		<button type="button" class="boton" data-siguiente>Siguiente <span aria-hidden="true">→</span></button>
+		<button type="submit" class="boton" data-enviar>Enviar solicitud</button>
 		<p class="estado" role="status" aria-live="polite"></p>
+	</div>
+
+	<div class="gracias" data-gracias hidden tabindex="-1">
+		<p class="gracias-titulo">Recibimos su solicitud</p>
+		<p>Le responderemos a la brevedad. Si es urgente, llámenos o escríbanos por WhatsApp.</p>
+		<button type="button" class="boton secundario" data-otra>Enviar otra solicitud</button>
 	</div>
 </form>
 
 <script>
 	const form = document.querySelector<HTMLFormElement>('#formulario')!;
 	const estado = form.querySelector<HTMLParagraphElement>('.estado')!;
-	const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+	const enviar = form.querySelector<HTMLButtonElement>('[data-enviar]')!;
+	const siguiente = form.querySelector<HTMLButtonElement>('[data-siguiente]')!;
+	const atras = form.querySelector<HTMLButtonElement>('[data-atras]')!;
+	const anuncio = form.querySelector<HTMLParagraphElement>('[data-anuncio]')!;
+	const gracias = form.querySelector<HTMLDivElement>('[data-gracias]')!;
+	const pasos = [...form.querySelectorAll<HTMLFieldSetElement>('.paso')];
+	const marcas = [...form.querySelectorAll<HTMLLIElement>('[data-avance] li')];
+	const TOTAL = pasos.length;
 	(form.elements.namedItem('t') as HTMLInputElement).value = String(Date.now());
 
 	const mensajes: Record<string, string> = {
 		enviado: 'Gracias. Recibimos su solicitud y le responderemos a la brevedad.',
 		datos: 'Revise los campos marcados: nombre, un correo válido y la descripción del proyecto son obligatorios.',
+		mensaje: 'Cuéntenos su proyecto en unas líneas para seguir.',
+		personales: 'Revise los campos marcados: el nombre y un correo válido son obligatorios.',
 		archivos: 'Puede adjuntar hasta 2 archivos (fotos o PDF) de hasta 5 MB cada uno.',
 		consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
 		limite: 'Recibimos varias solicitudes desde su conexión. Intente de nuevo en una hora.',
@@ -144,12 +200,112 @@ const preguntas = [
 		estado.textContent = mensajes[clave] ?? mensajes.otro;
 		estado.dataset.tipo = ok ? 'ok' : 'error';
 	}
+	function limpiarEstado() {
+		estado.textContent = '';
+		delete estado.dataset.tipo;
+	}
+
+	// ─── Pasos ───
+	let actual = 1;
+	const reducir = matchMedia('(prefers-reduced-motion: reduce)');
+
+	function irA(n: number, { enfocar = true } = {}) {
+		const antes = actual;
+		actual = Math.min(Math.max(n, 1), TOTAL);
+		pasos.forEach((p, i) => {
+			const visible = i + 1 === actual;
+			p.hidden = !visible;
+			p.classList.remove('entra-adelante', 'entra-atras');
+			// La animación dice hacia dónde se fue: el paso siguiente entra desde la derecha.
+			if (visible && antes !== actual && !reducir.matches) {
+				void p.offsetWidth;
+				p.classList.add(actual > antes ? 'entra-adelante' : 'entra-atras');
+			}
+		});
+		marcas.forEach((li, i) => {
+			const n = i + 1;
+			li.dataset.estado = n < actual ? 'hecho' : n === actual ? 'actual' : 'pendiente';
+			if (n === actual) li.setAttribute('aria-current', 'step');
+			else li.removeAttribute('aria-current');
+			// Se puede volver a un paso ya hecho tocando su marca; no saltar hacia adelante.
+			li.querySelector('button')!.disabled = n >= actual;
+		});
+		atras.hidden = actual === 1;
+		siguiente.hidden = actual === TOTAL;
+		enviar.hidden = actual !== TOTAL;
+		anuncio.textContent = `Paso ${actual} de ${TOTAL}: ${pasos[actual - 1].querySelector('legend')!.textContent}`;
+		if (enfocar && antes !== actual) {
+			pasos[actual - 1].focus({ preventScroll: true });
+			// Si el comienzo del formulario quedó arriba de la pantalla, se vuelve a él.
+			if (form.getBoundingClientRect().top < 0) form.scrollIntoView({ behavior: reducir.matches ? 'auto' : 'smooth', block: 'start' });
+		}
+	}
+
+	// Cada paso adelante es una entrada del historial: Atrás (navegador o celular) vuelve un paso.
+	function avanzar(n: number) {
+		history.pushState({ paso: n }, '');
+		irA(n);
+	}
+	window.addEventListener('popstate', (e) => {
+		const n = (e.state as { paso?: number } | null)?.paso;
+		if (!gracias.hidden) return;
+		limpiarEstado();
+		irA(typeof n === 'number' ? n : 1);
+	});
+
+	// Campos obligatorios de un paso (o de todos) que no están bien.
+	const invalidosEn = (raiz: ParentNode) =>
+		[...raiz.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]')].filter((c) => !c.checkValidity());
+
+	function revisarPaso(n: number): boolean {
+		const paso = pasos[n - 1];
+		for (const c of paso.querySelectorAll('[required]')) c.removeAttribute('aria-invalid');
+		const malos = invalidosEn(paso);
+		if (n === 2 && !archivosValidos()) {
+			archivos.setAttribute('aria-invalid', 'true');
+			mostrar('archivos');
+			archivos.focus();
+			return false;
+		}
+		if (!malos.length) return true;
+		for (const c of malos) c.setAttribute('aria-invalid', 'true');
+		if (n === 2) mostrar('mensaje');
+		else mostrar(malos.length === 1 && malos[0].name === 'consentimiento' ? 'consentimiento' : 'personales');
+		malos[0].focus();
+		return false;
+	}
+
+	siguiente.addEventListener('click', () => {
+		if (!revisarPaso(actual)) return;
+		limpiarEstado();
+		avanzar(actual + 1);
+	});
+	atras.addEventListener('click', () => {
+		limpiarEstado();
+		if (history.state?.paso === actual && actual > 1) history.back();
+		else irA(actual - 1);
+	});
+	for (const li of marcas) {
+		li.querySelector('button')!.addEventListener('click', () => {
+			const n = Number(li.dataset.i);
+			if (n >= actual) return;
+			limpiarEstado();
+			// Volver varios pasos de una vez: se retrocede en el historial lo mismo.
+			if (history.state?.paso === actual) history.go(n - actual);
+			else irA(n);
+		});
+	}
+	// Al quitar la marca roja cuando la persona corrige.
+	form.addEventListener('input', (e) => {
+		const c = e.target as HTMLElement;
+		if (c.getAttribute('aria-invalid') === 'true' && (c as HTMLInputElement).checkValidity?.()) c.removeAttribute('aria-invalid');
+	});
 
 	const params = new URLSearchParams(location.search);
 	// "Cotizar …" desde la ficha de un servicio (MosaicoServicios) llega con ?servicio=slug.
-	const servicio = form.elements.namedItem('servicio') as HTMLSelectElement | null;
 	const pedido = params.get('servicio');
-	if (servicio && pedido && [...servicio.options].some((o) => o.value === pedido)) servicio.value = pedido;
+	const opcionServicio = pedido ? form.querySelector<HTMLInputElement>(`input[name="servicio"][value="${CSS.escape(pedido)}"]`) : null;
+	if (opcionServicio) opcionServicio.checked = true;
 
 	// Resultado del envío sin JavaScript (redirección con ?enviado / ?error).
 	if (params.has('enviado')) mostrar('enviado', true);
@@ -159,37 +315,40 @@ const preguntas = [
 	const archivos = form.querySelector<HTMLInputElement>('#f-archivos')!;
 	const MAX_ARCHIVOS = 2;
 	const MAX_BYTES = 5 * 1024 * 1024;
-	const archivosValidos = () => {
+	function archivosValidos() {
 		const lista = [...(archivos.files ?? [])];
 		return lista.length <= MAX_ARCHIVOS && lista.every((f) => f.size <= MAX_BYTES);
-	};
+	}
 	archivos.addEventListener('change', () => {
 		if (archivosValidos()) {
 			archivos.removeAttribute('aria-invalid');
-			if (estado.dataset.tipo === 'error') estado.textContent = '';
+			if (estado.dataset.tipo === 'error') limpiarEstado();
 		} else {
 			archivos.setAttribute('aria-invalid', 'true');
 			mostrar('archivos');
 		}
 	});
 
+	// Paso en que vive un campo (para llevar a la persona al error que devuelve el servidor).
+	const pasoDe = (el: Element | null) => (el ? pasos.findIndex((p) => p.contains(el)) + 1 || 1 : 1);
+
 	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
-		for (const campo of form.querySelectorAll<HTMLInputElement>('[required]')) campo.removeAttribute('aria-invalid');
-		const invalidos = [...form.querySelectorAll<HTMLInputElement>('[required]')].filter((c) => !c.checkValidity());
-		if (invalidos.length) {
-			for (const c of invalidos) c.setAttribute('aria-invalid', 'true');
-			mostrar(invalidos.some((c) => c.name === 'consentimiento') && invalidos.length === 1 ? 'consentimiento' : 'datos');
-			invalidos[0].focus();
+		// Enter en un campo de un paso intermedio = Siguiente.
+		if (actual < TOTAL) {
+			siguiente.click();
 			return;
 		}
-		if (!archivosValidos()) {
-			archivos.setAttribute('aria-invalid', 'true');
-			mostrar('archivos');
-			archivos.focus();
-			return;
+		// Por si algo de un paso anterior quedó mal (p. ej., al volver con Atrás y borrar).
+		for (let n = 1; n <= TOTAL; n++) {
+			const malos = invalidosEn(pasos[n - 1]);
+			if (malos.length || (n === 2 && !archivosValidos())) {
+				if (n !== actual) irA(n);
+				revisarPaso(n);
+				return;
+			}
 		}
-		boton.disabled = true;
+		enviar.disabled = true;
 		estado.textContent = 'Enviando…';
 		delete estado.dataset.tipo;
 		try {
@@ -198,30 +357,61 @@ const preguntas = [
 			if (datos.ok) {
 				form.reset();
 				archivos.removeAttribute('aria-invalid');
-				mostrar('enviado', true);
+				limpiarEstado();
+				form.classList.add('enviado');
+				gracias.hidden = false;
+				gracias.focus({ preventScroll: true });
+				if (form.getBoundingClientRect().top < 0) form.scrollIntoView({ block: 'start' });
 			} else {
-				mostrar(datos.error ?? 'otro');
+				const error = datos.error ?? 'otro';
+				const campo = error === 'archivos' ? archivos : error === 'consentimiento' ? form.querySelector('#f-consentimiento') : null;
+				if (campo && pasoDe(campo) !== actual) irA(pasoDe(campo));
+				mostrar(error);
 			}
 		} catch {
 			mostrar('red');
 		} finally {
-			boton.disabled = false;
+			enviar.disabled = false;
 		}
 	});
+
+	form.querySelector('[data-otra]')!.addEventListener('click', () => {
+		form.classList.remove('enviado');
+		gracias.hidden = true;
+		(form.elements.namedItem('t') as HTMLInputElement).value = String(Date.now());
+		history.replaceState({ paso: 1 }, '');
+		irA(1);
+	});
+
+	// Al cargar: paso 1 (o el de un error que volvió sin JavaScript).
+	history.replaceState({ paso: 1 }, '');
+	const errorInicial = params.get('error');
+	irA(errorInicial === 'archivos' ? 2 : errorInicial === 'datos' || errorInicial === 'consentimiento' ? 3 : 1, { enfocar: false });
 </script>
 
 <style>
 	/* Los campos comparten estilos con la postulación: src/styles/formulario.css. */
-	.proyecto {
+	.cotiza {
+		scroll-margin-top: 6rem;
+		/* El paso que entra desde el lado no debe ensanchar la página en el celular: se recorta a
+		   lo ancho, con 0,5 rem de aire para que el contorno de foco de los botones no se corte. */
+		overflow-x: clip;
+		margin-inline: -0.5rem;
+		padding-inline: 0.5rem;
+	}
+	.paso {
 		display: grid;
 		gap: 1.25rem;
-		margin: 0.5rem 0 0;
+		margin: 0;
 		padding: 0;
 		border: 0;
 		min-width: 0;
 	}
+	.paso:focus {
+		outline: none;
+	}
 	/* La leyenda lleva la línea de arriba (el borde del fieldset la cortaría). */
-	.proyecto > legend {
+	.paso > legend {
 		width: 100%;
 		margin-bottom: 1.25rem;
 		padding: 1.25rem 0 0;
@@ -230,5 +420,182 @@ const preguntas = [
 		font-size: 1.25rem;
 		font-weight: 700;
 		letter-spacing: -0.02em;
+	}
+	.ayuda-paso {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--gris-medio);
+	}
+
+	/* Sin JavaScript: los tres pasos seguidos y solo el botón Enviar. */
+	.avance,
+	.atras,
+	[data-siguiente],
+	.ayuda-paso {
+		display: none;
+	}
+
+	/* ─── Con JavaScript: por pasos ─── */
+	:global(.cotiza-js) .avance {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.5rem;
+		margin: 0 0 0.25rem;
+		padding: 0;
+		list-style: none;
+	}
+	:global(.cotiza-js) .ayuda-paso {
+		display: block;
+	}
+	:global(.cotiza-js) .paso > legend {
+		/* La barra de avance ya hace de separador: la leyenda queda como título del paso. */
+		padding-top: 0;
+		border-top: 0;
+	}
+	.avance button {
+		display: grid;
+		gap: 0.45rem;
+		width: 100%;
+		min-height: 2.75rem;
+		padding: 0;
+		border: 0;
+		background: none;
+		color: var(--gris-medio);
+		font: inherit;
+		text-align: left;
+		cursor: default;
+	}
+	/* La losa del logo como barra de avance: gris pendiente, verde hecho y actual. */
+	.avance button::before {
+		content: '';
+		height: 6px;
+		background: var(--linea);
+		transition: background-color 0.25s var(--suave);
+	}
+	.avance li[data-estado='hecho'] button,
+	.avance li[data-estado='actual'] button {
+		color: var(--lols-carbon);
+	}
+	.avance li[data-estado='hecho'] button::before,
+	.avance li[data-estado='actual'] button::before {
+		background: var(--lols-verde-oscuro);
+	}
+	.avance li[data-estado='hecho'] button {
+		cursor: pointer;
+	}
+	.avance li[data-estado='hecho'] button:hover .avance-t {
+		text-decoration: underline;
+	}
+	.avance button:focus-visible {
+		outline: 3px solid var(--lols-verde-oscuro);
+		outline-offset: 2px;
+	}
+	.avance button > span {
+		display: inline;
+	}
+	.avance-n,
+	.avance-t {
+		font-family: var(--fuente-datos);
+		font-size: 0.95rem;
+		font-weight: 600;
+	}
+	.avance-n {
+		margin-right: 0.35rem;
+		color: var(--lols-verde-oscuro);
+	}
+	.avance li[data-estado='pendiente'] .avance-n {
+		color: inherit;
+	}
+	/* Número y texto en la misma línea, bajo la barra. */
+	.avance button {
+		grid-template-columns: auto 1fr;
+		grid-template-rows: auto auto;
+		column-gap: 0;
+	}
+	.avance button::before {
+		grid-column: 1 / -1;
+	}
+
+	:global(.cotiza-js) .atras {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 3rem;
+		padding: 0.75rem 0.25rem;
+		border: 0;
+		background: none;
+		color: var(--lols-verde-oscuro);
+		font-family: var(--fuente-titulos);
+		font-weight: 700;
+		font-size: 1rem;
+		cursor: pointer;
+	}
+	:global(.cotiza-js) .atras:hover {
+		text-decoration: underline;
+	}
+	:global(.cotiza-js) [data-siguiente] {
+		display: inline-flex;
+	}
+	/* `hidden` manda sobre los display de arriba. */
+	.cotiza [hidden] {
+		display: none !important;
+	}
+	/* Atrás a la izquierda; Siguiente / Enviar a la derecha. */
+	:global(.cotiza-js) .acciones {
+		justify-content: space-between;
+	}
+	:global(.cotiza-js) .acciones .estado {
+		flex-basis: 100%;
+		order: -1;
+	}
+	:global(.cotiza-js) .acciones .boton {
+		margin-left: auto;
+	}
+
+	/* El paso nuevo entra desde el lado hacia el que se avanzó (solo transform y opacidad). */
+	@media (prefers-reduced-motion: no-preference) {
+		.entra-adelante {
+			animation: paso-entra 0.28s var(--suave) both;
+		}
+		.entra-atras {
+			animation: paso-entra 0.28s var(--suave) both;
+			--desde: -1.5rem;
+		}
+	}
+	@keyframes paso-entra {
+		from {
+			opacity: 0;
+			transform: translateX(var(--desde, 1.5rem));
+		}
+	}
+
+	/* Enviado: en vez de los pasos, la confirmación. */
+	.cotiza.enviado > :not(.gracias) {
+		display: none;
+	}
+	.gracias {
+		display: grid;
+		gap: 0.75rem;
+		justify-items: start;
+		padding: 1.5rem 0 0;
+		border-top: 6px solid var(--lols-verde-oscuro);
+	}
+	.gracias:focus {
+		outline: none;
+	}
+	.gracias p {
+		margin: 0;
+	}
+	.gracias-titulo {
+		font-family: var(--fuente-titulos);
+		font-size: 1.5rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+	@media (max-width: 560px) {
+		/* En el celular, el botón principal a lo ancho: es lo que se toca con el pulgar. */
+		:global(.cotiza-js) .acciones .boton {
+			flex: 1 1 auto;
+		}
 	}
 </style>
