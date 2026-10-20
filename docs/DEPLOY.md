@@ -73,7 +73,7 @@ Plan de corte (se detalla cuando don Luis apruebe):
 
 ## Formulario de contacto (PHP)
 
-`public/api/contacto.php` recibe el formulario de cotización de `/contacto/` y
+`public/api/contacto.php` recibe el formulario de cotización de `/cotizar/` y
 `public/api/postulacion.php` las postulaciones de `/trabaja-con-nosotros/` (cargos y preguntas
 en `/api/cargos.json`, que se genera desde `src/data/postulaciones.ts`). Los dos envían un
 correo con `mail()` del servidor, con los archivos adjuntos (hasta 2, de 5 MB); lo común está

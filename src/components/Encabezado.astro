@@ -27,7 +27,7 @@ const ruta = Astro.url.pathname;
 					))
 				}
 			</ul>
-			<a href="/contacto/" class="boton">Cotizar</a>
+			<a href="/cotizar/" class="boton" aria-current={ruta.startsWith('/cotizar/') ? 'page' : undefined}>Cotizar</a>
 		</nav>
 	</div>
 </header>

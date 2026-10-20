@@ -52,7 +52,7 @@ const idPanel = 'ficha-servicios';
 						<div data-ficha={`servicio-${s.slug}`} hidden>
 							<FichaServicio servicio={s} titulo={tituloFicha} sub={subFicha} />
 							<div class="ficha-pie">
-								<a href={`/contacto/?servicio=${s.slug}`} class="boton">Cotizar {s.nombre.toLowerCase()}</a>
+								<a href={`/cotizar/?servicio=${s.slug}`} class="boton">Cotizar {s.nombre.toLowerCase()}</a>
 								<button type="button" class="ficha-boton" data-cerrar>
 									Cerrar
 									<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 10l5-5 5 5" /></svg>

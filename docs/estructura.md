@@ -20,7 +20,8 @@ referencia de docs/brief.md § 3.
 | Servicios | agrupados por necesidad (Construir / Instalar / Mantener, **propuesta a confirmar**), cada uno con el problema que resuelve | Ramboll, Arup |
 | Servicio | problema como titular → foto → qué hacemos / para quién → proyectos del servicio → contacto | Arup, Ramboll |
 | Empresa | directrices en grande → foto de equipo → línea de tiempo → valores → seguridad → equipo con nombre | Heatherwick, Tecsa, Ingevec, Mott MacDonald |
-| Contacto | formulario + persona que atiende + datos + mapa | Arup, Mott MacDonald |
+| Contacto | datos de la empresa (teléfono, WhatsApp, correo, horario, oficina) + mapa; la cotización, aparte (Marcos, 20-10-2026) | Arup, Mott MacDonald |
+| Cotizar | formulario en tres pasos + qué pasa después; el botón «Cotizar» del encabezado y de la barra del celular llevan aquí | Arup, Mott MacDonald, reunión |
 
 ## Qué se descartó y por qué
 
@@ -139,7 +140,7 @@ Cambios:
 - **Portada (10 → 7 bloques):** obra en video con lema, bajada y botones · cifras · servicios en
   seis fotos · obras en construcción (foto, nombre, comuna) · seguridad (video + dos datos) ·
   clientes · contacto (frase + botón). Salieron el proyecto destacado, el equipamiento, "cómo
-  trabajamos" (sigue en /contacto/) y la agrupación Construir/Instalar/Mantener.
+  trabajamos" (sigue en /cotizar/) y la agrupación Construir/Instalar/Mantener.
 - **Tarjetas de proyecto:** foto, pictograma, nombre y comuna; tipo, superficie, fechas y
   dirección pasaron a la ficha.
 - **Ficha de proyecto:** la foto va primero; después nombre, titular, datos y relato.
@@ -177,7 +178,7 @@ mecánica es común (`src/scripts/despliegue.ts`):
 - **Servicios** (`MosaicoServicios`): como en Google Imágenes, la ficha (`FichaServicio`) se abre
   a todo el ancho bajo la fila de la foto pinchada, con una muesca que apunta a ella. La fila se
   calcula con 3, 2 o 1 columnas. «Cotizar …» lleva al formulario con el servicio ya elegido
-  (`/contacto/?servicio=slug`).
+  (`/cotizar/?servicio=slug`).
 - **Equipamiento propio** (`Equipamiento`, en /empresa/): el mismo mosaico (`src/scripts/mosaico.ts`).
   La foto lleva la cifra en grande y el detalle muestra qué incluye cada categoría. Las
   categorías e ítems vienen del inventario de la Bóveda (andamios, alzaprimas y vigas,

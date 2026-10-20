@@ -1,13 +1,13 @@
 <?php
 /**
- * Formulario de cotización de lols.cl (/contacto/): valida, filtra spam y envía un correo con
+ * Formulario de cotización de lols.cl (/cotizar/): valida, filtra spam y envía un correo con
  * mail(), con las fotos o planos que adjunte la persona (hasta 2, de 5 MB, JPG/PNG/WebP/HEIC/PDF).
  * Lo común con postulacion.php (configuración, límite de envíos, adjuntos, correo) está en
  * lib/formulario.php; la configuración, en docs/DEPLOY.md. Sin config.ini no envía nada
  * (responde "no configurado").
  *
  * Responde JSON si la petición viene por fetch (Accept: application/json); si no, redirige
- * a /contacto/ con ?enviado=1 o ?error=<código>, para que funcione sin JavaScript.
+ * a /cotizar/ con ?enviado=1 o ?error=<código>, para que funcione sin JavaScript.
  *
  * Compatible con PHP 7.4+.
  */
@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/lib/formulario.php';
 
-$paginaFormulario = '/contacto/';
+$paginaFormulario = '/cotizar/';
 
 // Opciones del formulario (src/components/FormularioContacto.astro): cambiarlas en ambos.
 const SERVICIOS = [

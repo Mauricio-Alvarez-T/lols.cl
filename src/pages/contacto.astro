@@ -1,35 +1,54 @@
 ---
+// Contacto (Marcos, 20-10-2026): los datos de la empresa — teléfono, WhatsApp, correo, horario y
+// la oficina con su mapa. La solicitud de cotización se fue a /cotizar/: antes estaban juntas, y
+// el ítem «Contacto» del menú y el botón «Cotizar» llevaban a la misma página con lo mismo.
+// Cierra con «Hablemos de su proyecto», que lleva a /cotizar/.
+// Enlaces viejos a la cotización (/contacto/?servicio=…, ?enviado, ?error o #formulario) siguen
+// a /cotizar/ con lo que traían.
 import Base from '../layouts/Base.astro';
-import FormularioContacto from '../components/FormularioContacto.astro';
-import { empresa, telefonoHref, whatsappHref } from '../data/empresa';
-import Proceso from '../components/Proceso.astro';
+import Contacto from '../components/Contacto.astro';
 import ObraPortada from '../components/ObraPortada.astro';
+import { empresa, telefonoHref, whatsappHref } from '../data/empresa';
 import { bandas } from '../data/referencia';
+
+const horario = empresa.horario.charAt(0).toLowerCase() + empresa.horario.slice(1);
 ---
 
-<Base title="Contacto" description="Solicite una cotización a LOLS Ingeniería.">
-	<ObraPortada imagen={bandas.contacto} baja>
+<Base title="Contacto" description="Teléfono, WhatsApp, correo, horario y oficina de LOLS Ingeniería en Santiago.">
+	<script is:inline>
+		(function () {
+			var s = location.search, h = location.hash;
+			if (!/[?&](servicio|enviado|error)=/.test(s) && h !== '#formulario') return;
+			// Sin la transición entre páginas: esta página ni se alcanza a mostrar.
+			addEventListener('pageswap', function (e) { if (e.viewTransition) e.viewTransition.skipTransition(); });
+			location.replace('/cotizar/' + s + h);
+		})();
+	</script>
+	<ObraPortada imagen={bandas.oficina} baja>
 		<p class="etiqueta">Contacto</p>
-		<h1 class="display largo">Hablemos de su proyecto</h1>
-		<p class="bajada">Cuéntenos qué necesita: después de recibir su solicitud, nos ponemos en contacto con usted. Si prefiere, escríbanos por WhatsApp.</p>
+		<h1 class="display largo">Estamos en Santiago</h1>
+		<p class="bajada">Oficina en {empresa.direccion.valor}. Atendemos de {horario}.</p>
 		<p class="canales">
-			<a class="boton" href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a>
+			{empresa.whatsapp && <a class="boton" href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a>}
 			<a class="boton secundario" href={telefonoHref(empresa.telefono.valor)}>Llamar</a>
 		</p>
 	</ObraPortada>
-
 	<section class="seccion contenedor columnas">
 		<div>
-			<h2>Solicitar cotización</h2>
-			<FormularioContacto />
-		</div>
-		<aside>
+			<h2>Datos de contacto</h2>
 			<dl class="datos vertical">
-				<!-- Sin "Quién atiende": no van nombres de personas (don Luis, 08-10-2026). -->
 				<div>
 					<dt>Teléfono</dt>
 					<dd><a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a></dd>
 				</div>
+				{
+					empresa.whatsapp && (
+						<div>
+							<dt>WhatsApp</dt>
+							<dd><a href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a></dd>
+						</div>
+					)
+				}
 				<div>
 					<dt>Correo</dt>
 					<dd><a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a></dd>
@@ -42,40 +61,52 @@ import { bandas } from '../data/referencia';
 					<dt>Oficina</dt>
 					<dd>{empresa.direccion.valor}</dd>
 				</div>
+				<div>
+					<dt>Razón social</dt>
+					<dd>{empresa.razonSocial} · RUT {empresa.rut}</dd>
+				</div>
 			</dl>
-			<div class="despues">
-				<Proceso titulo="Qué pasa después" compacto />
-			</div>
+		</div>
+		<div>
+			<h2>Cómo llegar</h2>
 			<div class="mapa marco">
 				<iframe
-					title="Mapa: Philippi 36, Santiago"
+					title={`Mapa: ${empresa.direccion.valor}`}
 					src="https://www.openstreetmap.org/export/embed.html?bbox=-70.6813%2C-33.4543%2C-70.6654%2C-33.4463&layer=mapnik&marker=-33.45030%2C-70.67339"
 					loading="lazy"
 					referrerpolicy="no-referrer"></iframe>
 			</div>
 			<a class="ver-mapa" href="https://www.openstreetmap.org/?mlat=-33.45030&mlon=-70.67339#map=17/-33.45030/-70.67339">Ver en el mapa</a>
-		</aside>
+		</div>
 	</section>
-
 	<section class="contenedor derivar">
 		<p>¿Busca trabajo? <a href="/trabaja-con-nosotros/">Trabaja con nosotros</a></p>
 	</section>
+	<Contacto />
 </Base>
 
 <style>
 	.columnas {
 		display: grid;
-		grid-template-columns: 1.4fr 1fr;
+		grid-template-columns: 1fr 1.2fr;
 		gap: clamp(2rem, 6vw, 5rem);
 		padding-top: 0;
 	}
 	.columnas h2 {
+		margin-bottom: 1.25rem;
 		font-size: 1.75rem;
 		letter-spacing: -0.02em;
 	}
 	.vertical {
 		grid-template-columns: minmax(0, 1fr);
-		margin-bottom: 2rem;
+	}
+	/* Aquí los datos son lo principal: más grandes que en una ficha. */
+	.vertical dd {
+		font-size: 1.25rem;
+		overflow-wrap: anywhere;
+	}
+	.vertical > div {
+		padding-block: 0.9rem 1rem;
 	}
 	.canales {
 		display: flex;
@@ -83,13 +114,7 @@ import { bandas } from '../data/referencia';
 		gap: 0.75rem;
 		margin-top: 1.5rem;
 	}
-	.despues {
-		margin-bottom: 2rem;
-	}
 	.derivar {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem 2.5rem;
 		padding-block: 0 var(--seccion);
 		color: var(--lols-gris);
 	}

@@ -1,0 +1,75 @@
+---
+// Cotizar (Marcos, 20-10-2026): la solicitud de cotización tiene su propia página. Antes vivía en
+// /contacto/ y el botón «Cotizar» y el ítem «Contacto» del menú llevaban a la misma página, con la
+// misma información: ahora Contacto son los datos de la empresa y Cotizar es el formulario.
+// Al lado del formulario, «Qué pasa después» (claridad del proceso cuando no hay precios).
+// Sin el cierre «Hablemos de su proyecto»: su botón traería a esta misma página.
+import Base from '../layouts/Base.astro';
+import FormularioContacto from '../components/FormularioContacto.astro';
+import { empresa, telefonoHref, whatsappHref } from '../data/empresa';
+import Proceso from '../components/Proceso.astro';
+import ObraPortada from '../components/ObraPortada.astro';
+import { bandas } from '../data/referencia';
+---
+
+<Base title="Cotizar" description="Solicite una cotización a LOLS Ingeniería en tres pasos.">
+	<ObraPortada imagen={bandas.contacto} baja>
+		<p class="etiqueta">Cotizar</p>
+		<h1 class="display largo">Hablemos de su proyecto</h1>
+		<p class="bajada">Cuéntenos qué necesita en tres pasos: después de recibir su solicitud, nos ponemos en contacto con usted. Si prefiere, escríbanos por WhatsApp.</p>
+		<p class="canales">
+			<a class="boton" href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a>
+			<a class="boton secundario" href={telefonoHref(empresa.telefono.valor)}>Llamar</a>
+		</p>
+	</ObraPortada>
+	<section class="seccion contenedor columnas">
+		<div>
+			<h2>Solicitar cotización</h2>
+			<FormularioContacto />
+		</div>
+		<aside>
+			<Proceso titulo="Qué pasa después" compacto />
+		</aside>
+	</section>
+	<section class="contenedor derivar">
+		<p>¿Tiene una consulta que no es una cotización? <a href="/contacto/">Contacto</a></p>
+		<p>¿Busca trabajo? <a href="/trabaja-con-nosotros/">Trabaja con nosotros</a></p>
+	</section>
+</Base>
+
+<style>
+	.columnas {
+		display: grid;
+		grid-template-columns: 1.4fr 1fr;
+		gap: clamp(2rem, 6vw, 5rem);
+		padding-top: 0;
+	}
+	.columnas h2 {
+		font-size: 1.75rem;
+		letter-spacing: -0.02em;
+	}
+	.canales {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 1.5rem;
+	}
+	.derivar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 2.5rem;
+		padding-block: 0 var(--seccion);
+		color: var(--lols-gris);
+	}
+	.derivar p {
+		margin: 0;
+	}
+	.derivar a {
+		font-weight: 600;
+	}
+	@media (max-width: 860px) {
+		.columnas {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

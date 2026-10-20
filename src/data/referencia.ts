@@ -57,6 +57,8 @@ export const bandas = {
 	contacto: unsplash('1774599730788-a74cd9253b56', 'Equipo revisando planos en terreno'),
 	error: unsplash('1603465410243-af3e840367dd', 'Maquinaria en una obra detenida'),
 	privacidad: unsplash('1487491424367-7571f9afbb30', 'Vista aérea de edificios de altura'),
+	// Contacto (datos de la empresa): la ciudad; la cotización se quedó con `contacto` (equipo y planos).
+	oficina: unsplash('1487491424367-7571f9afbb30', 'Vista aérea de edificios de altura'),
 };
 
 export const bandasServicio: Record<string, ImagenReferencial> = {
