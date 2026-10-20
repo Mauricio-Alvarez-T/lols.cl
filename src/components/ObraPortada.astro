@@ -137,18 +137,25 @@ const horizontales = [40];
 		justify-content: center;
 	}
 
-	/* Con franja al pie: el mensaje al medio de la pantalla y la franja pegada abajo. */
+	/* Con franja al pie: la franja pegada abajo y el mensaje justo encima, a la izquierda (como
+	   Suffolk), para que el video se vea entero arriba; con `centrado`, el mensaje al medio. */
+	/* En columna: el mensaje y la franja se apilan, así nunca se montan (el alto de la franja
+	   cambia con el ancho y con el aviso de propuesta). */
 	.con-pie {
-		align-items: center;
+		flex-direction: column;
+		justify-content: flex-end;
+		align-items: stretch;
 	}
 	.con-pie .contenido {
+		padding-block: 6rem 2rem;
+	}
+	.con-pie.centrado .contenido {
+		margin-block: auto;
 		padding-block: 6rem;
 	}
 	.pie-hero {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
+		position: relative;
+		width: 100%;
 	}
 	.pie-fila {
 		display: flex;
@@ -214,12 +221,14 @@ const horizontales = [40];
 			min-height: calc(88svh - 4.5rem);
 		}
 		.con-pie .contenido {
-			padding-block: 4rem 7rem;
+			padding-block: 4rem 1.5rem;
 		}
 		.pie-fila {
+			gap: 0.6rem 1.25rem;
+		}
+		.centrado .pie-fila {
 			justify-content: center;
 			text-align: center;
-			gap: 0.6rem;
 		}
 		.pie-hero :global(.etiqueta) {
 			font-size: 0.78rem;

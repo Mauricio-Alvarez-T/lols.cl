@@ -6,26 +6,25 @@
 // solo el rótulo de los servicios y el lema; abajo, una franja con desde cuándo y dónde, y
 // «Ver proyectos». Sin bajada ni botones (Cotizar ya está en el encabezado) y sin WhatsApp
 // flotante. Después:
-//   obra en video con el lema → qué hacemos en tres líneas → cifras → servicios en fotos →
-//   obras en construcción → la próxima obra en grande y la cartera → obras de clientes (foto y
-//   dirección, en el mismo carrusel de las obras) → contacto. Sin bloque de seguridad (don Luis,
+//   obra en video con el lema → qué hacemos en tres líneas (con las palabras clave en verde) →
+//   cifras → los tres carruseles seguidos, en el mismo formato (Marcos, 20-10-2026): en obra
+//   ahora → han confiado en nosotros (foto y dirección) → próximos proyectos (las contratadas,
+//   con su render) → servicios en fotos → contacto. Sin bloque de seguridad (don Luis,
 //   20-10-2026: por ahora no se detalla). Los bloques de texto sueltos van centrados (Marcos,
 //   20-10-2026); los carruseles y las tarjetas mantienen el texto junto a su foto.
 // Movimiento al estilo de las páginas de producto de Apple (pedido de Marcos, 16-10-2026;
 // docs/estructura.md § Dirección visual): la obra se achica a lámina al bajar, el texto se
-// enciende por líneas, las cifras suben y la próxima obra se expande. Todo con CSS ligado al
+// enciende por líneas y las cifras suben. Todo con CSS ligado al
 // scroll; sin soporte o con "reducir movimiento" se ve quieto y completo.
 import Base from '../layouts/Base.astro';
-import Pendiente from '../components/Pendiente.astro';
 import CarruselObras from '../components/CarruselObras.astro';
 import { deProyecto, deMuestra, deConfianza } from '../data/carrusel';
 import Contacto from '../components/Contacto.astro';
 import { empresa, aniosTrayectoria, fundacion, servicios } from '../data/empresa';
-import { proyectos, proyectosPorEstado, obrasConfianza } from '../data/proyectos';
+import { proyectosPorEstado, obrasConfianza } from '../data/proyectos';
 import MosaicoServicios from '../components/MosaicoServicios.astro';
 import { obrasEnCurso, videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
-import { ejemplosContratados } from '../data/ejemplos';
 
 const enObra = proyectosPorEstado('en-curso').slice(0, 3);
 const contratados = proyectosPorEstado('contratado');
@@ -42,15 +41,13 @@ const cifras = [
 const nombresServicios = servicios.map((s, i) => (i === 0 ? s.nombre : s.nombre.toLowerCase()));
 const queHacemos = `${nombresServicios.slice(0, -1).join(', ')} y ${nombresServicios.at(-1)}.`;
 
-// La próxima obra en grande: la contratada más grande, con su render.
-const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 ---
 
 <Base title="LOLS Ingeniería" description={`${empresa.razonSocial}. ${empresa.lema}.`} sinWhatsapp>
 	<div class="portada-fija">
-		<ObraPortada video={videos.portada} centrado>
+		<ObraPortada video={videos.portada}>
 			<p class="rotulo-servicios">{servicios.map((s) => s.nombre).join(' · ')}</p>
-			<h1 class="display">{empresa.lema}<span class="punto">.</span></h1>
+			<h1 class="display titulo-portada">{empresa.lema}<span class="punto">.</span></h1>
 			<Fragment slot="pie">
 				<p class="etiqueta">Desde {fundacion} · Santiago, Chile</p>
 				<a href="/proyectos/" class="enlace-flecha">Ver proyectos</a>
@@ -60,9 +57,9 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 
 	<section class="manifiesto contenedor" aria-label="Qué hacemos">
 		<p class="manifiesto-texto">
-			<span class="linea">{queHacemos}</span>
-			<span class="linea">Desde {fundacion}, en Santiago.</span>
-			<span class="linea">Con 200 trabajadores y equipos propios.</span>
+			<span class="linea"><span class="resalte">{nombresServicios[0]}</span>{queHacemos.slice(nombresServicios[0].length)}</span>
+			<span class="linea">Desde <span class="resalte">{fundacion}</span>, en Santiago.</span>
+			<span class="linea">Con 200 trabajadores y <span class="resalte">equipos propios</span>.</span>
 		</p>
 	</section>
 
@@ -82,6 +79,29 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		</div>
 	</section>
 
+	<CarruselObras
+		titulo="En obra ahora"
+		enlace={{ href: '/proyectos/#en-construccion', texto: 'Todos los proyectos' }}
+		obras={enObra.length ? enObra.map(deProyecto) : obrasEnCurso.map(deMuestra)}
+	/>
+
+	<!-- Don Luis (08-10-2026): sin logos ni nombres; la foto del edificio y su dirección. En el
+	     mismo carrusel que "En obra ahora" (Marcos, 20-10-2026: las fotos se ven mejor así). -->
+	<CarruselObras titulo="Han confiado en nosotros" id="han-confiado" obras={obrasConfianza.map(deConfianza)} />
+
+	<!-- Próximos proyectos (Marcos, 20-10-2026): las obras contratadas, en el mismo carrusel que
+	     las otras dos, con su render y su ficha. Reemplaza a la próxima obra en grande. -->
+	{
+		contratados.length > 0 && (
+			<CarruselObras
+				titulo="Próximos proyectos"
+				id="proximos-proyectos"
+				enlace={{ href: '/proyectos/#contratados', texto: 'Todos los proyectos' }}
+				obras={contratados.map(deProyecto)}
+			/>
+		)
+	}
+
 	<section class="seccion servicios-portada">
 		<div class="contenedor">
 			<div class="cabecera">
@@ -91,40 +111,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 			<MosaicoServicios />
 		</div>
 	</section>
-
-	<CarruselObras
-		titulo="En obra ahora"
-		enlace={{ href: '/proyectos/#en-construccion', texto: 'Todos los proyectos' }}
-		obras={enObra.length ? enObra.map(deProyecto) : obrasEnCurso.map(deMuestra)}
-	/>
-
-	{
-		proxima && (
-			<section class="proxima" aria-label="La próxima obra">
-				<figure class="proxima-foto marco">
-					<img src={`/proyectos/${proxima.slug}/1.jpg`} alt={`Render del ${(proxima.tipo ?? 'proyecto').toLowerCase()} de ${proxima.nombre}`} loading="lazy" />
-				</figure>
-				<p class="contenedor proxima-pie">
-					{[proxima.nombre, proxima.tipo, proxima.comuna, proxima.superficie].filter(Boolean).join(' · ')} · render del proyecto
-				</p>
-			</section>
-		)
-	}
-	<div class="contenedor cartera-fila">
-			<a href="/proyectos/#contratados" class="cartera">
-				<span class="cartera-n">
-					{contratados.length || <Pendiente texto="n.º de obras contratadas">{ejemplosContratados.length}</Pendiente>}
-				</span>
-				<span class="cartera-texto">
-					obras en proyecto, las próximas en construirse
-					<span class="enlace-flecha">Ver cuáles</span>
-				</span>
-			</a>
-	</div>
-
-	<!-- Don Luis (08-10-2026): sin logos ni nombres; la foto del edificio y su dirección. En el
-	     mismo carrusel que "En obra ahora" (Marcos, 20-10-2026: las fotos se ven mejor así). -->
-	<CarruselObras titulo="Han confiado en nosotros" id="han-confiado" obras={obrasConfianza.map(deConfianza)} />
 
 	<Contacto />
 </Base>
@@ -167,7 +153,8 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 </script>
 
 <style>
-	.punto {
+	.punto,
+	.resalte {
 		color: var(--lols-verde);
 	}
 	/* Rótulo sobre el lema: los servicios en versalitas espaciadas (patrón Mortenson). */
@@ -180,6 +167,13 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		text-transform: uppercase;
 		color: rgb(255 255 255 / 0.9);
 		text-shadow: 0 1px 12px rgb(0 0 0 / 0.35);
+	}
+	/* El lema abajo a la izquierda y más chico que en las páginas interiores: que no tape el
+	   video (Marcos, 20-10-2026: "no deja ver la animación completa"). */
+	h1.display.titulo-portada {
+		max-width: 13ch;
+		margin-bottom: 0;
+		font-size: clamp(2.6rem, 1rem + 4.4vw, 5.75rem);
 	}
 	/* Celular: en una sola línea, más chico y menos espaciado (si se parte, un renglón empieza
 	   con el punto separador). */
@@ -250,62 +244,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		color: #c9cfca;
 	}
 
-	/* La próxima obra: la foto entra angosta y se abre a todo el ancho. */
-	.proxima {
-		padding-bottom: clamp(2rem, 4vw, 3rem);
-	}
-	.proxima-foto {
-		margin: 0;
-		height: clamp(18rem, 56vw, 44rem);
-	}
-	.proxima-pie {
-		margin-top: 0.75rem;
-		text-align: center;
-		font-family: var(--fuente-datos);
-		font-size: 0.95rem;
-		color: var(--gris-medio);
-	}
-
-	.cartera-fila {
-		padding-bottom: var(--seccion);
-	}
-	.cartera-fila .cartera {
-		margin-top: 0;
-	}
-	/* Cartera contratada: una línea que muestra continuidad, con su número grande. */
-	.cartera {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 1.25rem;
-		margin-top: clamp(2rem, 4vw, 3rem);
-		padding-block: 1.25rem;
-		border-block: 1px solid var(--lols-carbon);
-		color: var(--lols-carbon);
-		text-decoration: none;
-	}
-	.cartera-n {
-		font-family: var(--fuente-titulos);
-		font-size: clamp(2.5rem, 5vw, 3.75rem);
-		font-weight: 700;
-		letter-spacing: -0.04em;
-		line-height: 1;
-		font-variant-numeric: tabular-nums;
-	}
-	.cartera-texto {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		justify-content: center;
-		gap: 0.25rem 1.25rem;
-		font-family: var(--fuente-titulos);
-		font-size: clamp(1.1rem, 2vw, 1.35rem);
-		font-weight: 600;
-	}
-	.cartera-texto .enlace-flecha {
-		font-size: 1rem;
-	}
-
 	@media (max-width: 760px) {
 		.cifras {
 			grid-template-columns: 1fr;
@@ -319,12 +257,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		.cifra:first-child {
 			padding-top: 0;
 			border-top: 0;
-		}
-		/* El número arriba y el texto abajo, los dos al medio. */
-		.cartera {
-			flex-direction: column;
-			gap: 0.5rem;
-			text-align: center;
 		}
 	}
 
@@ -358,12 +290,9 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		}
 		/* En celular la barra de contacto ocupa el borde de abajo: el texto sube sobre ella. */
 		@media (max-width: 767px) {
-			:global(.anim) .portada-fija :global(.hero-obra > .contenido) {
-				padding-bottom: calc(clamp(3rem, 8vw, 5.5rem) + 4.5rem);
-			}
-			/* La franja del pie, sobre la barra de contacto (que tapa el borde de abajo). */
+			/* La franja del pie queda sobre la barra (el lema va justo encima de la franja). */
 			:global(.anim) .portada-fija :global(.hero-obra > .pie-hero) {
-				bottom: calc(3.5rem + env(safe-area-inset-bottom));
+				margin-bottom: calc(3.5rem + env(safe-area-inset-bottom));
 			}
 		}
 		:global(.anim) .portada-fija :global(.hero-obra),
@@ -371,9 +300,7 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		:global(.anim) .portada-fija :global(.hero-obra > .pie-hero),
 		:global(.anim) .linea,
 		:global(.anim) .cifra,
-		:global(.anim) .servicios-portada :global(.mosaico > .item),
-		:global(.anim) .proxima-foto,
-		:global(.anim) .proxima-foto img {
+		:global(.anim) .servicios-portada :global(.mosaico > .item) {
 			animation-timing-function: linear;
 			animation-fill-mode: both;
 		}
@@ -388,18 +315,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 			animation-name: subir-scroll;
 			animation-timeline: view();
 			animation-range: entry 0% cover 30%;
-		}
-		:global(.anim) .proxima-foto {
-			animation-name: abrir;
-			animation-timeline: view();
-			animation-range: entry 0% cover 50%;
-		}
-		:global(.anim) .proxima-foto img {
-			animation-name: acomodar;
-			animation-timeline: view();
-			/* "cover" = de que asoma a que sale (escrito como "entry 0% exit 100%" el
-			   minificador lo corta en "exit 0%"). */
-			animation-range: cover 0% cover 100%;
 		}
 	}
 	@keyframes portada-achicar {
@@ -422,19 +337,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		from {
 			opacity: 0;
 			transform: translateY(8vh);
-		}
-	}
-	@keyframes abrir {
-		from {
-			transform: scale(0.78);
-		}
-	}
-	@keyframes acomodar {
-		from {
-			transform: scale(1.18);
-		}
-		to {
-			transform: scale(1);
 		}
 	}
 </style>
