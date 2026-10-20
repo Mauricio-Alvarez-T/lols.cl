@@ -3,16 +3,15 @@
 // imagen + título y lleva a su página, donde está el detalle:
 //   obra en video con el lema → qué hacemos en tres líneas → cifras → servicios en fotos →
 //   obras en construcción → la próxima obra en grande y la cartera → seguridad (video + dos
-//   datos) → obras de clientes (foto y dirección) → contacto.
+//   datos) → obras de clientes (foto y dirección, en el mismo carrusel de las obras) → contacto.
 // Movimiento al estilo de las páginas de producto de Apple (pedido de Marcos, 16-10-2026;
 // docs/estructura.md § Dirección visual): la obra se achica a lámina al bajar, el texto se
-// enciende por líneas, las cifras suben, la próxima obra se expande y las obras de clientes
-// van en un carril lateral. Todo con CSS ligado al scroll; sin soporte o con "reducir
-// movimiento" se ve quieto y completo.
+// enciende por líneas, las cifras suben y la próxima obra se expande. Todo con CSS ligado al
+// scroll; sin soporte o con "reducir movimiento" se ve quieto y completo.
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import CarruselObras from '../components/CarruselObras.astro';
-import { deProyecto, deMuestra } from '../data/carrusel';
+import { deProyecto, deMuestra, deConfianza } from '../data/carrusel';
 import Contacto from '../components/Contacto.astro';
 import { empresa, aniosTrayectoria, fundacion, servicios } from '../data/empresa';
 import { proyectos, proyectosPorEstado, obrasConfianza } from '../data/proyectos';
@@ -119,49 +118,14 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 
 	<BloqueSeguridad />
 
-	<!-- Don Luis (08-10-2026): sin logos ni nombres; la foto del edificio y su dirección. -->
-	<section class="seccion clientes">
-		<div class="contenedor">
-			<h2 class="clientes-titulo">Han confiado en nosotros</h2>
-		</div>
-		<ul class="obras-clientes" data-carril tabindex="0" aria-label="Edificios de clientes de LOLS">
-			{
-				obrasConfianza.map((o) => (
-					<li>
-						<div class="marco">
-							<img src={`/proyectos/${o.slug}/1.jpg`} alt={`Edificio en ${o.direccion}, ${o.comuna}`} loading="lazy" />
-						</div>
-						<p>{o.direccion}, {o.comuna}</p>
-					</li>
-				))
-			}
-		</ul>
-		<div class="contenedor carril-controles">
-			<button type="button" class="carril-flecha" data-mover="-1" aria-label="Ver obras anteriores">
-				<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"></path></svg>
-			</button>
-			<button type="button" class="carril-flecha" data-mover="1" aria-label="Ver más obras">
-				<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"></path></svg>
-			</button>
-		</div>
-	</section>
+	<!-- Don Luis (08-10-2026): sin logos ni nombres; la foto del edificio y su dirección. En el
+	     mismo carrusel que "En obra ahora" (Marcos, 20-10-2026: las fotos se ven mejor así). -->
+	<CarruselObras titulo="Han confiado en nosotros" id="han-confiado" obras={obrasConfianza.map(deConfianza)} />
 
 	<Contacto />
 </Base>
 
 <script>
-	// Carril de obras de clientes: las flechas avanzan una foto (con el dedo o el trackpad se
-	// desliza igual; sin JS queda el desplazamiento lateral).
-	const carril = document.querySelector<HTMLElement>('[data-carril]');
-	for (const boton of document.querySelectorAll<HTMLButtonElement>('[data-mover]')) {
-		boton.addEventListener('click', () => {
-			if (!carril) return;
-			const item = carril.querySelector<HTMLElement>('li');
-			const paso = item ? item.offsetWidth + 20 : carril.clientWidth * 0.8;
-			carril.scrollBy({ left: Number(boton.dataset.mover) * paso, behavior: 'smooth' });
-		});
-	}
-
 	// Cifras: cuentan desde 0 hasta su valor cuando aparecen en pantalla, una sola vez por visita
 	// (el sufijo "+" llega al final). Sin JS, sin IntersectionObserver o con "reducir movimiento"
 	// (sin html.anim) se ve el número final de siempre. Los lectores de pantalla leen el número
@@ -314,71 +278,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		font-size: 1rem;
 	}
 
-	/* Obras de clientes: carril lateral de fotos grandes que se desliza con el dedo. */
-	.clientes-titulo {
-		font-size: clamp(1.75rem, 3vw, 2.25rem);
-		margin-bottom: 2rem;
-	}
-	.obras-clientes {
-		--borde: max(var(--gutter), calc((100vw - var(--ancho)) / 2 + var(--gutter)));
-		list-style: none;
-		margin: 0;
-		padding: 0 var(--borde) 0.5rem;
-		display: flex;
-		gap: 20px;
-		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		scroll-padding-inline: var(--borde);
-		scrollbar-width: none;
-	}
-	.obras-clientes::-webkit-scrollbar {
-		display: none;
-	}
-	.obras-clientes:focus-visible {
-		outline: 2px solid var(--lols-verde-oscuro);
-		outline-offset: 4px;
-	}
-	.obras-clientes li {
-		flex: 0 0 min(78vw, 22rem);
-		scroll-snap-align: start;
-	}
-	.obras-clientes .marco {
-		aspect-ratio: 4 / 5;
-		margin-bottom: 0.75rem;
-	}
-	.obras-clientes p {
-		margin: 0;
-		font-size: 0.95rem;
-		color: var(--lols-gris);
-	}
-	.carril-controles {
-		display: flex;
-		justify-content: flex-end;
-		gap: 0.75rem;
-		margin-top: 1.25rem;
-	}
-	.carril-flecha {
-		display: grid;
-		place-items: center;
-		width: 44px;
-		height: 44px;
-		border: 1px solid var(--lols-carbon);
-		background: transparent;
-		color: var(--lols-carbon);
-		cursor: pointer;
-		transition:
-			background-color 0.2s,
-			color 0.2s;
-	}
-	.carril-flecha:hover {
-		background: var(--lols-carbon);
-		color: var(--lols-blanco);
-	}
-	.carril-flecha:focus-visible {
-		outline: 2px solid var(--lols-verde-oscuro);
-		outline-offset: 2px;
-	}
-
 	@media (max-width: 760px) {
 		.cifras {
 			grid-template-columns: 1fr;
@@ -392,9 +291,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		.cifra:first-child {
 			padding-top: 0;
 			border-top: 0;
-		}
-		.carril-controles {
-			justify-content: center;
 		}
 	}
 
@@ -437,8 +333,7 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		:global(.anim) .cifra,
 		:global(.anim) .servicios-portada :global(.mosaico > .item),
 		:global(.anim) .proxima-foto,
-		:global(.anim) .proxima-foto img,
-		:global(.anim) .obras-clientes li {
+		:global(.anim) .proxima-foto img {
 			animation-timing-function: linear;
 			animation-fill-mode: both;
 		}
@@ -465,11 +360,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 			/* "cover" = de que asoma a que sale (escrito como "entry 0% exit 100%" el
 			   minificador lo corta en "exit 0%"). */
 			animation-range: cover 0% cover 100%;
-		}
-		:global(.anim) .obras-clientes li {
-			animation-name: acercar;
-			animation-timeline: view(inline);
-			animation-range: entry 0% cover 35%;
 		}
 	}
 	@keyframes portada-achicar {
@@ -505,12 +395,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		}
 		to {
 			transform: scale(1);
-		}
-	}
-	@keyframes acercar {
-		from {
-			opacity: 0.5;
-			transform: scale(0.92);
 		}
 	}
 </style>
