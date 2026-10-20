@@ -501,7 +501,9 @@ html.ver-marcadores span.ejemplo::after {
 	min-width: 2.75rem;
 	padding: 0 1rem;
 	border: 1px solid var(--lols-carbon);
-	border-radius: 999px;
+	/* Cuadrado, como .boton y las flechas de los carruseles (Marcos, 20-10-2026: todas las
+	   flechas en cuadrado; Cerrar también, para que no quede una píldora al lado). */
+	border-radius: 0;
 	background: transparent;
 	color: var(--lols-carbon);
 	font: 600 0.95rem var(--fuente-titulos);

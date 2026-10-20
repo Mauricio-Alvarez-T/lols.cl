@@ -9,7 +9,8 @@
 //     opacity 0,3 s) y el entrante llega desde la derecha; el título pasa de gris a oscuro;
 //   - columna de fotos (66 %, 16:9): la fila se desplaza (transform 0,6 s); las fotos ya
 //     pasadas se desvanecen (0,4 s) al cruzar la franja; la siguiente asoma hasta el borde;
-//   - flechas en círculos de 60 px con borde fino, alineadas a la derecha bajo la foto.
+//   - flechas en cuadrados de 60 px con borde fino, alineadas a la derecha bajo la foto (en
+//     Ramboll son círculos; Marcos pidió cuadrados el 20-10-2026, como el resto del sitio).
 // Sin avance automático. Vuelve al principio después de la última. Se puede deslizar con el
 // dedo. Sin JavaScript se ve la primera obra y cada título sigue siendo un enlace a su página.
 //
@@ -583,7 +584,7 @@ const idFicha = (o: ObraCarrusel, i: number) => `obra-${o.id ?? `${seccion}-${i 
 		height: 60px;
 		padding: 0;
 		border: 1px solid #273943;
-		border-radius: 50%;
+		border-radius: 0;
 		background: transparent;
 		color: #273943;
 		cursor: pointer;

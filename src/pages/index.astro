@@ -203,13 +203,15 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		color: var(--lols-verde);
 	}
 
-	/* Qué hacemos: tres líneas grandes, como en las páginas de producto de Apple. */
+	/* Qué hacemos: tres líneas grandes, como en las páginas de producto de Apple. Centradas
+	   (Marcos, 20-10-2026), en computador y en celular. */
 	.manifiesto {
 		padding-block: clamp(5rem, 14vw, 10rem);
 	}
 	.manifiesto-texto {
-		margin: 0;
+		margin: 0 auto;
 		max-width: 21ch;
+		text-align: center;
 		font-family: var(--fuente-titulos);
 		font-optical-sizing: auto;
 		font-size: clamp(2rem, 0.9rem + 4.2vw, 4.5rem);
@@ -224,7 +226,8 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		margin-bottom: 0.2em;
 	}
 
-	/* Cifras: grandes, sobre carbón, con el verde de la marca hacia el lima. */
+	/* Cifras: grandes, sobre carbón, en el verde de la marca. Un solo verde, sin degradado al
+	   lima (Marcos, 20-10-2026: "del mismo verde, no de distintos tonos"). */
 	.cifras {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -248,10 +251,7 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		line-height: 0.95;
 		letter-spacing: -0.06em;
 		font-variant-numeric: tabular-nums;
-		background: linear-gradient(120deg, var(--lols-verde) 10%, var(--lols-lima) 90%);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+		color: var(--lols-verde);
 	}
 	.cifras .cifra-texto {
 		margin-top: 0.75rem;
