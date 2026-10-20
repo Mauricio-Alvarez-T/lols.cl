@@ -61,6 +61,14 @@ Americana 325 (en la Bóveda, "Unión Latinoamericana"); Abate Molina 221 (sitio
 en 2018; currículum: 2019); Buzeta 3810 (tabla: Estación Central; foto: Cerrillos); y el teléfono
 del currículum (9 8972 2715), distinto del que usa el sitio (+56 652 710 609).
 
+## Cambios posteriores
+
+- **20-10-2026 · Sin Seguridad por ahora:** don Luis no quiere detallar seguridad en el sitio por el
+  momento. Se sacaron la página /seguridad/ (con la Política SST de ejemplo), el bloque de la
+  portada, el ítem del menú y la columna del pie. Todo queda en el historial de git (antes del
+  commit que dice "Sin Seguridad") por si se vuelve a pedir; el dato de la mutual sigue en
+  src/data/empresa.ts.
+
 ## Lo que falta
 
 - Render, tipo, superficie e inicio de cada obra en construcción, y las que parten pronto.

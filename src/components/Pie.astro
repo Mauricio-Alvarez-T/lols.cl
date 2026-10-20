@@ -1,6 +1,6 @@
 ---
 // Pie como sección diseñada: datos de contacto en columnas, rutas del sitio y de otros
-// públicos, seguridad (la mutual; sin certificaciones que LOLS no tiene) y datos legales. Todo sobre el verde
+// públicos y datos legales (la columna de Seguridad se sacó el 20-10-2026, con la página). Todo sobre el verde
 // de LOLS, para que cada página termine con la marca (como el pie rojo de Arup). La frase de
 // cierre la pone el bloque Contacto, justo antes.
 import { empresa, navegacion, telefonoHref, whatsappHref, fundacion } from '../data/empresa';
@@ -32,13 +32,6 @@ const anio = new Date().getFullYear();
 				<li><a href="/privacidad/">Política de privacidad</a></li>
 			</ul>
 		</nav>
-		<div>
-			<h2>Seguridad</h2>
-			<ul class="sellos">
-				<li>{empresa.mutual}</li>
-				<li><a href="/seguridad/#politica">Política de Seguridad y Salud en el Trabajo</a></li>
-			</ul>
-		</div>
 	</div>
 
 	<div class="contenedor legal">
@@ -55,7 +48,7 @@ const anio = new Date().getFullYear();
 	}
 	.columnas {
 		display: grid;
-		grid-template-columns: 1.4fr 1fr 1fr 1fr;
+		grid-template-columns: 1.4fr 1fr 1fr;
 		gap: 2.5rem;
 		padding-block: clamp(3rem, 6vw, 4.5rem) 2.5rem;
 	}
@@ -89,18 +82,6 @@ const anio = new Date().getFullYear();
 	a:hover {
 		color: var(--lols-lima);
 		background-size: 100% 1px;
-	}
-	.sellos {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-	}
-	.sellos li {
-		padding: 0.25rem 0.6rem;
-		border: 1px solid rgb(255 255 255 / 0.4);
-		font-family: var(--fuente-datos);
-		font-weight: 600;
-		font-size: 0.85rem;
 	}
 	.legal {
 		display: flex;

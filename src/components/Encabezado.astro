@@ -184,10 +184,10 @@ const ruta = Astro.url.pathname;
 			display: none;
 		}
 	}
-	/* Menú de celular (botón con 3 rayas) hasta 1200 px: con Trabaja con nosotros arriba (19-10-2026)
-	   el menú completo mide unos 860 px y, junto al logo, no cabe en una línea en tablets ni en
-	   notebooks chicos; antes de eso se cortaba en dos líneas o la página se movía de lado. */
-	@media (max-width: 1200px) {
+	/* Menú de celular (botón con 3 rayas) hasta 1080 px: el menú completo (5 secciones + Cotizar,
+	   desde que se sacó Seguridad el 20-10-2026) mide unos 745 px y, junto al logo, necesita
+	   ~1050 px; más angosto se cortaba en dos líneas o la página se movía de lado. */
+	@media (max-width: 1080px) {
 		.menu-boton {
 			display: grid;
 			place-items: center;

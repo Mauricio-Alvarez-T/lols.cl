@@ -145,7 +145,7 @@ export const fotosEquipamiento: Record<string, ImagenReferencial> = {
 };
 
 // Videos de stock (Mixkit, licencia libre, enlazados desde su CDN). Uso según
-// docs/investigacion-secciones.md: loops decorativos donde suman ambiente (portada, seguridad,
+// docs/investigacion-secciones.md: loops decorativos donde suman ambiente (portada, empresa,
 // trabaja con nosotros). El timelapse de la ficha de proyecto se sacó (don Luis: nada de videos de avance).
 // Peso: 720p ≤ 5 MB en los loops; 360p (< 1 MB) en celular. Componente VideoFondo.
 export interface VideoReferencial {
@@ -166,7 +166,6 @@ const mixkit = (id: number, alt: string): VideoReferencial => ({
 
 export const videos = {
 	portada: mixkit(4010, 'Vista aérea de edificios en construcción con grúas'),
-	seguridad: mixkit(23170, 'Dos profesionales con casco revisan planos en obra'),
 	empresa: mixkit(46753, 'Dos trabajadores con casco caminan hacia la obra'),
 	trabaja: mixkit(31473, 'Trabajadores en obra gruesa de un edificio'),
 };

@@ -3,8 +3,9 @@
 // abajo a la izquierda (lo primero que se ve es la obra, no un bloque de texto). Un velo
 // degradado desde abajo asegura la lectura sobre cualquier cuadro del video. Encima, los ejes
 // del plano se trazan al cargar y quedan muy tenues (animaciones.css).
-// El contenido (título, bajada, botones) llega por el slot desde la página.
-// Acepta video (portada, Seguridad, Empresa…) o imagen (páginas interiores): toda cabecera
+// El contenido (título, bajada, botones) llega por el slot desde la página. Con `centrado` va
+// al medio (la portada, Marcos 20-10-2026); las páginas interiores lo dejan a la izquierda.
+// Acepta video (portada, Empresa…) o imagen (páginas interiores): toda cabecera
 // lleva al menos una imagen, nunca solo texto (pedido del usuario, 30-sep).
 import VideoFondo from './VideoFondo.astro';
 import Referencial from './Referencial.astro';
@@ -14,13 +15,14 @@ interface Props {
 	video?: VideoReferencial;
 	imagen?: ImagenReferencial | { src: string; alt: string };
 	baja?: boolean; // páginas interiores: menos alto, para que el contenido asome antes
+	centrado?: boolean; // título, bajada y botones al medio
 }
-const { video, imagen, baja = false } = Astro.props;
+const { video, imagen, baja = false, centrado = false } = Astro.props;
 const verticales = [25, 50, 75];
 const horizontales = [40];
 ---
 
-<section class:list={['hero-obra', { baja }]}>
+<section class:list={['hero-obra', { baja, centrado }]}>
 	{video && <VideoFondo video={video} clase="fondo-hero" eager />}
 	{
 		!video && imagen && (
@@ -111,6 +113,16 @@ const horizontales = [40];
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.75rem;
+	}
+	.centrado .contenido {
+		text-align: center;
+	}
+	.centrado .contenido :global(.display),
+	.centrado .contenido :global(.bajada) {
+		margin-inline: auto;
+	}
+	.centrado .contenido :global(.acciones) {
+		justify-content: center;
 	}
 	/* Botones sobre la obra: primario blanco, secundario con contorno blanco. */
 	.contenido :global(.boton) {

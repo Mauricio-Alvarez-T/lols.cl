@@ -14,7 +14,8 @@ export const empresa = {
 	// También recibe las postulaciones (CV): don Luis, 08-10-2026.
 	correo: { valor: 'lols@lols.cl' },
 	horario: 'Lunes a viernes, de 9:00 a 17:00',
-	// Única mutualidad o registro que se muestra (don Luis: "solo la mutual").
+	// Única mutualidad o registro (don Luis: "solo la mutual"). Hoy no se muestra: Seguridad se
+	// sacó el 20-10-2026; queda el dato para cuando se vuelva a pedir.
 	mutual: 'Mutual de Seguridad CChC',
 	// Número de WhatsApp comercial (formato 56XXXXXXXXX). Mientras sea null, los botones
 	// abren WhatsApp sin destinatario y el build de producción falla (marcador en BarraContacto).
@@ -125,14 +126,14 @@ export const necesidades = [
 ];
 export const necesidadesRevisar = 'agrupación propuesta; confirmar';
 
-// Menú principal: las 4 secciones que tienen casi todos los sitios del rubro + Seguridad,
-// que casi ninguno muestra y es lo primero que revisa un mandante (docs/investigacion-secciones.md).
+// Menú principal: las 4 secciones que tienen casi todos los sitios del rubro
+// (docs/investigacion-secciones.md). Seguridad se sacó el 20-10-2026: don Luis no quiere detallarla
+// por ahora (la página está en el historial de git si se vuelve a pedir).
 // Trabaja con nosotros también va arriba (Marcos, 19-10-2026): LOLS busca gente seguido y desde
 // el pie casi no se encontraba. Antes de Contacto, para que Contacto y Cotizar queden juntos.
 export const navegacion = [
 	{ href: '/proyectos/', texto: 'Proyectos' },
 	{ href: '/servicios/', texto: 'Servicios' },
-	{ href: '/seguridad/', texto: 'Seguridad' },
 	{ href: '/empresa/', texto: 'Empresa' },
 	{ href: '/trabaja-con-nosotros/', texto: 'Trabaja con nosotros' },
 	{ href: '/contacto/', texto: 'Contacto' },

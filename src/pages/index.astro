@@ -2,8 +2,10 @@
 // Portada: mostrar, no contar (docs/estructura.md § Mostrar, no contar). Cada sección es
 // imagen + título y lleva a su página, donde está el detalle:
 //   obra en video con el lema → qué hacemos en tres líneas → cifras → servicios en fotos →
-//   obras en construcción → la próxima obra en grande y la cartera → seguridad (video + dos
-//   datos) → obras de clientes (foto y dirección, en el mismo carrusel de las obras) → contacto.
+//   obras en construcción → la próxima obra en grande y la cartera → obras de clientes (foto y
+//   dirección, en el mismo carrusel de las obras) → contacto. Sin bloque de seguridad (don Luis,
+//   20-10-2026: por ahora no se detalla). Los bloques de texto sueltos van centrados (Marcos,
+//   20-10-2026); los carruseles y las tarjetas mantienen el texto junto a su foto.
 // Movimiento al estilo de las páginas de producto de Apple (pedido de Marcos, 16-10-2026;
 // docs/estructura.md § Dirección visual): la obra se achica a lámina al bajar, el texto se
 // enciende por líneas, las cifras suben y la próxima obra se expande. Todo con CSS ligado al
@@ -18,7 +20,6 @@ import { proyectos, proyectosPorEstado, obrasConfianza } from '../data/proyectos
 import MosaicoServicios from '../components/MosaicoServicios.astro';
 import { obrasEnCurso, videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
-import BloqueSeguridad from '../components/BloqueSeguridad.astro';
 import { ejemploBajadaHero, ejemplosContratados } from '../data/ejemplos';
 
 const enObra = proyectosPorEstado('en-curso').slice(0, 3);
@@ -42,7 +43,7 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 
 <Base title="LOLS Ingeniería" description={`${empresa.razonSocial}. ${empresa.lema}.`}>
 	<div class="portada-fija">
-		<ObraPortada video={videos.portada}>
+		<ObraPortada video={videos.portada} centrado>
 			<h1 class="display">{empresa.lema}<span class="punto">.</span></h1>
 			<p class="bajada"><Pendiente texto="una frase: qué hace LOLS, para quién y dónde">{ejemploBajadaHero}</Pendiente></p>
 			<div class="acciones">
@@ -115,8 +116,6 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 				</span>
 			</a>
 	</div>
-
-	<BloqueSeguridad />
 
 	<!-- Don Luis (08-10-2026): sin logos ni nombres; la foto del edificio y su dirección. En el
 	     mismo carrusel que "En obra ahora" (Marcos, 20-10-2026: las fotos se ven mejor así). -->
@@ -198,6 +197,7 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 	}
 	.cifra {
 		padding: 0 clamp(1rem, 3vw, 2.5rem);
+		text-align: center;
 		border-left: 1px solid #343b36;
 	}
 	.cifra:first-child {
@@ -235,6 +235,7 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 	}
 	.proxima-pie {
 		margin-top: 0.75rem;
+		text-align: center;
 		font-family: var(--fuente-datos);
 		font-size: 0.95rem;
 		color: var(--gris-medio);
@@ -250,6 +251,7 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 	.cartera {
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		gap: 1.25rem;
 		margin-top: clamp(2rem, 4vw, 3rem);
 		padding-block: 1.25rem;
@@ -269,6 +271,7 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		display: flex;
 		flex-wrap: wrap;
 		align-items: baseline;
+		justify-content: center;
 		gap: 0.25rem 1.25rem;
 		font-family: var(--fuente-titulos);
 		font-size: clamp(1.1rem, 2vw, 1.35rem);
@@ -291,6 +294,12 @@ const proxima = proyectos.find((p) => p.slug === 'buzeta-3810');
 		.cifra:first-child {
 			padding-top: 0;
 			border-top: 0;
+		}
+		/* El número arriba y el texto abajo, los dos al medio. */
+		.cartera {
+			flex-direction: column;
+			gap: 0.5rem;
+			text-align: center;
 		}
 	}
 
