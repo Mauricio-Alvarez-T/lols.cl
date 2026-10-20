@@ -3,7 +3,7 @@
 // imagen + título y lleva a su página, donde está el detalle.
 // Primera pantalla (Marcos 20-10-2026, tras revisar portadas con video de constructoras de
 // EE. UU., Europa y Chile — Suffolk, Mortenson, Turner, DPR, Bouygues, Ingevec…): sobre el video
-// solo el rótulo de los servicios y el lema; abajo, una franja con desde cuándo y dónde, y
+// solo el rótulo de los servicios y el lema; abajo, una franja con dónde (el «desde 1995» va junto al logo) y
 // «Ver proyectos». Sin bajada ni botones (Cotizar ya está en el encabezado) y sin WhatsApp
 // flotante. Después:
 //   obra en video con el lema → qué hacemos en tres líneas (con las palabras clave en verde) →
@@ -49,7 +49,8 @@ const queHacemos = `${nombresServicios.slice(0, -1).join(', ')} y ${nombresServi
 			<p class="rotulo-servicios">{servicios.map((s) => s.nombre).join(' · ')}</p>
 			<h1 class="display titulo-portada">{empresa.lema}<span class="punto">.</span></h1>
 			<Fragment slot="pie">
-				<p class="etiqueta">Desde {fundacion} · Santiago, Chile</p>
+				<!-- Sin "Desde 1995": ya va junto al logo (Marcos, 20-10-2026). -->
+				<p class="etiqueta">Santiago, Chile</p>
 				<a href="/proyectos/" class="enlace-flecha">Ver proyectos</a>
 			</Fragment>
 		</ObraPortada>
