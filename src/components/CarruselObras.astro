@@ -26,12 +26,12 @@ import Pendiente from './Pendiente.astro';
 import Referencial from './Referencial.astro';
 import FichaObra from './FichaObra.astro';
 import type { EjemploTarjeta, ImagenReferencial } from '../data/referencia';
-import type { Proyecto } from '../data/proyectos';
+import type { FotoObra, Proyecto } from '../data/proyectos';
 
 export interface ObraCarrusel {
 	id: string | null; // slug; las muestras reciben uno según su posición
 	href: string | null; // null: sin página propia (el título y la foto no son enlaces)
-	imagen: ImagenReferencial | { src: string; alt: string };
+	imagen: ImagenReferencial | FotoObra;
 	tipo: string | null;
 	nombre: string | null;
 	comuna: string | null;
@@ -121,7 +121,7 @@ const conFicha = obras.every((o) => o.ficha);
 										{esReferencial(o.imagen) ? (
 											<Referencial imagen={o.imagen} sizes="(max-width: 760px) 88vw, 60vw" />
 										) : (
-											<img src={o.imagen.src} alt={o.imagen.alt} loading="lazy" />
+											<img src={o.imagen.src} srcset={o.imagen.srcset} sizes={o.imagen.srcset && '(max-width: 760px) 88vw, 60vw'} width={o.imagen.width} height={o.imagen.height} alt={o.imagen.alt} loading="lazy" />
 										)}
 									</a>
 								) : (
@@ -129,7 +129,7 @@ const conFicha = obras.every((o) => o.ficha);
 										{esReferencial(o.imagen) ? (
 											<Referencial imagen={o.imagen} sizes="(max-width: 760px) 88vw, 60vw" />
 										) : (
-											<img src={o.imagen.src} alt={o.imagen.alt} loading="lazy" />
+											<img src={o.imagen.src} srcset={o.imagen.srcset} sizes={o.imagen.srcset && '(max-width: 760px) 88vw, 60vw'} width={o.imagen.width} height={o.imagen.height} alt={o.imagen.alt} loading="lazy" />
 										)}
 									</div>
 								)}

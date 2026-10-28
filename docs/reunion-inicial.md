@@ -20,7 +20,7 @@ Notas tomadas en la reunión y cómo se llevaron al sitio.
 | Nota | Dónde | Estado |
 |---|---|---|
 | Eliminar lo antiguo | Las fotos de 2018 quedan solo como muestra en "Terminados" y el build de producción falla mientras estén | Falta que don Luis elija las obras terminadas y fotos nuevas |
-| Proyectos en construcción | `/proyectos/#en-construccion` y "En obra ahora" en la portada. Campos `tipo`, `direccion`, `superficie`, `inicio` en `src/data/proyectos.ts` | Faltan los datos y fotos/videos de Rodrigo |
+| Proyectos en construcción | `/proyectos/#en-construccion` y "En obra ahora" en la portada. Campos `tipo`, `direccion`, `superficieM2`, `inicio` en `src/content/obras/<slug>.json` (`docs/contenido-obras.md`) | Faltan los datos y fotos/videos de Rodrigo |
 | Contratados | `/proyectos/#contratados`: tabla (aún no hay obra que fotografiar) y línea con el total en la portada. Estado `contratado` | Falta la lista |
 | Terminados | `/proyectos/#terminados`. Al terminar una obra basta cambiar su `estado` | — |
 | Equipamiento propio | Componente `Equipamiento`: completo en `/empresa/#equipamiento`, compacto en la portada | Faltan lista completa, cantidades y fotos |

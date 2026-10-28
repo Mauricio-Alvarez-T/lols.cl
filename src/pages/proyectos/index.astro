@@ -95,7 +95,7 @@ import { bandas } from '../../data/referencia';
 								{'origen' in f.imagen ? (
 									<Referencial imagen={f.imagen} sizes="(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw" />
 								) : (
-									<img src={f.imagen.src} alt={f.imagen.alt} loading="lazy" />
+									<img src={f.imagen.src} srcset={f.imagen.srcset} sizes={f.imagen.srcset && '(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw'} width={f.imagen.width} height={f.imagen.height} alt={f.imagen.alt} loading="lazy" />
 								)}
 							</div>
 							<p class="inicio">

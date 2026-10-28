@@ -15,7 +15,7 @@ import Pendiente from './Pendiente.astro';
 import Pictograma from './Pictograma.astro';
 import Referencial from './Referencial.astro';
 import { servicioPorSlug } from '../data/empresa';
-import { plantilla, estados, pictogramaDeTipo, type Estado, type Proyecto } from '../data/proyectos';
+import { plantilla, estados, pictogramaDeTipo, type Estado, type FotoObra, type Proyecto } from '../data/proyectos';
 import { obras2018, type EjemploTarjeta } from '../data/referencia';
 import { ejemploProyecto, ejemploFichaExtra } from '../data/ejemplos';
 
@@ -34,7 +34,8 @@ const ej = { ...ejemploProyecto, ...muestra };
 // Estado de la muestra: las terminadas traen año; las en construcción, fecha de inicio.
 const estado: Estado | null = p.estado ?? (muestra ? (muestra.anio ? 'terminado' : 'en-curso') : null);
 const conAnio = estado === 'terminado' || (esEjemplo && !estado);
-const galeria = p.fotos.slice(1);
+// Solo fotos propias: una imagen referencial (campo `referencia`) va sola, como portada.
+const galeria = p.fotos.slice(1).filter((f): f is FotoObra => !('origen' in f));
 const relato = [
 	{ titulo: 'Desafío', texto: p.desafio, pendiente: 'qué problema tenía el mandante', ejemplo: ej.desafio },
 	{ titulo: 'Solución', texto: p.solucion, pendiente: 'qué hizo LOLS y cómo', ejemplo: ej.solucion },
@@ -103,7 +104,7 @@ const datos = [
 					{galeria.length
 						? galeria.map((f) => (
 								<div class="marco">
-									<img src={f.src} alt={f.alt} loading="lazy" />
+									<img src={f.src} srcset={f.srcset} sizes={f.srcset && '(max-width: 560px) 100vw, 50vw'} width={f.width} height={f.height} alt={f.alt} loading="lazy" />
 								</div>
 							))
 						: obras2018.slice(3, 6).map((f) => (

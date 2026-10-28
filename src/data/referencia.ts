@@ -129,6 +129,17 @@ export const fotosObrasEjemplo: Record<string, ImagenReferencial> = {
 	'abate-molina-321': unsplash('1543892607-04657ef3a279', 'Edificio de tres pisos con ventanales'),
 };
 
+// Imagen referencial de una obra real que todavía no tiene la suya: el campo `referencia` de
+// src/content/obras/<slug>.json nombra una de estas claves ("<lista>/<clave o posición>"), y la
+// obra la muestra con su etiqueta hasta tener la foto o el render real (docs/contenido-obras.md).
+const conPrefijo = (lista: string, imagenes: Record<string, ImagenReferencial>) =>
+	Object.entries(imagenes).map(([clave, imagen]) => [`${lista}/${clave}`, imagen] as const);
+export const referenciasDeObra: Record<string, ImagenReferencial> = Object.fromEntries([
+	...conPrefijo('rendersEjemplo', rendersEjemplo),
+	...conPrefijo('rendersContratados', { ...rendersContratados }),
+	...conPrefijo('fotosObrasEjemplo', fotosObrasEjemplo),
+]);
+
 // Tipos de andamio que se usan en Chile y que calzan con las piezas del inventario de la Bóveda
 // (verticales, horizontales y diagonales; andamio saliente y ménsulas; ruedas). Fotos de ejemplo.
 export const fotosAndamios: Record<string, ImagenReferencial> = {

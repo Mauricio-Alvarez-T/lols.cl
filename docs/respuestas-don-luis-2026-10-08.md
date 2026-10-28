@@ -14,7 +14,7 @@ reunión, y cómo se llevaron al sitio. Las trajo Marcos.
 | Solo el render de lo que se hará y la imagen de lo terminado; fotos por etapa: no | Sin video ni timelapse en la ficha de obra. Una obra sin imagen muestra "Render por recibir" (en construcción) o "Foto por recibir" (terminada), nunca una foto de obra a medio hacer |
 | "Han confiado en nosotros": solo la foto del edificio y la dirección, sin nombres de personas. Logos de clientes: no | La portada muestra las 8 obras terminadas del sitio de 2018 con su foto y su dirección |
 | No agregar nombres de personas | Sin testimonios, sin "Las personas a cargo" (Empresa) y sin "Quién atiende" (Contacto) |
-| Obras y mandantes que se pueden nombrar: todas | Proyectos con sus datos reales (`src/data/proyectos.ts`) |
+| Obras y mandantes que se pueden nombrar: todas | Proyectos con sus datos reales (`src/content/obras/`, ver `docs/contenido-obras.md`) |
 | Todas las obras de aquí en adelante y, de los años anteriores, solo una por año | En construcción: las 6 obras activas con dirección de la Bóveda LOLS, con render de ejemplo (`rendersEjemplo`, marcado). Terminadas: las 2 de 2026 de la Bóveda (con foto de ejemplo), 2019 y 2020 con el render del sitio de 2018, de 2021 a 2025 obras de ejemplo (`obrasEjemplo`, marcadas) y una por año del sitio de 2018 (2014, 2016, 2017 y 2018) |
 | Cifras: quitar las de equipos. Trabajadores: 200. Registro de m²: no hay. Obras ejecutadas: 70+ | Equipamiento sin cantidades. Portada: 31 años, 70+ obras ejecutadas y 200 trabajadores, sin m² |
 | Capacidad técnica: eliminar términos repetidos | Los ítems de cada equipo ya no repiten el nombre de la categoría ("Andamios verticales" → "Verticales") |

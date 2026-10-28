@@ -2,7 +2,7 @@ name: Deploy lols.cl
 
 # Pull-side: el FTP de cPanel bloquea las IPs de GitHub Actions (cPHulk). Este workflow
 # solo compila y publica dist/ + scripts/ en la rama `deploy`; un cron en el servidor la
-# baja con git y la copia al docroot (scripts/cpanel-deploy.sh, docs/DEPLOY.md).
+# baja con git y la copia al docroot (copia fijada de scripts/cpanel-deploy.sh, docs/DEPLOY.md).
 
 on:
   push:
@@ -35,6 +35,30 @@ jobs:
       - run: npm ci
 
       - run: npm run build
+
+      # Una obra real (src/content/obras) con un marcador de propuesta no sale al sitio.
+      - name: Verificar obras reales
+        run: node scripts/verificar-obras-reales.mjs
+
+      # Commit de main que queda en línea: la Bóveda lo lee en /build.txt.
+      - name: build.txt
+        run: echo "$GITHUB_SHA" > dist/build.txt
+
+      # Solo informa cuánto falta para producción (el build con SITE=https://lols.cl se cae en
+      # el primer marcador, así que no sirve para contarlos).
+      - name: Contar marcadores
+        continue-on-error: true
+        run: |
+          contar() { grep -rhoE --include='*.html' "$1" dist | wc -l; }
+          {
+            echo "| Marcador | Apariciones |"
+            echo "|---|---|"
+            echo "| data-pendiente | $(contar 'data-pendiente=') |"
+            echo "| pendiente (sin ejemplo) | $(contar 'class="([^"]* )?pendiente( [^"]*)?"') |"
+            echo "| revisar | $(contar 'class="([^"]* )?revisar( [^"]*)?"') |"
+            echo "| ejemplo | $(contar 'class="([^"]* )?ejemplo( [^"]*)?"') |"
+            echo "| Referencial | $(contar 'class="([^"]* )?etiqueta-ref( [^"]*)?"') |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Publicar rama deploy
         run: |

@@ -1,8 +1,8 @@
 // CONTENIDO DE EJEMPLO para la propuesta de diseño (modo propuesta). No es información de
 // LOLS: sirve para que el diseño se vea como el sitio final mientras llegan los textos
 // reales. Se muestra dentro de <Pendiente>, así que el build de producción falla mientras
-// quede alguno. Al tener el texto real, va en src/data/empresa.ts o proyectos.ts y el
-// ejemplo se borra de aquí.
+// quede alguno. Al tener el texto real, va en src/data/empresa.ts o en la obra
+// (src/content/obras/, docs/contenido-obras.md) y el ejemplo se borra de aquí.
 
 export const ejemplosServicio: Record<
 	string,

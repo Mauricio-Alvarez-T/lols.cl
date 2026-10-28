@@ -31,7 +31,7 @@ const otros = proyectos.filter((o) => o.slug !== p.slug).slice(0, 2);
 			portada && 'origen' in portada ? (
 				<Referencial imagen={portada} carga="eager" />
 			) : portada ? (
-				<img src={portada.src} alt={portada.alt} />
+				<img src={portada.src} srcset={portada.srcset} sizes={portada.srcset && '100vw'} width={portada.width} height={portada.height} alt={portada.alt} />
 			) : esEjemplo ? (
 				<Referencial imagen={bandas.fichaEjemplo} carga="eager" />
 			) : (

@@ -6,4 +6,5 @@ export default defineConfig({
   site: process.env.SITE ?? 'https://nuevo.lols.cl',
   output: 'static',
   trailingSlash: 'always', // mismas URLs que el WordPress viejo (/quienes-somos/)
+  prerenderConflictBehavior: 'error', // dos rutas con la misma URL botan el build
 });
