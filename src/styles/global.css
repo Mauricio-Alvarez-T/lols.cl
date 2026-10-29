@@ -378,6 +378,52 @@ section.hero-obra .fondo-hero .pausa {
 	filter: saturate(0.88) contrast(1.04);
 }
 
+/* Esqueleto de carga (Marcos 29-10-2026): mientras la foto no llega, su marco —que ya tiene la
+   forma final por su aspect-ratio, así que nada salta— queda con un brillo suave que lo cruza;
+   al llegar, la foto aparece con un fundido. Esqueleto.astro pone y quita .cargando. */
+.marco {
+	--brillo: rgb(255 255 255 / 0.7);
+}
+/* Marcos oscuros: el fondo de una portada con texto blanco espera en oscuro, como el del video. */
+.marco.video,
+.marco.portada,
+.marco.fondo-hero {
+	--brillo: rgb(255 255 255 / 0.1);
+}
+.marco.fondo-hero {
+	background-color: #1c1c1c;
+}
+.marco.cargando {
+	background-image: linear-gradient(100deg, transparent 25%, var(--brillo) 50%, transparent 75%);
+	background-size: 200% 100%;
+	background-repeat: no-repeat;
+	animation: brillo 1.6s ease-in-out infinite;
+}
+.marco.cargando > img,
+.marco.cargando > iframe {
+	opacity: 0;
+}
+.marco > .aparece {
+	animation: aparecer 0.5s var(--suave);
+}
+@keyframes brillo {
+	from {
+		background-position: 150% 0;
+	}
+	to {
+		background-position: -50% 0;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.marco.cargando {
+		background-image: none;
+		animation: none;
+	}
+	.marco > .aparece {
+		animation: none;
+	}
+}
+
 /* Transiciones entre páginas (CSS nativo; Chrome/Edge/Safari, en Firefox es navegación
    normal). El encabezado queda fijo y la foto de la tarjeta viaja a la portada de la ficha
    (TarjetaProyecto le asigna view-transition-name al hacer clic). */

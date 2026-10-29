@@ -1,0 +1,25 @@
+---
+// Esqueleto de carga (Marcos 29-10-2026): cada foto (o mapa) que aún no llega deja su marco con
+// un brillo suave (.cargando, en global.css) y al llegar aparece con un fundido. Las que ya
+// estaban (caché) se muestran tal cual. Va inline y justo después de <main> para correr
+// mientras se lee la página, sin esperar a otro archivo: si no corre, las fotos se ven como
+// siempre (nada queda oculto).
+---
+
+<script is:inline>
+	(function () {
+		var piezas = document.querySelectorAll('.marco > img, .marco > iframe');
+		for (var i = 0; i < piezas.length; i++) {
+			var pieza = piezas[i];
+			if (pieza.tagName === 'IMG' && pieza.complete) continue;
+			pieza.parentElement.classList.add('cargando');
+			var listo = function (e) {
+				var el = e.target;
+				el.parentElement.classList.remove('cargando');
+				if (e.type === 'load') el.classList.add('aparece');
+			};
+			pieza.addEventListener('load', listo, { once: true });
+			pieza.addEventListener('error', listo, { once: true });
+		}
+	})();
+</script>

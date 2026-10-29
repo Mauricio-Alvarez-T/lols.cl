@@ -11,6 +11,7 @@ import Encabezado from '../components/Encabezado.astro';
 import Pie from '../components/Pie.astro';
 import AvisoPropuesta from '../components/AvisoPropuesta.astro';
 import Animaciones from '../components/Animaciones.astro';
+import Esqueleto from '../components/Esqueleto.astro';
 import BarraContacto from '../components/BarraContacto.astro';
 
 interface Props {
@@ -50,6 +51,7 @@ const titulo = title === 'LOLS Ingeniería' ? title : `${title} · LOLS Ingenier
 		<main id="contenido">
 			<slot />
 		</main>
+		<Esqueleto />
 		<Pie />
 		<BarraContacto flotante={!sinWhatsapp} />
 		<Animaciones />
