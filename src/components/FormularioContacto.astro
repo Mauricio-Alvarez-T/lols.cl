@@ -2,8 +2,10 @@
 // Formulario de cotización → /api/contacto.php (public/api/). Funciona sin JavaScript
 // (POST normal + redirección con ?enviado=1 o ?error=); con JavaScript envía por fetch y
 // muestra el resultado sin recargar. Consentimiento sin marcar por defecto (Ley 21.719).
-// Terreno, etapa, inicio y hasta 2 fotos o planos (Marcos, 09-10-2026): las opciones y los
-// límites de los adjuntos están repetidos en public/api/contacto.php; cambiarlos en ambos.
+// Terreno, etapa, inicio y adjuntos (Marcos, 09-10-2026; desde el 11-11 hasta 5 planos, modelos o
+// documentos, src/data/formatos.ts): las opciones y los límites están repetidos en
+// public/api/contacto.php; cambiarlos en ambos. Lo que no se pudo adjuntar se cuenta en
+// «¿No pudo adjuntar algún archivo?» (enlace + comentario, campo nota_archivos).
 //
 // En tres pasos (Marcos, 20-10-2026; idea del «Stepper» de React Bits, reescrita sin React):
 // 1) Qué necesita (servicio, etapa, cuándo empezar), 2) Su proyecto (dónde, cuánto, terreno,
@@ -124,8 +126,8 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 				Hasta 5 archivos de {MAX_MB} MB como máximo cada uno ({MAX_TOTAL_MB} MB entre todos): planos en PDF, DWG o DXF; modelos de Revit,
 				IFC, SketchUp, Rhino o Blender; planillas y fotos. Las fotos pesadas se achican solas.
 			</p>
-			<details class="formatos">
-				<summary>Ver todos los formatos</summary>
+			<details class="desplegable formatos">
+				<summary>Ver los formatos que recibimos</summary>
 				<dl>
 					{
 						gruposCotizacion.map((g) => (
@@ -139,13 +141,32 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 				<p>¿Uno de otro programa? Póngalo en un ZIP. Los RAR y 7z no se pueden revisar: mándelos como enlace.</p>
 			</details>
 		</div>
-		<label for="f-enlace">
-			<span>Enlace a archivos pesados <span class="opcional">(opcional)</span></span>
-			<input id="f-enlace" name="enlace" type="url" inputmode="url" maxlength="500" pattern="https?://.+" placeholder="https://drive.google.com/…" aria-describedby="f-enlace-ayuda" />
-		</label>
-		<p id="f-enlace-ayuda" class="ayuda">
-			¿Pesan más, como un modelo de Revit o de Blender, o una nube de puntos? Súbalos a Google Drive, OneDrive, Dropbox o WeTransfer y pegue aquí el enlace.
-		</p>
+		<!-- Si un archivo no entra (Marcos, 11-11-2026): primero cambiarle el formato, si no, seguir sin
+		     él (es opcional) y, como última opción, contar aquí qué archivo era y por qué no lo mandó.
+		     Se abre solo cuando un archivo no queda adjunto, y ya trae anotado cuál era. -->
+		<details class="desplegable sin-adjuntar" data-sin-adjuntar>
+			<summary>¿No pudo adjuntar algún archivo?</summary>
+			<div class="panel">
+				<p>
+					Adjuntar es <strong>opcional</strong>: puede enviar la solicitud sin archivos. Si uno pesa mucho o es de otro formato, pruebe a{' '}
+					<strong>guardarlo como PDF</strong> (casi todos los programas lo permiten y pesa mucho menos) o a <strong>ponerlo en un ZIP</strong>.
+				</p>
+				<label for="f-enlace">
+					<span>Enlace a los archivos <span class="opcional">(opcional)</span></span>
+					<input id="f-enlace" name="enlace" type="url" inputmode="url" maxlength="500" pattern="https?://.+" placeholder="https://drive.google.com/…" aria-describedby="f-enlace-ayuda" />
+				</label>
+				<p id="f-enlace-ayuda" class="ayuda">Súbalos a Google Drive, OneDrive, Dropbox o WeTransfer y pegue aquí el enlace.</p>
+				<label for="f-nota-archivos">
+					<span>¿Qué archivo era y por qué no lo pudo adjuntar? <span class="opcional">(opcional)</span></span>
+					<textarea
+						id="f-nota-archivos"
+						name="nota_archivos"
+						rows="3"
+						maxlength="1000"
+						placeholder="Ej.: el modelo está en Revit 2024 y pesa 80 MB; se lo puedo mandar por WeTransfer."></textarea>
+				</label>
+			</div>
+		</details>
 	</fieldset>
 
 	<fieldset class="paso" data-paso="3" tabindex="-1">
@@ -200,7 +221,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 </form>
 
 <script>
-	import { prepararAdjuntos } from '../scripts/adjuntos';
+	import { prepararAdjuntos, peso, extension, type Motivo } from '../scripts/adjuntos';
 	import { MAX_MB, extCotizacion } from '../data/formatos';
 
 	const form = document.querySelector<HTMLFormElement>('#formulario')!;
@@ -220,7 +241,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 		datos: 'Revise los campos marcados: nombre, un correo válido y la descripción del proyecto son obligatorios.',
 		mensaje: 'Cuéntenos su proyecto en unas líneas para seguir.',
 		personales: 'Revise los campos marcados: el nombre y un correo válido son obligatorios.',
-		archivos: `Revise los archivos: hasta 5, de ${MAX_MB} MB como máximo cada uno.`,
+		archivos: `Revise los archivos: hasta 5, de ${MAX_MB} MB como máximo cada uno. Son opcionales: puede quitarlos y contarnos qué eran en «¿No pudo adjuntar algún archivo?».`,
 		zip: 'Un ZIP trae adentro programas, macros u otros comprimidos, y por seguridad no los recibimos. Sáquelos del ZIP o mándenos un enlace.',
 		enlace: 'Revise el enlace: debe empezar con https:// (el de Google Drive, OneDrive, Dropbox o WeTransfer).',
 		consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
@@ -304,6 +325,9 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 		const malos = invalidosEn(paso);
 		if (!malos.length) return true;
 		for (const c of malos) c.setAttribute('aria-invalid', 'true');
+		// El enlace vive en «¿No pudo adjuntar algún archivo?»: se abre para que se vea el error.
+		const plegado = malos[0].closest('details');
+		if (plegado) plegado.open = true;
 		if (n === 2) mostrar(malos[0].name === 'enlace' ? 'enlace' : 'mensaje');
 		else mostrar(malos.length === 1 && malos[0].name === 'consentimiento' ? 'consentimiento' : 'personales');
 		malos[0].focus();
@@ -349,11 +373,29 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 	// Planos, modelos, fotos o documentos: máximo 5, de MAX_MB cada uno; las fotos pesadas se
 	// achican al elegirlas (src/scripts/adjuntos.ts). El servidor vuelve a revisarlo.
 	const archivos = form.querySelector<HTMLInputElement>('#f-archivos')!;
+	const sinAdjuntar = form.querySelector<HTMLDetailsElement>('[data-sin-adjuntar]')!;
+	const notaArchivos = form.querySelector<HTMLTextAreaElement>('#f-nota-archivos')!;
+	// Lo que no quedó adjunto se anota en «¿No pudo adjuntar algún archivo?» (que se abre), para que
+	// la persona solo agregue el porqué o cómo hacerlo llegar. Puede borrarlo si no quiere mandarlo.
+	function anotarRechazo(f: File, motivo: Motivo) {
+		const ext = extension(f.name).toUpperCase();
+		const linea = `No pude adjuntar «${f.name}» (${ext ? ext + ', ' : ''}${peso(f.size)}): ${motivo === 'pesado' ? 'pesa demasiado' : 'es de un formato que no se recibe'}.`;
+		if (!notaArchivos.value.includes(`«${f.name}»`) && notaArchivos.value.length + linea.length < notaArchivos.maxLength) {
+			notaArchivos.value = notaArchivos.value.trimEnd() ? `${notaArchivos.value.trimEnd()}\n${linea}` : linea;
+		}
+		sinAdjuntar.open = true;
+	}
 	const adjuntos = prepararAdjuntos(archivos, {
 		extensiones: extCotizacion,
 		maxArchivos: 5,
-		noRecibido: 'no es un formato que recibamos. Si es de otro programa (o un RAR o 7z), póngalo en un ZIP o pegue un enlace más abajo.',
+		noRecibido: 'no es un formato que recibamos.',
+		// Marcos, 11-11-2026: primero cambiar el formato, si no, seguir sin él y, de última, contarlo.
+		consejo: {
+			uno: 'Guárdelo como PDF o en un ZIP (pesa menos), o siga sin él: adjuntar es opcional. Si no puede, cuéntenos más abajo qué archivo era.',
+			varios: 'Guárdelos como PDF o en un ZIP (pesan menos), o siga sin ellos: adjuntar es opcional. Si no puede, cuéntenos más abajo qué archivos eran.',
+		},
 		correo: archivos.dataset.correo ?? '',
+		alRechazar: anotarRechazo,
 	});
 	archivos.addEventListener('change', () => {
 		if (estado.dataset.tipo === 'error') limpiarEstado();
@@ -409,6 +451,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 								? form.querySelector('#f-consentimiento')
 								: null;
 				if (campo && pasoDe(campo) !== actual) irA(pasoDe(campo));
+				if (error === 'archivos' || error === 'zip' || error === 'enlace') sinAdjuntar.open = true;
 				noEnviada(error);
 			}
 		} catch {
@@ -421,6 +464,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 	form.querySelector('[data-otra]')!.addEventListener('click', () => {
 		form.classList.remove('enviado');
 		gracias.hidden = true;
+		sinAdjuntar.open = false;
 		(form.elements.namedItem('t') as HTMLInputElement).value = String(Date.now());
 		history.replaceState({ paso: 1 }, '');
 		irA(1);

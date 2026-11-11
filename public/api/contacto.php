@@ -2,7 +2,8 @@
 /**
  * Formulario de cotización de lols.cl (/cotizar/): valida, filtra spam y envía un correo con
  * mail(), con lo que adjunte la persona: hasta 5 archivos de fotos, PDF, planos, modelos y
- * documentos técnicos (FORMATOS en lib/formulario.php), y un enlace para los muy pesados.
+ * documentos técnicos (FORMATOS en lib/formulario.php), un enlace para los muy pesados y un
+ * comentario sobre lo que no pudo adjuntar (nota_archivos).
  * Lo común con postulacion.php (configuración, límite de envíos, adjuntos, correo) está en
  * lib/formulario.php; la configuración, en docs/DEPLOY.md. Sin config.ini no envía nada
  * (responde "no configurado").
@@ -63,6 +64,8 @@ $superficie = unaLinea(campo('superficie', 40));
 $mensaje = campo('mensaje', 5000);
 // Enlace a planos o modelos pesados (Drive, OneDrive, Dropbox, WeTransfer…): solo http(s).
 $enlace = unaLinea(campo('enlace', 500));
+// «¿No pudo adjuntar algún archivo?» (Marcos, 11-11-2026): qué archivo era y por qué no lo mandó.
+$notaArchivos = campo('nota_archivos', 1000);
 $terreno = opcion('terreno', TERRENOS);
 $etapa = opcion('etapa', ETAPAS);
 $inicio = opcion('inicio', INICIOS);
@@ -92,7 +95,7 @@ limitarEnvios('contacto');
 
 $servicioTexto = $servicio !== '' ? SERVICIOS[$servicio] : 'No indicado';
 $asunto = 'Cotización web: ' . $servicioTexto . ' — ' . $nombre;
-$cuerpo = implode("\n", [
+$cuerpo = implode("\n", array_merge([
     'Nueva solicitud desde el formulario de ' . ($_SERVER['HTTP_HOST'] ?? ''),
     '',
     'Nombre:    ' . $nombre,
@@ -112,10 +115,15 @@ $cuerpo = implode("\n", [
     'Proyecto:',
     $mensaje,
     '',
+], $notaArchivos !== '' ? [
+    'Archivos que no pudo adjuntar:',
+    $notaArchivos,
+    '',
+] : [], [
     '—',
     'Enviado el ' . date('d-m-Y H:i') . '. La persona aceptó la política de privacidad.',
     'Responder a este correo le contesta directamente a ' . $correo . '.',
-]);
+]));
 
 if (!enviarCorreo($destinatario, $remitente, $asunto, $cuerpo, $correo, $archivos)) {
     responder(false, 'envio', 500);

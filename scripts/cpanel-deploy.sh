@@ -24,7 +24,7 @@ LOCK="$HOME/.deploy-lols.cl.lock"
 PERMITIDOS='
 1b5790cce1698dd4d1dd2546f3d3634c0ed3be0ba93138a1ccb8e191b90b9d21  .htaccess
 56a889acb6a7ed82730146af9007af5eb63091e53f4a0df3db57629d8649d167  api/.user.ini
-d0988b727772176880a5178a55f2c262a573ffa64e2c64af5d98ac7ced473bb7  api/contacto.php
+5f69cd8651be78829a732e0d120cc9c6b145d94f1ee9b1869049c6470b29f9a0  api/contacto.php
 679615f48b69f1927ec9dc5e42f20ad0d87404ca92feac88eaaf6b1c39c5b3a6  api/lib/formulario.php
 bf9b65c3047b118ff89522837825eb2ad9a757875ea92d56ffb3cfaa32258ac7  api/postulacion.php
 '

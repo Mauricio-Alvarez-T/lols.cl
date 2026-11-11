@@ -151,18 +151,71 @@
 .formulario .adjuntos-aviso:empty {
 	display: none;
 }
-/* Ayuda con más de un párrafo y la lista de formatos que se abre (cotización). */
+/* Ayuda con más de un párrafo y lo que se despliega al tocarlo (cotización: los formatos que se
+   reciben y «¿No pudo adjuntar algún archivo?»). Una flecha dice que se abre. */
 .formulario div.ayuda > p {
 	margin: 0;
 }
-.formulario .formatos summary {
+.formulario .desplegable summary {
 	display: inline-flex;
 	align-items: center;
+	gap: 0.5rem;
 	min-height: 2.75rem;
 	font-family: var(--fuente-titulos);
 	font-weight: 600;
 	color: var(--lols-verde-oscuro);
 	cursor: pointer;
+}
+.formulario .desplegable summary::after {
+	content: '';
+	flex: none;
+	width: 0.45rem;
+	height: 0.45rem;
+	margin-top: -0.2rem;
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	transform: rotate(45deg);
+	transition: transform 0.2s var(--suave, ease);
+}
+.formulario .desplegable[open] > summary::after {
+	margin-top: 0.2rem;
+	transform: rotate(-135deg);
+}
+.formulario .desplegable summary:hover {
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+.formulario .desplegable summary:focus-visible {
+	outline: 3px solid var(--lols-verde-oscuro);
+	outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+	.formulario .desplegable summary::after {
+		transition: none;
+	}
+}
+/* «¿No pudo adjuntar algún archivo?»: abierto, un recuadro gris con el enlace y el comentario. */
+.formulario .sin-adjuntar {
+	margin-top: -0.85rem;
+}
+.formulario .sin-adjuntar .panel {
+	display: grid;
+	gap: 1.25rem;
+	margin-top: 0.5rem;
+	padding: 1.25rem;
+	border-left: 6px solid var(--lols-verde-oscuro);
+	background: var(--lols-gris-claro);
+}
+.formulario .sin-adjuntar .panel > p:first-child {
+	margin: 0;
+}
+.formulario .sin-adjuntar textarea {
+	min-height: 6rem;
+}
+@media (max-width: 560px) {
+	.formulario .sin-adjuntar .panel {
+		padding: 1rem;
+	}
 }
 .formulario .formatos dl {
 	display: grid;

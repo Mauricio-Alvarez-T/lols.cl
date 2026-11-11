@@ -10,7 +10,8 @@
 //     recibe o ya están todos los que caben), y los demás se quedan.
 // El servidor (public/api/lib/formulario.php) revisa lo mismo: cuántos, cuánto pesan y el tipo
 // por sus primeros bytes. Un PDF, un plano o un modelo no se pueden achicar aquí: si pasa del
-// máximo se pide uno más liviano, un enlace o mandarlo por correo.
+// máximo se pide uno más liviano (en la cotización: guardarlo como PDF o en un ZIP), un enlace o
+// mandarlo por correo, y se recuerda que es opcional.
 // Formatos y pesos: src/data/formatos.ts. Sin JavaScript queda el campo de archivos de siempre.
 import { MAX_MB, MAX_TOTAL_MB } from '../data/formatos';
 
@@ -45,7 +46,7 @@ export interface Adjuntos {
 }
 
 const origen = (f: File) => `${f.name}|${f.size}|${f.lastModified}`;
-const extension = (nombre: string) => (nombre.match(/\.([a-z0-9_]+)$/i)?.[1] ?? '').toLowerCase();
+export const extension = (nombre: string) => (nombre.match(/\.([a-z0-9_]+)$/i)?.[1] ?? '').toLowerCase();
 
 export const peso = (bytes: number) =>
 	bytes < 1024 * 1024
@@ -116,16 +117,33 @@ async function achicar(f: File): Promise<File | null> {
 	}
 }
 
+// Por qué un archivo no quedó adjunto (para alRechazar).
+export type Motivo = 'pesado' | 'formato';
+
 export interface OpcionesAdjuntos {
 	// Extensiones que se reciben además de las fotos (src/data/formatos.ts).
 	extensiones: string[];
 	maxArchivos: number;
 	// Final del aviso cuando un archivo no es de un formato que se recibe.
 	noRecibido: string;
+	// Qué hacer con lo que no quedó adjunto por peso o formato: se dice UNA vez al final del aviso,
+	// para uno o para varios archivos. Si falta, solo para el peso: «Suba uno más liviano, siga
+	// sin él o mándelo a <correo>.»
+	consejo?: { uno: string; varios: string };
 	correo: string;
+	// Se llama por cada archivo que no quedó adjunto por su peso o su formato (la cotización abre
+	// «¿No pudo adjuntar algún archivo?» y lo anota ahí).
+	alRechazar?: (f: File, motivo: Motivo) => void;
 }
 
-export function prepararAdjuntos(input: HTMLInputElement, { extensiones, maxArchivos, noRecibido, correo }: OpcionesAdjuntos): Adjuntos {
+export function prepararAdjuntos(
+	input: HTMLInputElement,
+	{ extensiones, maxArchivos, noRecibido, consejo, correo, alRechazar }: OpcionesAdjuntos,
+): Adjuntos {
+	const salida = consejo ?? {
+		uno: `Suba uno más liviano, siga sin él o mándelo a ${correo}.`,
+		varios: `Suba otros más livianos, siga sin ellos o mándelos a ${correo}.`,
+	};
 	const items: Item[] = [];
 	const total = () => items.reduce((s, i) => s + i.archivo.size, 0);
 	let pendiente: Promise<void> = Promise.resolve();
@@ -211,12 +229,20 @@ export function prepararAdjuntos(input: HTMLInputElement, { extensiones, maxArch
 
 	// Cada aviso empieza por «no quedó adjunto»: que se entienda que ese archivo no se enviará y
 	// que el resto del formulario sigue (Marcos, 11-11-2026).
-	const pesado = (f: File) =>
-		`«${f.name}» no quedó adjunto: pesa ${peso(f.size)} y el máximo es ${MAX_MB} MB. Suba uno más liviano, siga sin él o mándelo a ${correo}.`;
-	const lleno = (f: File) =>
-		`«${f.name}» no quedó adjunto: con él, los archivos pasan de ${MAX_TOTAL_MB} MB entre todos. Quite uno o mándelo a ${correo}.`;
+	// texto: qué archivo y por qué; motivo: para alRechazar; aconsejar: si le sirve el consejo.
+	type Problema = { texto: string; motivo?: Motivo; aconsejar?: boolean };
+	const pesado = (f: File): Problema => ({
+		texto: `«${f.name}» no quedó adjunto: pesa ${peso(f.size)} y el máximo es ${MAX_MB} MB.`,
+		motivo: 'pesado',
+		aconsejar: true,
+	});
+	const lleno = (f: File): Problema => ({
+		texto: `«${f.name}» no quedó adjunto: con él, los archivos pasan de ${MAX_TOTAL_MB} MB entre todos.`,
+		motivo: 'pesado',
+		aconsejar: true,
+	});
 
-	async function preparar(f: File, c: Clase): Promise<string> {
+	async function preparar(f: File, c: Clase): Promise<Problema | null> {
 		const ext = extension(f.name);
 		const item: Item = { origen: origen(f), archivo: f, clase: c, nota: peso(f.size), listo: false };
 		const debeAchicar = c === 'foto' && (f.size > UMBRAL_FOTO || !FOTOS_DEL_SERVIDOR.includes(ext));
@@ -226,7 +252,7 @@ export function prepararAdjuntos(input: HTMLInputElement, { extensiones, maxArch
 			if (c === 'foto') item.vista = URL.createObjectURL(f);
 			item.listo = true;
 			items.push(item);
-			return '';
+			return null;
 		}
 		item.nota = 'Achicando la foto…';
 		items.push(item);
@@ -240,8 +266,11 @@ export function prepararAdjuntos(input: HTMLInputElement, { extensiones, maxArch
 			// No se pudo abrir o achicar y así como está no se puede mandar.
 			items.splice(items.indexOf(item), 1);
 			return f.size > MAX_BYTES
-				? `«${f.name}» no quedó adjunta: no pudimos achicar la foto (${peso(f.size)}; el máximo es ${MAX_MB} MB). Pruebe con otra, siga sin ella o mándela a ${correo}.`
-				: `«${f.name}» no quedó adjunta: ese tipo de foto no lo podemos recibir. Pruebe con una foto JPG o PNG.`;
+				? {
+						texto: `«${f.name}» no quedó adjunta: no pudimos achicar la foto (${peso(f.size)}; el máximo es ${MAX_MB} MB). Pruebe con otra, siga sin ella o mándela a ${correo}.`,
+						motivo: 'pesado',
+					}
+				: { texto: `«${f.name}» no quedó adjunta: ese tipo de foto no lo podemos recibir. Pruebe con una foto JPG o PNG.`, motivo: 'formato' };
 		}
 		if (total() > MAX_TOTAL) {
 			items.splice(items.indexOf(item), 1);
@@ -249,29 +278,36 @@ export function prepararAdjuntos(input: HTMLInputElement, { extensiones, maxArch
 		}
 		item.vista = URL.createObjectURL(item.archivo);
 		item.listo = true;
-		return '';
+		return null;
 	}
 
 	async function agregar(nuevos: File[]) {
-		const problemas: string[] = [];
+		const problemas: Problema[] = [];
+		const anotar = (f: File, p: Problema) => {
+			problemas.push(p);
+			if (p.motivo) alRechazar?.(f, p.motivo);
+		};
 		for (const f of nuevos) {
 			if (items.some((i) => i.origen === origen(f))) continue;
 			const c = clase(f, extensiones);
 			if (!c) {
-				problemas.push(`«${f.name}» no quedó adjunto: ${noRecibido}`);
+				anotar(f, { texto: `«${f.name}» no quedó adjunto: ${noRecibido}`, motivo: 'formato', aconsejar: !!consejo });
 				continue;
 			}
 			if (items.length >= maxArchivos) {
-				problemas.push(`«${f.name}» no quedó adjunto: se pueden ${maxArchivos} archivos como máximo (quite uno para cambiarlo).`);
+				anotar(f, { texto: `«${f.name}» no quedó adjunto: se pueden ${maxArchivos} archivos como máximo (quite uno para cambiarlo).` });
 				continue;
 			}
 			const problema = await preparar(f, c);
-			if (problema) problemas.push(problema);
+			if (problema) anotar(f, problema);
 			pintar();
 		}
 		sincronizar();
 		pintar();
-		avisar(problemas.join(' '));
+		// Cada archivo con su motivo y, una sola vez al final, qué hacer.
+		const aconsejados = problemas.filter((p) => p.aconsejar).length;
+		const final = aconsejados ? (aconsejados > 1 ? salida.varios : salida.uno) : '';
+		avisar([...problemas.map((p) => p.texto), final].filter(Boolean).join(' '));
 	}
 
 	input.addEventListener('change', () => {
