@@ -96,6 +96,10 @@ copia fijada no agregaría protección ahí.
 - https://nuevo.lols.cl/deploy-status.txt → `<fecha> · OK · <sha>`, con el sha del último build.
 - https://nuevo.lols.cl/build.txt → el SHA del último commit de `main` que pasó el build.
 - Log: File Manager → `/home/lolscl/deploy-lols.cl.log` → última línea `deploy OK` o `sin cambios`.
+- Un push que solo cambia `docs/` o archivos `.md` **no** dispara el build (`paths-ignore` del
+  workflow): `build.txt` sigue con el commit anterior y es normal. Para forzar un deploy (por
+  ejemplo, para probar un cambio del cron): GitHub → Actions → Deploy lols.cl → Run workflow, o
+  `gh workflow run "Deploy lols.cl" --ref main`.
 
 ## Filtro de ejecutables
 
