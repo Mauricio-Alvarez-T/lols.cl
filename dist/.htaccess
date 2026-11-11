@@ -1,0 +1,40 @@
+# El docroot de nuevo.lols.cl queda en public_html/nuevo.lols.cl (el hosting no permite
+# sacarlo de public_html). Declarar RewriteEngine aquí corta la herencia de las reglas
+# de WordPress del public_html/.htaccess padre.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+</IfModule>
+
+Options -Indexes
+ErrorDocument 404 /404.html
+
+# URLs del WordPress de 2018 → estructura nueva (docs/brief.md § 5).
+# Incluye las subpáginas de cada proyecto viejo (/proyectos-terminados/abate/, ...).
+<IfModule mod_alias.c>
+  RedirectMatch 301 ^/quienes-somos/?$ /empresa/
+  RedirectMatch 301 ^/nuestros-servicios/?$ /servicios/
+  RedirectMatch 301 ^/proyectos-terminados(/.*)?$ /proyectos/?estado=terminado
+  RedirectMatch 301 ^/proyectos-en-construccion(/.*)?$ /proyectos/?estado=en-curso
+</IfModule>
+
+# Compresión: el hosting no comprime por defecto (el HTML de la portada viajaba en crudo).
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript application/json image/svg+xml
+</IfModule>
+
+# Caché: lo de /_astro/ lleva hash en el nombre (cambia de nombre si cambia), así que se
+# guarda un año; el resto de estáticos, una semana; el HTML se revalida siempre para que
+# cada deploy se vea al tiro.
+<IfModule mod_setenvif.c>
+  SetEnvIf Request_URI "^/_astro/" ASSET_CON_HASH
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.(css|js|woff2|svg|jpg|jpeg|png|webp)$">
+    Header set Cache-Control "public, max-age=604800"
+    # Va en el mismo bloque (y después) porque los FilesMatch se aplican al final.
+    Header set Cache-Control "public, max-age=31536000, immutable" env=ASSET_CON_HASH
+  </FilesMatch>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
