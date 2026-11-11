@@ -12,6 +12,7 @@ import Pendiente from './Pendiente.astro';
 import Pictograma from './Pictograma.astro';
 import { empresa } from '../data/empresa';
 import { grupos, aniosExperiencia, campoPregunta } from '../data/postulaciones';
+import { MAX_MB } from '../scripts/adjuntos';
 import '../styles/formulario.css';
 
 const pictogramas = { 'en-obra': 'faena', profesionales: 'edificio-oficinas' } as const;
@@ -165,7 +166,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 				<span>Suba aquí su currículum (CV) <span class="opcional" data-si-obra>(opcional)</span><abbr title="obligatorio" data-si-prof hidden>*</abbr></span>
 				<input id="p-archivos" name="archivos[]" type="file" multiple accept=".pdf,.doc,.docx,image/*" aria-describedby="p-archivos-ayuda" data-correo={empresa.correo.valor} />
 			</label>
-			<p id="p-archivos-ayuda" class="ayuda">PDF, Word o una foto: hasta 2 archivos de 5 MB cada uno (por ejemplo, el CV y un certificado). Las fotos pesadas se achican solas.</p>
+			<p id="p-archivos-ayuda" class="ayuda">PDF, Word o una foto: hasta 2 archivos de {MAX_MB} MB como máximo cada uno (por ejemplo, el CV y un certificado). Las fotos pesadas se achican solas.</p>
 
 			<label for="p-mensaje">
 				<span>Algo más que quiera contarnos <span class="opcional">(opcional)</span></span>
@@ -196,7 +197,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 </div>
 
 <script>
-	import { prepararAdjuntos } from '../scripts/adjuntos';
+	import { MAX_MB, prepararAdjuntos } from '../scripts/adjuntos';
 
 	const raiz = document.querySelector<HTMLElement>('[data-postula]');
 	const form = document.querySelector<HTMLFormElement>('#formulario');
@@ -225,7 +226,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 			enviado: 'Postulación enviada. Gracias: si su perfil calza con nuestras obras, lo llamaremos.',
 			datos: 'Revise los campos marcados: nombre, teléfono, años de experiencia y las preguntas del cargo son obligatorios.',
 			cv: 'Para este cargo, adjunte su CV (PDF, Word o una foto).',
-			archivos: 'Revise los archivos: hasta 2 (PDF, Word o fotos), de 5 MB cada uno.',
+			archivos: `Revise los archivos: hasta 2 (PDF, Word o fotos), de ${MAX_MB} MB como máximo cada uno.`,
 			consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
 			limite: 'Recibimos varias postulaciones desde su conexión. Intente de nuevo en una hora.',
 			'no-configurado': 'El envío aún no está habilitado. Mientras tanto, mande su CV por correo.',
@@ -279,7 +280,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 		const inicial = location.hash.slice(1);
 		mostrar(inicial, botones.has(inicial) || grupos.has(inicial));
 
-		// CV y adjuntos: máximo 2, de 5 MB cada uno; las fotos pesadas se achican al elegirlas
+		// CV y adjuntos: máximo 2, de MAX_MB cada uno; las fotos pesadas se achican al elegirlas
 		// (src/scripts/adjuntos.ts). El servidor vuelve a revisarlo.
 		const adjuntos = prepararAdjuntos(archivos, { word: true, correo: archivos.dataset.correo ?? '' });
 		archivos.addEventListener('change', () => {

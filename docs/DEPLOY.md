@@ -164,7 +164,8 @@ Plan de corte (se detalla cuando don Luis apruebe):
 `public/api/contacto.php` recibe el formulario de cotización de `/cotizar/` y
 `public/api/postulacion.php` las postulaciones de `/trabaja-con-nosotros/` (cargos y preguntas
 en `/api/cargos.json`, que se genera desde `src/data/postulaciones.ts`). Los dos envían un
-correo con `mail()` del servidor, con los archivos adjuntos (hasta 2, de 5 MB); lo común está
+correo con `mail()` del servidor, con los archivos adjuntos (hasta 2, de 2 MB: ver § Peso de los
+archivos); lo común está
 en `public/api/lib/formulario.php`. No guardan datos personales (Ley 21.719); para el límite de
 5 envíos por hora guardan un hash de la IP que se descarta a la hora.
 
@@ -189,6 +190,17 @@ del docroot:
      que el buzón exista, pero conviene que exista para ver rebotes.
 
 Sin `config.ini` el formulario responde "aún no está habilitado" y no envía nada.
+
+**Peso de los archivos (medido el 11-11-2026).** El PHP del hosting recibe archivos de hasta
+**2 MB** (`upload_max_filesize` de fábrica: un PDF de 1,9 MB pasa y uno de 2,1 MB no), aunque
+`formulario.php` diga 5 MB. Por eso el formulario avisa 2 MB y achica las fotos a menos de 1,5 MB
+en el navegador (`src/scripts/adjuntos.ts`, constante `MAX_MB`: cambiarla ahí y nada más).
+Para subir el límite hay que hacerlo en el hosting, **no en la carpeta del sitio**: el deploy hace
+`rsync --delete` del docroot y borraría el `.user.ini` / `php.ini` que el MultiPHP INI Editor
+escribe ahí. Después de subirlo, volver a medir y recién entonces cambiar `MAX_MB`.
+Medir sin mandar correos: un POST a `postulacion.php` con los datos completos, un PDF del peso a
+probar y **sin** `consentimiento` → si el archivo pasa responde `consentimiento`; si no,
+`archivos`.
 
 **Verificar:** `curl -s https://nuevo.lols.cl/api/contacto.php` (y `postulacion.php`) →
 `{"ok":false,"error":"metodo"}`

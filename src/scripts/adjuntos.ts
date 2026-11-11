@@ -8,13 +8,18 @@
 //     botón para quitarlo; elegir de nuevo agrega, no reemplaza;
 //   - si uno no se puede adjuntar, el aviso dice cuál y por qué (muy pesado, tipo no aceptado o
 //     ya hay 2), y los demás se quedan.
-// El servidor (public/api/lib/formulario.php) revisa lo mismo: máximo 2 archivos de 5 MB, y el
-// tipo por sus primeros bytes. Un PDF o un Word no se pueden achicar aquí: si pasa de 5 MB se
-// pide uno más liviano o mandarlo por correo.
+// El servidor (public/api/lib/formulario.php) revisa lo mismo: máximo 2 archivos y el tipo por
+// sus primeros bytes. Un PDF o un Word no se pueden achicar aquí: si pasa del máximo se pide uno
+// más liviano o mandarlo por correo.
 // Sin JavaScript queda el campo de archivos de siempre.
 
+// Peso máximo de cada archivo. 2 MB es lo que recibe hoy el PHP del hosting (upload_max_filesize
+// de fábrica; medido el 11-11-2026: 1,9 MB pasa y 2,1 MB no). formulario.php dice 5 MB, pero el
+// hosting corta antes. Si se sube ese límite en el hosting, cambiar solo este número: lo usan los
+// avisos y las ayudas de los dos formularios (docs/DEPLOY.md § Formularios).
+export const MAX_MB = 2;
 const MAX_ARCHIVOS = 2;
-const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_BYTES = MAX_MB * 1024 * 1024;
 // Fotos que pasan este peso se achican (carga más rápida con poca señal y correo más liviano).
 const UMBRAL_FOTO = 1.5 * 1024 * 1024;
 const MAX_PIXELES = 5_000_000;
@@ -201,7 +206,7 @@ export function prepararAdjuntos(
 	// Cada aviso empieza por «no quedó adjunto»: que se entienda que ese archivo no se enviará y
 	// que el resto del formulario sigue (Marcos, 11-11-2026).
 	const pesado = (f: File) =>
-		`«${f.name}» no quedó adjunto: pesa ${peso(f.size)} y el máximo es 5 MB. Suba uno más liviano, siga sin él o mándelo a ${correo}.`;
+		`«${f.name}» no quedó adjunto: pesa ${peso(f.size)} y el máximo es ${MAX_MB} MB. Suba uno más liviano, siga sin él o mándelo a ${correo}.`;
 
 	async function preparar(f: File, c: Clase): Promise<string> {
 		const ext = extension(f.name);
@@ -226,7 +231,7 @@ export function prepararAdjuntos(
 			// No se pudo abrir o achicar y así como está no se puede mandar.
 			items.splice(items.indexOf(item), 1);
 			return f.size > MAX_BYTES
-				? `«${f.name}» no quedó adjunta: no pudimos achicar la foto (${peso(f.size)}; el máximo es 5 MB). Pruebe con otra, siga sin ella o mándela a ${correo}.`
+				? `«${f.name}» no quedó adjunta: no pudimos achicar la foto (${peso(f.size)}; el máximo es ${MAX_MB} MB). Pruebe con otra, siga sin ella o mándela a ${correo}.`
 				: `«${f.name}» no quedó adjunta: ese tipo de foto no lo podemos recibir. Pruebe con una foto JPG o PNG.`;
 		}
 		item.vista = URL.createObjectURL(item.archivo);

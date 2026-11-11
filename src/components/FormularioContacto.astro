@@ -13,6 +13,7 @@
 // navegador (o del celular) vuelve al paso anterior. Todo sigue siendo UN solo <form>: sin
 // JavaScript se ven los tres pasos seguidos, con su título, y se envía igual que antes.
 import { empresa, servicios } from '../data/empresa';
+import { MAX_MB } from '../scripts/adjuntos';
 import '../styles/formulario.css';
 
 const necesidades = [...servicios.map((s) => [s.slug, s.nombre]), ['otro', 'Otro']];
@@ -116,7 +117,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 			<span>Fotos o planos</span>
 			<input id="f-archivos" name="archivos[]" type="file" multiple accept="image/*,.pdf" aria-describedby="f-archivos-ayuda" data-correo={empresa.correo.valor} />
 		</label>
-		<p id="f-archivos-ayuda" class="ayuda">Hasta 2 archivos (fotos o PDF), de 5 MB cada uno, como referencia de lo que quiere. Las fotos pesadas se achican solas.</p>
+		<p id="f-archivos-ayuda" class="ayuda">Hasta 2 archivos (fotos o PDF), de {MAX_MB} MB como máximo cada uno, como referencia de lo que quiere. Las fotos pesadas se achican solas.</p>
 	</fieldset>
 
 	<fieldset class="paso" data-paso="3" tabindex="-1">
@@ -171,7 +172,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 </form>
 
 <script>
-	import { prepararAdjuntos } from '../scripts/adjuntos';
+	import { MAX_MB, prepararAdjuntos } from '../scripts/adjuntos';
 
 	const form = document.querySelector<HTMLFormElement>('#formulario')!;
 	const estado = form.querySelector<HTMLParagraphElement>('.estado')!;
@@ -190,7 +191,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 		datos: 'Revise los campos marcados: nombre, un correo válido y la descripción del proyecto son obligatorios.',
 		mensaje: 'Cuéntenos su proyecto en unas líneas para seguir.',
 		personales: 'Revise los campos marcados: el nombre y un correo válido son obligatorios.',
-		archivos: 'Revise los archivos: hasta 2 (fotos o PDF), de 5 MB cada uno.',
+		archivos: `Revise los archivos: hasta 2 (fotos o PDF), de ${MAX_MB} MB como máximo cada uno.`,
 		consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
 		limite: 'Recibimos varias solicitudes desde su conexión. Intente de nuevo en una hora.',
 		'no-configurado': 'El formulario aún no está habilitado. Escríbanos directamente por correo.',
@@ -313,7 +314,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 	if (params.has('enviado')) mostrar('enviado', true);
 	else if (params.has('error')) noEnviada(params.get('error')!);
 
-	// Fotos o planos: máximo 2, de 5 MB cada uno; las fotos pesadas se achican al elegirlas
+	// Fotos o planos: máximo 2, de MAX_MB cada uno; las fotos pesadas se achican al elegirlas
 	// (src/scripts/adjuntos.ts). El servidor vuelve a revisarlo.
 	const archivos = form.querySelector<HTMLInputElement>('#f-archivos')!;
 	const adjuntos = prepararAdjuntos(archivos, { word: false, correo: archivos.dataset.correo ?? '' });
