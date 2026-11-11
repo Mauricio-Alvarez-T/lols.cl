@@ -163,9 +163,9 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 
 			<label for="p-archivos">
 				<span>Suba aquí su currículum (CV) <span class="opcional" data-si-obra>(opcional)</span><abbr title="obligatorio" data-si-prof hidden>*</abbr></span>
-				<input id="p-archivos" name="archivos[]" type="file" multiple accept=".pdf,.doc,.docx,image/*" aria-describedby="p-archivos-ayuda" />
+				<input id="p-archivos" name="archivos[]" type="file" multiple accept=".pdf,.doc,.docx,image/*" aria-describedby="p-archivos-ayuda" data-correo={empresa.correo.valor} />
 			</label>
-			<p id="p-archivos-ayuda" class="ayuda">PDF, Word o una foto, hasta 2 archivos de 5 MB cada uno (por ejemplo, el CV y un certificado).</p>
+			<p id="p-archivos-ayuda" class="ayuda">PDF, Word o una foto: hasta 2 archivos de 5 MB cada uno (por ejemplo, el CV y un certificado). Las fotos pesadas se achican solas.</p>
 
 			<label for="p-mensaje">
 				<span>Algo más que quiera contarnos <span class="opcional">(opcional)</span></span>
@@ -196,6 +196,8 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 </div>
 
 <script>
+	import { prepararAdjuntos } from '../scripts/adjuntos';
+
 	const raiz = document.querySelector<HTMLElement>('[data-postula]');
 	const form = document.querySelector<HTMLFormElement>('#formulario');
 	if (raiz && form) {
@@ -271,19 +273,11 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 		const inicial = location.hash.slice(1);
 		mostrar(inicial, botones.has(inicial) || grupos.has(inicial));
 
-		// CV y adjuntos: máximo 2, de 5 MB cada uno (el servidor vuelve a revisarlo).
-		const archivosValidos = () => {
-			const lista = [...(archivos.files ?? [])];
-			return lista.length <= 2 && lista.every((f) => f.size <= 5 * 1024 * 1024);
-		};
+		// CV y adjuntos: máximo 2, de 5 MB cada uno; las fotos pesadas se achican al elegirlas
+		// (src/scripts/adjuntos.ts). El servidor vuelve a revisarlo.
+		const adjuntos = prepararAdjuntos(archivos, { word: true, correo: archivos.dataset.correo ?? '' });
 		archivos.addEventListener('change', () => {
-			if (archivosValidos()) {
-				archivos.removeAttribute('aria-invalid');
-				if (estado.dataset.tipo === 'error') estado.textContent = '';
-			} else {
-				archivos.setAttribute('aria-invalid', 'true');
-				mostrarEstado('archivos');
-			}
+			if (estado.dataset.tipo === 'error') estado.textContent = '';
 		});
 		form.addEventListener('change', (e) => {
 			const grupo = (e.target as Element).closest('[data-grupo-opciones]');
@@ -306,27 +300,28 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 				invalidos[0].focus();
 				return;
 			}
-			if (!archivosValidos()) {
-				archivos.setAttribute('aria-invalid', 'true');
-				mostrarEstado('archivos');
-				archivos.focus();
-				return;
-			}
-			if (cvObligatorio && !archivos.files?.length) {
+			boton.disabled = true;
+			delete estado.dataset.tipo;
+			// Si una foto se está achicando, se espera a que termine.
+			estado.textContent = 'Preparando los archivos…';
+			await adjuntos.listo();
+			if (cvObligatorio && !adjuntos.cantidad()) {
+				boton.disabled = false;
 				archivos.setAttribute('aria-invalid', 'true');
 				mostrarEstado('cv');
 				archivos.focus();
 				return;
 			}
-			boton.disabled = true;
 			estado.textContent = 'Enviando…';
-			delete estado.dataset.tipo;
 			try {
-				const r = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+				const cuerpo = new FormData(form);
+				adjuntos.ponerEn(cuerpo);
+				const r = await fetch(form.action, { method: 'POST', body: cuerpo, headers: { Accept: 'application/json' } });
 				const datos = await r.json().catch(() => ({ ok: false, error: 'otro' }));
 				if (datos.ok) {
 					const elegido = cargo.value;
 					form.reset();
+					adjuntos.vaciar();
 					cargo.value = elegido;
 					mostrarEstado('enviado', true);
 				} else {

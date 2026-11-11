@@ -12,7 +12,7 @@
 // arriba dice en qué paso va; cada paso revisa lo suyo antes de seguir, y el botón Atrás del
 // navegador (o del celular) vuelve al paso anterior. Todo sigue siendo UN solo <form>: sin
 // JavaScript se ven los tres pasos seguidos, con su título, y se envía igual que antes.
-import { servicios } from '../data/empresa';
+import { empresa, servicios } from '../data/empresa';
 import '../styles/formulario.css';
 
 const necesidades = [...servicios.map((s) => [s.slug, s.nombre]), ['otro', 'Otro']];
@@ -114,9 +114,9 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 		</label>
 		<label for="f-archivos">
 			<span>Fotos o planos</span>
-			<input id="f-archivos" name="archivos[]" type="file" multiple accept="image/*,.pdf" aria-describedby="f-archivos-ayuda" />
+			<input id="f-archivos" name="archivos[]" type="file" multiple accept="image/*,.pdf" aria-describedby="f-archivos-ayuda" data-correo={empresa.correo.valor} />
 		</label>
-		<p id="f-archivos-ayuda" class="ayuda">Hasta 2 archivos (fotos o PDF), de 5 MB cada uno, como referencia de lo que quiere.</p>
+		<p id="f-archivos-ayuda" class="ayuda">Hasta 2 archivos (fotos o PDF), de 5 MB cada uno, como referencia de lo que quiere. Las fotos pesadas se achican solas.</p>
 	</fieldset>
 
 	<fieldset class="paso" data-paso="3" tabindex="-1">
@@ -171,6 +171,8 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 </form>
 
 <script>
+	import { prepararAdjuntos } from '../scripts/adjuntos';
+
 	const form = document.querySelector<HTMLFormElement>('#formulario')!;
 	const estado = form.querySelector<HTMLParagraphElement>('.estado')!;
 	const enviar = form.querySelector<HTMLButtonElement>('[data-enviar]')!;
@@ -261,12 +263,6 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 		const paso = pasos[n - 1];
 		for (const c of paso.querySelectorAll('[required]')) c.removeAttribute('aria-invalid');
 		const malos = invalidosEn(paso);
-		if (n === 2 && !archivosValidos()) {
-			archivos.setAttribute('aria-invalid', 'true');
-			mostrar('archivos');
-			archivos.focus();
-			return false;
-		}
 		if (!malos.length) return true;
 		for (const c of malos) c.setAttribute('aria-invalid', 'true');
 		if (n === 2) mostrar('mensaje');
@@ -311,22 +307,12 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 	if (params.has('enviado')) mostrar('enviado', true);
 	else if (params.has('error')) mostrar(params.get('error')!);
 
-	// Fotos o planos: máximo 2, de 5 MB cada uno (el servidor vuelve a revisarlo).
+	// Fotos o planos: máximo 2, de 5 MB cada uno; las fotos pesadas se achican al elegirlas
+	// (src/scripts/adjuntos.ts). El servidor vuelve a revisarlo.
 	const archivos = form.querySelector<HTMLInputElement>('#f-archivos')!;
-	const MAX_ARCHIVOS = 2;
-	const MAX_BYTES = 5 * 1024 * 1024;
-	function archivosValidos() {
-		const lista = [...(archivos.files ?? [])];
-		return lista.length <= MAX_ARCHIVOS && lista.every((f) => f.size <= MAX_BYTES);
-	}
+	const adjuntos = prepararAdjuntos(archivos, { word: false, correo: archivos.dataset.correo ?? '' });
 	archivos.addEventListener('change', () => {
-		if (archivosValidos()) {
-			archivos.removeAttribute('aria-invalid');
-			if (estado.dataset.tipo === 'error') limpiarEstado();
-		} else {
-			archivos.setAttribute('aria-invalid', 'true');
-			mostrar('archivos');
-		}
+		if (estado.dataset.tipo === 'error') limpiarEstado();
 	});
 
 	// Paso en que vive un campo (para llevar a la persona al error que devuelve el servidor).
@@ -342,21 +328,26 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 		// Por si algo de un paso anterior quedó mal (p. ej., al volver con Atrás y borrar).
 		for (let n = 1; n <= TOTAL; n++) {
 			const malos = invalidosEn(pasos[n - 1]);
-			if (malos.length || (n === 2 && !archivosValidos())) {
+			if (malos.length) {
 				if (n !== actual) irA(n);
 				revisarPaso(n);
 				return;
 			}
 		}
 		enviar.disabled = true;
-		estado.textContent = 'Enviando…';
 		delete estado.dataset.tipo;
+		// Si una foto se está achicando, se espera a que termine.
+		estado.textContent = 'Preparando los archivos…';
+		await adjuntos.listo();
+		estado.textContent = 'Enviando…';
 		try {
-			const r = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+			const cuerpo = new FormData(form);
+			adjuntos.ponerEn(cuerpo);
+			const r = await fetch(form.action, { method: 'POST', body: cuerpo, headers: { Accept: 'application/json' } });
 			const datos = await r.json().catch(() => ({ ok: false, error: 'otro' }));
 			if (datos.ok) {
 				form.reset();
-				archivos.removeAttribute('aria-invalid');
+				adjuntos.vaciar();
 				limpiarEstado();
 				form.classList.add('enviado');
 				gracias.hidden = false;

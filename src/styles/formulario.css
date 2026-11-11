@@ -52,6 +52,100 @@
 	font-size: 0.9rem;
 	color: var(--lols-gris);
 }
+/* Archivos elegidos (src/scripts/adjuntos.ts): miniatura, nombre, peso y «Quitar». */
+.formulario .adjuntos {
+	display: grid;
+	gap: 0.5rem;
+	margin: -0.5rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+.formulario .adjuntos li {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem;
+	border: 1px solid var(--linea);
+	background: var(--lols-blanco);
+}
+.formulario .adjunto-miniatura {
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 3rem;
+	height: 3rem;
+	overflow: hidden;
+	background: var(--lols-gris-claro);
+	font-family: var(--fuente-datos);
+	font-size: 0.8rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--lols-verde-oscuro);
+}
+.formulario .adjunto-miniatura img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.formulario .adjunto-texto {
+	flex: 1;
+	min-width: 0;
+	display: grid;
+	gap: 0.1rem;
+}
+.formulario .adjunto-texto b {
+	font-family: var(--fuente-titulos);
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+.formulario .adjunto-texto span {
+	font-size: 0.9rem;
+	color: var(--lols-gris);
+}
+/* Mientras se achica la foto, la nota late despacio. */
+.formulario [data-ocupado] .adjunto-texto span {
+	animation: adjunto-latido 1.2s ease-in-out infinite alternate;
+}
+@keyframes adjunto-latido {
+	to {
+		opacity: 0.45;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.formulario [data-ocupado] .adjunto-texto span {
+		animation: none;
+	}
+}
+.formulario .adjunto-quitar {
+	flex: none;
+	min-height: 2.75rem;
+	padding: 0 0.75rem;
+	border: 0;
+	background: none;
+	font-family: var(--fuente-titulos);
+	font-weight: 600;
+	color: var(--lols-verde-oscuro);
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+	cursor: pointer;
+}
+.formulario .adjunto-quitar:disabled {
+	visibility: hidden;
+}
+.formulario .adjunto-quitar:focus-visible {
+	outline: 3px solid var(--lols-verde-oscuro);
+	outline-offset: -3px;
+}
+/* Por qué un archivo no quedó adjunto. Vacío no ocupa lugar. */
+.formulario .adjuntos-aviso {
+	margin: -0.5rem 0 0;
+	font-weight: 600;
+	color: #b3261e;
+}
+.formulario .adjuntos-aviso:empty {
+	display: none;
+}
 .formulario input:focus-visible,
 .formulario select:focus-visible,
 .formulario textarea:focus-visible {
