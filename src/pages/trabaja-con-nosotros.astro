@@ -3,6 +3,8 @@
 // Aquí el video de faena suma: muestra el trabajo real y la cultura. Se postula por cargo, en tres
 // pasos (FormularioPostulacion, Marcos 09-10-2026); las postulaciones llegan por correo a
 // destinatario_cv (lols@lols.cl según don Luis, hasta que se cree un correo propio).
+// Postular va primero, justo bajo la portada, y la portada lleva un botón «Postular y subir mi CV»
+// (Marcos, 11-11-2026: que quede claro dónde dejar los datos y el currículum).
 import Base from '../layouts/Base.astro';
 import Pendiente from '../components/Pendiente.astro';
 import ObraPortada from '../components/ObraPortada.astro';
@@ -16,8 +18,18 @@ import { ejemplosTrabaja as ej } from '../data/ejemplos';
 		<p class="etiqueta">Trabaja con nosotros</p>
 		<h1 class="display">Construye con nosotros<span class="punto">.</span></h1>
 		<p class="bajada"><Pendiente texto="frase para postulantes">{ej.bajada}</Pendiente></p>
+		<p class="canales"><a class="boton" href="#postular">Postular y subir mi CV</a></p>
 	</ObraPortada>
 
+	<section class="seccion gris" id="postular">
+		<div class="contenedor">
+			<div class="cabecera">
+				<h2>¿Dónde quiere trabajar?</h2>
+			</div>
+			<p class="intro">Elija su grupo y su cargo, deje sus datos y suba aquí mismo su currículum (CV).</p>
+			<FormularioPostulacion />
+		</div>
+	</section>
 
 	<section class="seccion contenedor">
 		<div class="cabecera"><h2>Lo que ofrecemos</h2></div>
@@ -32,21 +44,14 @@ import { ejemplosTrabaja as ej } from '../data/ejemplos';
 			}
 		</div>
 	</section>
-
-	<section class="seccion gris" id="postular">
-		<div class="contenedor">
-			<div class="cabecera">
-				<h2>¿Dónde quiere trabajar?</h2>
-			</div>
-			<p class="intro">Elija su grupo, vea los cargos y postule al suyo.</p>
-			<FormularioPostulacion />
-		</div>
-	</section>
 </Base>
 
 <style>
 	.punto {
 		color: var(--lols-verde);
+	}
+	.canales {
+		margin-top: 1.5rem;
 	}
 	.motivos {
 		display: grid;

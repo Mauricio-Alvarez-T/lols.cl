@@ -70,7 +70,7 @@ export const grupos: Grupo[] = [
 	{
 		id: 'en-obra',
 		nombre: 'En obra',
-		bajada: 'Capataces, maestros y ayudantes. No necesita CV.',
+		bajada: 'Capataces, maestros y ayudantes. Si tiene CV, puede subirlo; no es obligatorio.',
 		cvObligatorio: false,
 		cargos: [
 			oficio('capataz', 'Capataz'),
@@ -95,7 +95,7 @@ export const grupos: Grupo[] = [
 	{
 		id: 'profesionales',
 		nombre: 'Profesionales y oficina técnica',
-		bajada: 'Jefe de obra, prevencionista, arquitecto y administrativo. Con CV.',
+		bajada: 'Jefe de obra, prevencionista, arquitecto y administrativo. Suba su CV al postular.',
 		cvObligatorio: true,
 		cargos: [
 			{

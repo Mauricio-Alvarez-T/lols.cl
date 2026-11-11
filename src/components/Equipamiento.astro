@@ -3,6 +3,8 @@
 // categoría se despliega bajo su fila, como los servicios (src/scripts/mosaico.ts). Categorías e
 // ítems del inventario de la Bóveda y de la reunión con don Luis (src/data/empresa.ts); las
 // fotos son de muestra hasta tener las reales. Sin cantidades (don Luis, 08-10-2026).
+// A futuro las fotos reales se suben desde la Bóveda, como las obras (Marcos, 11-11-2026): cada
+// categoría (y cada tipo de andamio) con sus imágenes; el sitio las toma al compilar.
 import Pendiente from './Pendiente.astro';
 import Referencial from './Referencial.astro';
 import Pictograma from './Pictograma.astro';
@@ -16,7 +18,7 @@ const idPanel = 'ficha-equipamiento';
 	<div class="cabecera">
 		<h2>Equipamiento propio</h2>
 	</div>
-	<Pendiente texto="fotos reales del equipamiento" />
+	<Pendiente texto="fotos reales del equipamiento (se subirán desde la Bóveda)" />
 
 	<ul class="mosaico" data-mosaico>
 		{

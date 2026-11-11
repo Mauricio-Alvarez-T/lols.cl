@@ -3,7 +3,11 @@
 // públicos y datos legales (la columna de Seguridad se sacó el 20-10-2026, con la página). Todo sobre el verde
 // de LOLS, para que cada página termine con la marca (como el pie rojo de Arup). La frase de
 // cierre la pone el bloque Contacto, justo antes.
-import { empresa, navegacion, telefonoHref, whatsappHref, fundacion } from '../data/empresa';
+// El teléfono se abre con tres opciones: llamar, escribir por WhatsApp o guardarlo en los contactos
+// del equipo (Marcos, 11-11-2026); por eso ya no va la línea suelta «WhatsApp». Es un <details>:
+// funciona sin JavaScript y con teclado.
+import Pendiente from './Pendiente.astro';
+import { empresa, navegacion, telefonoHref, whatsappHref, contactoVcardHref, fundacion } from '../data/empresa';
 
 const anio = new Date().getFullYear();
 ---
@@ -14,9 +18,19 @@ const anio = new Date().getFullYear();
 			<h2>Contacto</h2>
 			<address>
 				<p>{empresa.direccion.valor}</p>
-				<p><a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a></p>
+				<details class="telefono">
+					<summary>
+						<span>{empresa.telefono.valor}</span>
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+					</summary>
+					{empresa.telefono.pendiente && <Pendiente texto={empresa.telefono.pendiente} />}
+					<ul class="opciones">
+						<li><a href={telefonoHref(empresa.telefono.valor)}>Llamar</a></li>
+						<li><a href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a></li>
+						<li><a href={contactoVcardHref()} download="LOLS Ingenieria.vcf">Guardar en mis contactos</a></li>
+					</ul>
+				</details>
 				<p><a href={`mailto:${empresa.correo.valor}`}>{empresa.correo.valor}</a></p>
-				<p><a href={whatsappHref()} target="_blank" rel="noopener">WhatsApp</a></p>
 				<p>{empresa.horario}</p>
 			</address>
 		</div>
@@ -65,6 +79,59 @@ const anio = new Date().getFullYear();
 	}
 	address p {
 		margin: 0 0 0.4rem;
+	}
+	.telefono {
+		margin: 0 0 0.4rem;
+	}
+	.telefono summary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		cursor: pointer;
+		list-style: none;
+	}
+	.telefono summary::-webkit-details-marker {
+		display: none;
+	}
+	.telefono summary:hover {
+		color: var(--lols-lima);
+	}
+	.telefono svg {
+		width: 1rem;
+		height: 1rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2.2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		transition: transform 0.2s var(--suave);
+	}
+	.telefono[open] svg {
+		transform: rotate(180deg);
+	}
+	.opciones {
+		gap: 0;
+		margin: 0.5rem 0 0.25rem;
+		border-left: 2px solid rgb(255 255 255 / 0.35);
+	}
+	.opciones a {
+		display: flex;
+		align-items: center;
+		min-height: 2.25rem;
+		padding-left: 0.85rem;
+		background: none;
+	}
+	.opciones a:hover {
+		background: rgb(255 255 255 / 0.08);
+	}
+	/* Celular: cada opción con al menos 44 px de alto para el dedo. */
+	@media (pointer: coarse) {
+		.telefono summary {
+			min-height: 44px;
+		}
+		.opciones a {
+			min-height: 44px;
+		}
 	}
 	ul {
 		list-style: none;

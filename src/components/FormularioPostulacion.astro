@@ -32,7 +32,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 						<span>{g.bajada}</span>
 					</span>
 					<span class="grupo-n">
-						{g.cargos.length} cargos <span aria-hidden="true">→</span>
+						{g.cargos.length} cargos · {g.cvObligatorio ? 'suba su CV aquí' : 'CV opcional'} <span aria-hidden="true">→</span>
 					</span>
 				</a>
 			))
@@ -63,7 +63,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 								data-grupo={g.id}
 								data-cv={g.cvObligatorio ? 'si' : 'no'}
 							>
-								Postular<span class="sr-only"> como {c.nombre}</span>
+								{g.cvObligatorio ? 'Postular con mi CV' : 'Postular'}<span class="sr-only"> como {c.nombre}</span>
 							</a>
 						</li>
 					))}
@@ -162,7 +162,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 			<Pendiente texto="preguntas reales de cada cargo (estas son de ejemplo; las revisa la jefatura)" />
 
 			<label for="p-archivos">
-				<span>Su CV <span class="opcional" data-si-obra>(opcional)</span><abbr title="obligatorio" data-si-prof hidden>*</abbr></span>
+				<span>Suba aquí su currículum (CV) <span class="opcional" data-si-obra>(opcional)</span><abbr title="obligatorio" data-si-prof hidden>*</abbr></span>
 				<input id="p-archivos" name="archivos[]" type="file" multiple accept=".pdf,.doc,.docx,image/*" aria-describedby="p-archivos-ayuda" />
 			</label>
 			<p id="p-archivos-ayuda" class="ayuda">PDF, Word o una foto, hasta 2 archivos de 5 MB cada uno (por ejemplo, el CV y un certificado).</p>
