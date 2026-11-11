@@ -164,8 +164,8 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 	</div>
 
 	<div class="gracias" data-gracias hidden tabindex="-1">
-		<p class="gracias-titulo">Recibimos su solicitud</p>
-		<p>Le responderemos a la brevedad. Si es urgente, llámenos o escríbanos por WhatsApp.</p>
+		<p class="gracias-titulo">Solicitud enviada</p>
+		<p>La recibimos y le responderemos a la brevedad. Si es urgente, llámenos o escríbanos por WhatsApp.</p>
 		<button type="button" class="boton secundario" data-otra>Enviar otra solicitud</button>
 	</div>
 </form>
@@ -186,21 +186,27 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 	(form.elements.namedItem('t') as HTMLInputElement).value = String(Date.now());
 
 	const mensajes: Record<string, string> = {
-		enviado: 'Gracias. Recibimos su solicitud y le responderemos a la brevedad.',
+		enviado: 'Solicitud enviada. Gracias: le responderemos a la brevedad.',
 		datos: 'Revise los campos marcados: nombre, un correo válido y la descripción del proyecto son obligatorios.',
 		mensaje: 'Cuéntenos su proyecto en unas líneas para seguir.',
 		personales: 'Revise los campos marcados: el nombre y un correo válido son obligatorios.',
-		archivos: 'Puede adjuntar hasta 2 archivos (fotos o PDF) de hasta 5 MB cada uno.',
+		archivos: 'Revise los archivos: hasta 2 (fotos o PDF), de 5 MB cada uno.',
 		consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
 		limite: 'Recibimos varias solicitudes desde su conexión. Intente de nuevo en una hora.',
 		'no-configurado': 'El formulario aún no está habilitado. Escríbanos directamente por correo.',
-		red: 'No pudimos conectar con el servidor. Revise su conexión e intente de nuevo.',
-		otro: 'No pudimos enviar la solicitud. Intente de nuevo o escríbanos directamente por correo.',
+		red: 'No pudimos conectar con el servidor: revise su conexión e intente de nuevo.',
+		otro: 'Intente de nuevo o escríbanos directamente por correo.',
 	};
 
 	function mostrar(clave: string, ok = false) {
 		estado.textContent = mensajes[clave] ?? mensajes.otro;
 		estado.dataset.tipo = ok ? 'ok' : 'error';
+	}
+	// Si al apretar «Enviar» falta algo o el envío falla, se dice claro que la solicitud NO salió
+	// (Marcos, 11-11-2026: «no me dice explícitamente si mi cotización fue o no enviada»).
+	function noEnviada(clave: string, previo = 'No se envió su solicitud.') {
+		mostrar(clave);
+		estado.textContent = `${previo} ${estado.textContent}`;
 	}
 	function limpiarEstado() {
 		estado.textContent = '';
@@ -305,7 +311,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 
 	// Resultado del envío sin JavaScript (redirección con ?enviado / ?error).
 	if (params.has('enviado')) mostrar('enviado', true);
-	else if (params.has('error')) mostrar(params.get('error')!);
+	else if (params.has('error')) noEnviada(params.get('error')!);
 
 	// Fotos o planos: máximo 2, de 5 MB cada uno; las fotos pesadas se achican al elegirlas
 	// (src/scripts/adjuntos.ts). El servidor vuelve a revisarlo.
@@ -331,6 +337,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 			if (malos.length) {
 				if (n !== actual) irA(n);
 				revisarPaso(n);
+				estado.textContent = `Aún no se envía su solicitud. ${estado.textContent}`;
 				return;
 			}
 		}
@@ -357,10 +364,10 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 				const error = datos.error ?? 'otro';
 				const campo = error === 'archivos' ? archivos : error === 'consentimiento' ? form.querySelector('#f-consentimiento') : null;
 				if (campo && pasoDe(campo) !== actual) irA(pasoDe(campo));
-				mostrar(error);
+				noEnviada(error);
 			}
 		} catch {
-			mostrar('red');
+			noEnviada('red');
 		} finally {
 			enviar.disabled = false;
 		}

@@ -222,19 +222,25 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 		(form.elements.namedItem('t') as HTMLInputElement).value = String(Date.now());
 
 		const mensajes: Record<string, string> = {
-			enviado: 'Gracias. Recibimos su postulación; si su perfil calza con nuestras obras, lo llamaremos.',
+			enviado: 'Postulación enviada. Gracias: si su perfil calza con nuestras obras, lo llamaremos.',
 			datos: 'Revise los campos marcados: nombre, teléfono, años de experiencia y las preguntas del cargo son obligatorios.',
 			cv: 'Para este cargo, adjunte su CV (PDF, Word o una foto).',
-			archivos: 'Puede adjuntar hasta 2 archivos (PDF, Word o fotos) de hasta 5 MB cada uno.',
+			archivos: 'Revise los archivos: hasta 2 (PDF, Word o fotos), de 5 MB cada uno.',
 			consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
 			limite: 'Recibimos varias postulaciones desde su conexión. Intente de nuevo en una hora.',
 			'no-configurado': 'El envío aún no está habilitado. Mientras tanto, mande su CV por correo.',
-			red: 'No pudimos conectar con el servidor. Revise su conexión e intente de nuevo.',
-			otro: 'No pudimos enviar la postulación. Intente de nuevo o mande su CV por correo.',
+			red: 'No pudimos conectar con el servidor: revise su conexión e intente de nuevo.',
+			otro: 'Intente de nuevo o mande su CV por correo.',
 		};
 		const mostrarEstado = (clave: string, ok = false) => {
 			estado.textContent = mensajes[clave] ?? mensajes.otro;
 			estado.dataset.tipo = ok ? 'ok' : 'error';
+		};
+		// Si al apretar «Enviar» falta algo o el envío falla, se dice claro que la postulación NO
+		// salió (Marcos, 11-11-2026).
+		const noEnviada = (clave: string, previo = 'No se envió su postulación.') => {
+			mostrarEstado(clave);
+			estado.textContent = `${previo} ${estado.textContent}`;
 		};
 
 		// Paso actual: '' (grupos), el id de un grupo (sus cargos) o el de un cargo (formulario).
@@ -296,7 +302,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 				(grupo ?? c).setAttribute('aria-invalid', 'true');
 			}
 			if (invalidos.length) {
-				mostrarEstado(invalidos.length === 1 && invalidos[0].name === 'consentimiento' ? 'consentimiento' : 'datos');
+				noEnviada(invalidos.length === 1 && invalidos[0].name === 'consentimiento' ? 'consentimiento' : 'datos', 'Aún no se envía su postulación.');
 				invalidos[0].focus();
 				return;
 			}
@@ -308,7 +314,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 			if (cvObligatorio && !adjuntos.cantidad()) {
 				boton.disabled = false;
 				archivos.setAttribute('aria-invalid', 'true');
-				mostrarEstado('cv');
+				noEnviada('cv', 'Aún no se envía su postulación.');
 				archivos.focus();
 				return;
 			}
@@ -325,10 +331,10 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 					cargo.value = elegido;
 					mostrarEstado('enviado', true);
 				} else {
-					mostrarEstado(datos.error ?? 'otro');
+					noEnviada(datos.error ?? 'otro');
 				}
 			} catch {
-				mostrarEstado('red');
+				noEnviada('red');
 			} finally {
 				boton.disabled = false;
 			}
@@ -337,7 +343,7 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 		// Resultado del envío sin JavaScript (redirección con ?enviado / ?error).
 		const params = new URLSearchParams(location.search);
 		if (params.has('enviado')) mostrarEstado('enviado', true);
-		else if (params.has('error')) mostrarEstado(params.get('error')!);
+		else if (params.has('error')) noEnviada(params.get('error')!);
 	}
 </script>
 

@@ -198,8 +198,10 @@ export function prepararAdjuntos(
 		else input.removeAttribute('aria-invalid');
 	}
 
+	// Cada aviso empieza por «no quedó adjunto»: que se entienda que ese archivo no se enviará y
+	// que el resto del formulario sigue (Marcos, 11-11-2026).
 	const pesado = (f: File) =>
-		`«${f.name}» pesa ${peso(f.size)} y el máximo es 5 MB. Suba uno más liviano o mándelo a ${correo}.`;
+		`«${f.name}» no quedó adjunto: pesa ${peso(f.size)} y el máximo es 5 MB. Suba uno más liviano, siga sin él o mándelo a ${correo}.`;
 
 	async function preparar(f: File, c: Clase): Promise<string> {
 		const ext = extension(f.name);
@@ -224,8 +226,8 @@ export function prepararAdjuntos(
 			// No se pudo abrir o achicar y así como está no se puede mandar.
 			items.splice(items.indexOf(item), 1);
 			return f.size > MAX_BYTES
-				? `No pudimos achicar «${f.name}» (${peso(f.size)}; el máximo es 5 MB). Pruebe con otra foto o mándela a ${correo}.`
-				: `«${f.name}» no es un tipo de foto que podamos recibir. Pruebe con una foto JPG o PNG.`;
+				? `«${f.name}» no quedó adjunta: no pudimos achicar la foto (${peso(f.size)}; el máximo es 5 MB). Pruebe con otra, siga sin ella o mándela a ${correo}.`
+				: `«${f.name}» no quedó adjunta: ese tipo de foto no lo podemos recibir. Pruebe con una foto JPG o PNG.`;
 		}
 		item.vista = URL.createObjectURL(item.archivo);
 		item.listo = true;
@@ -238,11 +240,11 @@ export function prepararAdjuntos(
 			if (items.some((i) => i.origen === origen(f))) continue;
 			const c = clase(f, word);
 			if (!c) {
-				problemas.push(`«${f.name}» no se puede adjuntar: no es ${tipos}.`);
+				problemas.push(`«${f.name}» no quedó adjunto: no es ${tipos}.`);
 				continue;
 			}
 			if (items.length >= MAX_ARCHIVOS) {
-				problemas.push(`Puede adjuntar 2 archivos como máximo: quite uno para agregar «${f.name}».`);
+				problemas.push(`«${f.name}» no quedó adjunto: se pueden 2 archivos como máximo (quite uno para cambiarlo).`);
 				continue;
 			}
 			const problema = await preparar(f, c);
