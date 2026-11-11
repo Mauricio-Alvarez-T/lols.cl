@@ -326,9 +326,14 @@ const comunes = [{ nombre: 'experiencia', titulo: 'Años de experiencia', opcion
 				const datos = await r.json().catch(() => ({ ok: false, error: 'otro' }));
 				if (datos.ok) {
 					const elegido = cargo.value;
+					// reset() también vaciaba la hora de carga (trampa para bots) y la segunda
+					// postulación salía sin esa revisión: se conserva.
+					const t = form.elements.namedItem('t') as HTMLInputElement;
+					const cargada = t.value;
 					form.reset();
 					adjuntos.vaciar();
 					cargo.value = elegido;
+					t.value = cargada;
 					mostrarEstado('enviado', true);
 				} else {
 					noEnviada(datos.error ?? 'otro');
