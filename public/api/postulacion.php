@@ -72,8 +72,8 @@ foreach ($cargo['preguntas'] as $p) {
 }
 
 $archivos = adjuntos(TIPOS_CV);
-if ($archivos === null) {
-    responder(false, 'archivos', 422);
+if (!is_array($archivos)) {
+    responder(false, $archivos, 422);
 }
 if ($cargo['cvObligatorio'] && !$archivos) {
     responder(false, 'cv', 422);

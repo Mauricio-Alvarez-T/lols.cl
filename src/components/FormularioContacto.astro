@@ -13,7 +13,7 @@
 // navegador (o del celular) vuelve al paso anterior. Todo sigue siendo UN solo <form>: sin
 // JavaScript se ven los tres pasos seguidos, con su título, y se envía igual que antes.
 import { empresa, servicios } from '../data/empresa';
-import { MAX_MB } from '../scripts/adjuntos';
+import { MAX_MB, MAX_TOTAL_MB, gruposCotizacion, extCotizacion, acceptDe } from '../data/formatos';
 import '../styles/formulario.css';
 
 const necesidades = [...servicios.map((s) => [s.slug, s.nombre]), ['otro', 'Otro']];
@@ -113,11 +113,39 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 			<span>Cuéntenos su proyecto <abbr title="obligatorio">*</abbr></span>
 			<textarea id="f-mensaje" name="mensaje" rows="5" maxlength="5000" required placeholder="A grandes rasgos: qué quiere construir o instalar y para qué lo usará."></textarea>
 		</label>
+		<!-- Planos, modelos y documentos de ingeniería y arquitectura (Marcos, 11-11-2026: «que a
+		     nadie quede afuera»): formatos en src/data/formatos.ts. Lo muy pesado va por enlace. -->
 		<label for="f-archivos">
-			<span>Fotos o planos</span>
-			<input id="f-archivos" name="archivos[]" type="file" multiple accept="image/*,.pdf" aria-describedby="f-archivos-ayuda" data-correo={empresa.correo.valor} />
+			<span>Planos, modelos, fotos o documentos <span class="opcional">(opcional)</span></span>
+			<input id="f-archivos" name="archivos[]" type="file" multiple accept={acceptDe(extCotizacion)} aria-describedby="f-archivos-ayuda" data-correo={empresa.correo.valor} />
 		</label>
-		<p id="f-archivos-ayuda" class="ayuda">Hasta 2 archivos (fotos o PDF), de {MAX_MB} MB como máximo cada uno, como referencia de lo que quiere. Las fotos pesadas se achican solas.</p>
+		<div id="f-archivos-ayuda" class="ayuda">
+			<p>
+				Hasta 5 archivos de {MAX_MB} MB como máximo cada uno ({MAX_TOTAL_MB} MB entre todos): planos en PDF, DWG o DXF; modelos de Revit,
+				IFC, SketchUp, Rhino o Blender; planillas y fotos. Las fotos pesadas se achican solas.
+			</p>
+			<details class="formatos">
+				<summary>Ver todos los formatos</summary>
+				<dl>
+					{
+						gruposCotizacion.map((g) => (
+							<div>
+								<dt>{g.nombre}</dt>
+								<dd>{g.ext.map((e) => e.toUpperCase()).join(' · ')}</dd>
+							</div>
+						))
+					}
+				</dl>
+				<p>¿Uno de otro programa? Póngalo en un ZIP. Los RAR y 7z no se pueden revisar: mándelos como enlace.</p>
+			</details>
+		</div>
+		<label for="f-enlace">
+			<span>Enlace a archivos pesados <span class="opcional">(opcional)</span></span>
+			<input id="f-enlace" name="enlace" type="url" inputmode="url" maxlength="500" pattern="https?://.+" placeholder="https://drive.google.com/…" aria-describedby="f-enlace-ayuda" />
+		</label>
+		<p id="f-enlace-ayuda" class="ayuda">
+			¿Pesan más, como un modelo de Revit o de Blender, o una nube de puntos? Súbalos a Google Drive, OneDrive, Dropbox o WeTransfer y pegue aquí el enlace.
+		</p>
 	</fieldset>
 
 	<fieldset class="paso" data-paso="3" tabindex="-1">
@@ -172,7 +200,8 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 </form>
 
 <script>
-	import { MAX_MB, prepararAdjuntos } from '../scripts/adjuntos';
+	import { prepararAdjuntos } from '../scripts/adjuntos';
+	import { MAX_MB, extCotizacion } from '../data/formatos';
 
 	const form = document.querySelector<HTMLFormElement>('#formulario')!;
 	const estado = form.querySelector<HTMLParagraphElement>('.estado')!;
@@ -191,7 +220,9 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 		datos: 'Revise los campos marcados: nombre, un correo válido y la descripción del proyecto son obligatorios.',
 		mensaje: 'Cuéntenos su proyecto en unas líneas para seguir.',
 		personales: 'Revise los campos marcados: el nombre y un correo válido son obligatorios.',
-		archivos: `Revise los archivos: hasta 2 (fotos o PDF), de ${MAX_MB} MB como máximo cada uno.`,
+		archivos: `Revise los archivos: hasta 5, de ${MAX_MB} MB como máximo cada uno.`,
+		zip: 'Un ZIP trae adentro programas, macros u otros comprimidos, y por seguridad no los recibimos. Sáquelos del ZIP o mándenos un enlace.',
+		enlace: 'Revise el enlace: debe empezar con https:// (el de Google Drive, OneDrive, Dropbox o WeTransfer).',
 		consentimiento: 'Para enviar, debe aceptar la política de privacidad.',
 		limite: 'Recibimos varias solicitudes desde su conexión. Intente de nuevo en una hora.',
 		'no-configurado': 'El formulario aún no está habilitado. Escríbanos directamente por correo.',
@@ -263,16 +294,17 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 	});
 
 	// Campos obligatorios de un paso (o de todos) que no están bien.
+	// (El enlace es opcional, pero si se escribe debe ser una dirección https://.)
 	const invalidosEn = (raiz: ParentNode) =>
-		[...raiz.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]')].filter((c) => !c.checkValidity());
+		[...raiz.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required], input[type="url"]')].filter((c) => !c.checkValidity());
 
 	function revisarPaso(n: number): boolean {
 		const paso = pasos[n - 1];
-		for (const c of paso.querySelectorAll('[required]')) c.removeAttribute('aria-invalid');
+		for (const c of paso.querySelectorAll('[required], input[type="url"]')) c.removeAttribute('aria-invalid');
 		const malos = invalidosEn(paso);
 		if (!malos.length) return true;
 		for (const c of malos) c.setAttribute('aria-invalid', 'true');
-		if (n === 2) mostrar('mensaje');
+		if (n === 2) mostrar(malos[0].name === 'enlace' ? 'enlace' : 'mensaje');
 		else mostrar(malos.length === 1 && malos[0].name === 'consentimiento' ? 'consentimiento' : 'personales');
 		malos[0].focus();
 		return false;
@@ -314,10 +346,15 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 	if (params.has('enviado')) mostrar('enviado', true);
 	else if (params.has('error')) noEnviada(params.get('error')!);
 
-	// Fotos o planos: máximo 2, de MAX_MB cada uno; las fotos pesadas se achican al elegirlas
-	// (src/scripts/adjuntos.ts). El servidor vuelve a revisarlo.
+	// Planos, modelos, fotos o documentos: máximo 5, de MAX_MB cada uno; las fotos pesadas se
+	// achican al elegirlas (src/scripts/adjuntos.ts). El servidor vuelve a revisarlo.
 	const archivos = form.querySelector<HTMLInputElement>('#f-archivos')!;
-	const adjuntos = prepararAdjuntos(archivos, { word: false, correo: archivos.dataset.correo ?? '' });
+	const adjuntos = prepararAdjuntos(archivos, {
+		extensiones: extCotizacion,
+		maxArchivos: 5,
+		noRecibido: 'no es un formato que recibamos. Si es de otro programa (o un RAR o 7z), póngalo en un ZIP o pegue un enlace más abajo.',
+		correo: archivos.dataset.correo ?? '',
+	});
 	archivos.addEventListener('change', () => {
 		if (estado.dataset.tipo === 'error') limpiarEstado();
 	});
@@ -363,7 +400,14 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 				if (form.getBoundingClientRect().top < 0) form.scrollIntoView({ block: 'start' });
 			} else {
 				const error = datos.error ?? 'otro';
-				const campo = error === 'archivos' ? archivos : error === 'consentimiento' ? form.querySelector('#f-consentimiento') : null;
+				const campo =
+					error === 'archivos' || error === 'zip'
+						? archivos
+						: error === 'enlace'
+							? form.querySelector('#f-enlace')
+							: error === 'consentimiento'
+								? form.querySelector('#f-consentimiento')
+								: null;
 				if (campo && pasoDe(campo) !== actual) irA(pasoDe(campo));
 				noEnviada(error);
 			}
@@ -385,7 +429,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 	// Al cargar: paso 1 (o el de un error que volvió sin JavaScript).
 	history.replaceState({ paso: 1 }, '');
 	const errorInicial = params.get('error');
-	irA(errorInicial === 'archivos' ? 2 : errorInicial === 'datos' || errorInicial === 'consentimiento' ? 3 : 1, { enfocar: false });
+	irA(['archivos', 'zip', 'enlace'].includes(errorInicial ?? '') ? 2 : errorInicial === 'datos' || errorInicial === 'consentimiento' ? 3 : 1, { enfocar: false });
 </script>
 
 <style>

@@ -98,8 +98,9 @@ anterior) si encuentra:
 
 Además copia sin bits de ejecución (archivos 644, carpetas 755): suexec no corre un CGI sin `+x`.
 
-Hoy la lista tiene `.htaccess` (de `public/.htaccess`) y los tres PHP del formulario:
-`api/contacto.php`, `api/postulacion.php` y `api/lib/formulario.php` (de `public/api/`). Al
+Hoy la lista tiene `.htaccess` (de `public/.htaccess`), los tres PHP del formulario
+(`api/contacto.php`, `api/postulacion.php` y `api/lib/formulario.php`) y `api/.user.ini` (peso
+de los archivos), todos de `public/`. Al
 abortar escribe
 `<fecha> · FALLO · filtro · <sha>` en `deploy-status.txt`, deja en el log una línea `FILTRO:`
 por cada archivo, y no actualiza el testigo: cada 5 min lo vuelve a intentar hasta que se
@@ -113,7 +114,7 @@ quedará en `FALLO · filtro` hasta hacer esto):
 
    ```
    git fetch origin
-   for f in .htaccess api/contacto.php api/postulacion.php api/lib/formulario.php; do
+   for f in .htaccess api/.user.ini api/contacto.php api/postulacion.php api/lib/formulario.php; do
      echo "$(git show origin/main:public/$f | sha256sum | cut -d' ' -f1)  $f"
    done
    ```
@@ -164,8 +165,13 @@ Plan de corte (se detalla cuando don Luis apruebe):
 `public/api/contacto.php` recibe el formulario de cotización de `/cotizar/` y
 `public/api/postulacion.php` las postulaciones de `/trabaja-con-nosotros/` (cargos y preguntas
 en `/api/cargos.json`, que se genera desde `src/data/postulaciones.ts`). Los dos envían un
-correo con `mail()` del servidor, con los archivos adjuntos (hasta 2, de 2 MB: ver § Peso de los
-archivos); lo común está
+correo con `mail()` del servidor, con los archivos adjuntos (ver § Peso de los archivos). La
+cotización recibe hasta 5: fotos, PDF y planos, modelos y documentos de ingeniería y arquitectura
+(DWG, Revit, IFC, SketchUp, Blender, STEP, nubes de puntos, ZIP…; lista en `FORMATOS` de
+`lib/formulario.php` y en `src/data/formatos.ts`), y un enlace para lo muy pesado. Cada formato
+se reconoce por la extensión y se confirma con sus primeros bytes; nunca un programa, y un ZIP
+se revisa por dentro (sin programas, macros ni otros comprimidos). RAR y 7z no se reciben: no se
+puede revisar lo que traen. La postulación, hasta 2 (PDF, Word o foto). Lo común está
 en `public/api/lib/formulario.php`. No guardan datos personales (Ley 21.719); para el límite de
 5 envíos por hora guardan un hash de la IP que se descarta a la hora.
 
@@ -192,12 +198,14 @@ del docroot:
 Sin `config.ini` el formulario responde "aún no está habilitado" y no envía nada.
 
 **Peso de los archivos (medido el 11-11-2026).** El PHP del hosting recibe archivos de hasta
-**2 MB** (`upload_max_filesize` de fábrica: un PDF de 1,9 MB pasa y uno de 2,1 MB no), aunque
-`formulario.php` diga 5 MB. Por eso el formulario avisa 2 MB y achica las fotos a menos de 1,5 MB
-en el navegador (`src/scripts/adjuntos.ts`, constante `MAX_MB`: cambiarla ahí y nada más).
-Para subir el límite hay que hacerlo en el hosting, **no en la carpeta del sitio**: el deploy hace
-`rsync --delete` del docroot y borraría el `.user.ini` / `php.ini` que el MultiPHP INI Editor
-escribe ahí. Después de subirlo, volver a medir y recién entonces cambiar `MAX_MB`.
+**2 MB** (`upload_max_filesize` de fábrica: un PDF de 1,9 MB pasa y uno de 2,1 MB no) y 8 MB por
+envío (`post_max_size`). Por eso el formulario avisa 2 MB y 7 MB entre todos, y achica las fotos
+a menos de 1,5 MB en el navegador (`MAX_MB` y `MAX_TOTAL_MB` de `src/data/formatos.ts`).
+`public/api/.user.ini` (va con el build y está en `PERMITIDOS`) los sube a 10 MB y 32 MB, pero
+PHP solo lo lee si en el hosting corre como CGI/FastCGI/FPM. Tras el deploy, medir; si pasa,
+subir `MAX_MB` a 10 y `MAX_TOTAL_MB` a 20 (los topes de `formulario.php`). No usar el MultiPHP
+INI Editor sobre la carpeta del sitio: escribe el `.user.ini` en la raíz del docroot y el
+`rsync --delete` del deploy lo borra.
 Medir sin mandar correos: un POST a `postulacion.php` con los datos completos, un PDF del peso a
 probar y **sin** `consentimiento` → si el archivo pasa responde `consentimiento`; si no,
 `archivos`.

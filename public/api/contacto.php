@@ -1,7 +1,8 @@
 <?php
 /**
  * Formulario de cotización de lols.cl (/cotizar/): valida, filtra spam y envía un correo con
- * mail(), con las fotos o planos que adjunte la persona (hasta 2, de 5 MB, JPG/PNG/WebP/HEIC/PDF).
+ * mail(), con lo que adjunte la persona: hasta 5 archivos de fotos, PDF, planos, modelos y
+ * documentos técnicos (FORMATOS en lib/formulario.php), y un enlace para los muy pesados.
  * Lo común con postulacion.php (configuración, límite de envíos, adjuntos, correo) está en
  * lib/formulario.php; la configuración, en docs/DEPLOY.md. Sin config.ini no envía nada
  * (responde "no configurado").
@@ -45,6 +46,8 @@ const INICIOS = [
     'mas-6' => 'En más de 6 meses',
     'no-sabe' => 'No lo sabe',
 ];
+// Fotos y PDF, y todos los formatos técnicos de lib/formulario.php (Marcos, 11-11-2026).
+const MAX_ADJUNTOS = 5;
 const TIPOS_ADJUNTO = ['jpg', 'png', 'webp', 'heic', 'pdf'];
 
 revisarPeticion();
@@ -58,6 +61,8 @@ $servicio = campo('servicio', 40);
 $direccion = unaLinea(campo('direccion', 200));
 $superficie = unaLinea(campo('superficie', 40));
 $mensaje = campo('mensaje', 5000);
+// Enlace a planos o modelos pesados (Drive, OneDrive, Dropbox, WeTransfer…): solo http(s).
+$enlace = unaLinea(campo('enlace', 500));
 $terreno = opcion('terreno', TERRENOS);
 $etapa = opcion('etapa', ETAPAS);
 $inicio = opcion('inicio', INICIOS);
@@ -72,9 +77,12 @@ if ($servicio !== '' && !isset(SERVICIOS[$servicio])) {
 if ($terreno === null || $etapa === null || $inicio === null) {
     responder(false, 'datos', 422);
 }
-$archivos = adjuntos(TIPOS_ADJUNTO);
-if ($archivos === null) {
-    responder(false, 'archivos', 422);
+if ($enlace !== '' && (!filter_var($enlace, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $enlace))) {
+    responder(false, 'enlace', 422);
+}
+$archivos = adjuntos(array_merge(TIPOS_ADJUNTO, array_keys(FORMATOS)), MAX_ADJUNTOS);
+if (!is_array($archivos)) {
+    responder(false, $archivos, 422);
 }
 if (!$consiente) {
     responder(false, 'consentimiento', 422);
@@ -99,6 +107,7 @@ $cuerpo = implode("\n", [
     'Etapa:       ' . ($etapa !== '' ? ETAPAS[$etapa] : '—'),
     'Inicio:      ' . ($inicio !== '' ? INICIOS[$inicio] : '—'),
     'Adjuntos:    ' . ($archivos ? count($archivos) . ' (' . implode(', ', array_column($archivos, 'nombre')) . ')' : '—'),
+    'Enlace:      ' . ($enlace ?: '—'),
     '',
     'Proyecto:',
     $mensaje,

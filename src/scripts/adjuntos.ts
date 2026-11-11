@@ -6,20 +6,16 @@
 //     (GIF, AVIF…) se pasan a JPG;
 //   - cada archivo se muestra en una lista con su nombre, su peso (y cuánto se achicó) y un
 //     botón para quitarlo; elegir de nuevo agrega, no reemplaza;
-//   - si uno no se puede adjuntar, el aviso dice cuál y por qué (muy pesado, tipo no aceptado o
-//     ya hay 2), y los demás se quedan.
-// El servidor (public/api/lib/formulario.php) revisa lo mismo: máximo 2 archivos y el tipo por
-// sus primeros bytes. Un PDF o un Word no se pueden achicar aquí: si pasa del máximo se pide uno
-// más liviano o mandarlo por correo.
-// Sin JavaScript queda el campo de archivos de siempre.
+//   - si uno no se puede adjuntar, el aviso dice cuál y por qué (muy pesado, formato que no se
+//     recibe o ya están todos los que caben), y los demás se quedan.
+// El servidor (public/api/lib/formulario.php) revisa lo mismo: cuántos, cuánto pesan y el tipo
+// por sus primeros bytes. Un PDF, un plano o un modelo no se pueden achicar aquí: si pasa del
+// máximo se pide uno más liviano, un enlace o mandarlo por correo.
+// Formatos y pesos: src/data/formatos.ts. Sin JavaScript queda el campo de archivos de siempre.
+import { MAX_MB, MAX_TOTAL_MB } from '../data/formatos';
 
-// Peso máximo de cada archivo. 2 MB es lo que recibe hoy el PHP del hosting (upload_max_filesize
-// de fábrica; medido el 11-11-2026: 1,9 MB pasa y 2,1 MB no). formulario.php dice 5 MB, pero el
-// hosting corta antes. Si se sube ese límite en el hosting, cambiar solo este número: lo usan los
-// avisos y las ayudas de los dos formularios (docs/DEPLOY.md § Formularios).
-export const MAX_MB = 2;
-const MAX_ARCHIVOS = 2;
 const MAX_BYTES = MAX_MB * 1024 * 1024;
+const MAX_TOTAL = MAX_TOTAL_MB * 1024 * 1024;
 // Fotos que pasan este peso se achican (carga más rápida con poca señal y correo más liviano).
 const UMBRAL_FOTO = 1.5 * 1024 * 1024;
 const MAX_PIXELES = 5_000_000;
@@ -28,7 +24,7 @@ const CALIDAD_JPG = 0.82;
 // Fotos que el servidor recibe tal cual (las demás se pasan a JPG).
 const FOTOS_DEL_SERVIDOR = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'];
 
-type Clase = 'foto' | 'pdf' | 'word';
+type Clase = 'foto' | 'documento';
 interface Item {
 	origen: string; // nombre, peso y fecha del archivo elegido (para no repetirlo)
 	archivo: File;
@@ -49,18 +45,20 @@ export interface Adjuntos {
 }
 
 const origen = (f: File) => `${f.name}|${f.size}|${f.lastModified}`;
-const extension = (nombre: string) => (nombre.match(/\.([a-z0-9]+)$/i)?.[1] ?? '').toLowerCase();
+const extension = (nombre: string) => (nombre.match(/\.([a-z0-9_]+)$/i)?.[1] ?? '').toLowerCase();
 
 export const peso = (bytes: number) =>
 	bytes < 1024 * 1024
 		? `${Math.max(1, Math.round(bytes / 1024))} KB`
 		: `${(bytes / 1024 / 1024).toLocaleString('es-CL', { maximumFractionDigits: 1 })} MB`;
 
-function clase(f: File, word: boolean): Clase | null {
+// Foto (se achica o se pasa a JPG), documento (va tal cual) o null si no se recibe. Un TIFF es
+// documento: suelen ser planos escaneados y el navegador no los abre para achicarlos.
+function clase(f: File, extensiones: string[]): Clase | null {
 	const ext = extension(f.name);
-	if (f.type.startsWith('image/') || FOTOS_DEL_SERVIDOR.includes(ext)) return 'foto';
-	if (ext === 'pdf' || f.type === 'application/pdf') return 'pdf';
-	if (word && (ext === 'doc' || ext === 'docx')) return 'word';
+	if (FOTOS_DEL_SERVIDOR.includes(ext)) return 'foto';
+	if (extensiones.includes(ext)) return 'documento';
+	if (f.type.startsWith('image/')) return 'foto';
 	return null;
 }
 
@@ -118,12 +116,18 @@ async function achicar(f: File): Promise<File | null> {
 	}
 }
 
-export function prepararAdjuntos(
-	input: HTMLInputElement,
-	{ word, correo }: { word: boolean; correo: string },
-): Adjuntos {
-	const tipos = word ? 'PDF, Word ni foto' : 'foto ni PDF';
+export interface OpcionesAdjuntos {
+	// Extensiones que se reciben además de las fotos (src/data/formatos.ts).
+	extensiones: string[];
+	maxArchivos: number;
+	// Final del aviso cuando un archivo no es de un formato que se recibe.
+	noRecibido: string;
+	correo: string;
+}
+
+export function prepararAdjuntos(input: HTMLInputElement, { extensiones, maxArchivos, noRecibido, correo }: OpcionesAdjuntos): Adjuntos {
 	const items: Item[] = [];
+	const total = () => items.reduce((s, i) => s + i.archivo.size, 0);
 	let pendiente: Promise<void> = Promise.resolve();
 
 	// La lista y el aviso van justo después de la ayuda del campo.
@@ -165,7 +169,9 @@ export function prepararAdjuntos(
 					img.alt = '';
 					miniatura.append(img);
 				} else {
-					miniatura.textContent = i.clase === 'pdf' ? 'PDF' : i.clase === 'word' ? 'Word' : 'Foto';
+					const ext = extension(i.archivo.name).toUpperCase();
+					miniatura.textContent = ext || 'Archivo';
+					if (ext.length > 4) miniatura.dataset.largo = '';
 				}
 				const texto = document.createElement('span');
 				texto.className = 'adjunto-texto';
@@ -207,6 +213,8 @@ export function prepararAdjuntos(
 	// que el resto del formulario sigue (Marcos, 11-11-2026).
 	const pesado = (f: File) =>
 		`«${f.name}» no quedó adjunto: pesa ${peso(f.size)} y el máximo es ${MAX_MB} MB. Suba uno más liviano, siga sin él o mándelo a ${correo}.`;
+	const lleno = (f: File) =>
+		`«${f.name}» no quedó adjunto: con él, los archivos pasan de ${MAX_TOTAL_MB} MB entre todos. Quite uno o mándelo a ${correo}.`;
 
 	async function preparar(f: File, c: Clase): Promise<string> {
 		const ext = extension(f.name);
@@ -214,6 +222,7 @@ export function prepararAdjuntos(
 		const debeAchicar = c === 'foto' && (f.size > UMBRAL_FOTO || !FOTOS_DEL_SERVIDOR.includes(ext));
 		if (!debeAchicar) {
 			if (f.size > MAX_BYTES) return pesado(f);
+			if (total() + f.size > MAX_TOTAL) return lleno(f);
 			if (c === 'foto') item.vista = URL.createObjectURL(f);
 			item.listo = true;
 			items.push(item);
@@ -234,6 +243,10 @@ export function prepararAdjuntos(
 				? `«${f.name}» no quedó adjunta: no pudimos achicar la foto (${peso(f.size)}; el máximo es ${MAX_MB} MB). Pruebe con otra, siga sin ella o mándela a ${correo}.`
 				: `«${f.name}» no quedó adjunta: ese tipo de foto no lo podemos recibir. Pruebe con una foto JPG o PNG.`;
 		}
+		if (total() > MAX_TOTAL) {
+			items.splice(items.indexOf(item), 1);
+			return lleno(f);
+		}
 		item.vista = URL.createObjectURL(item.archivo);
 		item.listo = true;
 		return '';
@@ -243,13 +256,13 @@ export function prepararAdjuntos(
 		const problemas: string[] = [];
 		for (const f of nuevos) {
 			if (items.some((i) => i.origen === origen(f))) continue;
-			const c = clase(f, word);
+			const c = clase(f, extensiones);
 			if (!c) {
-				problemas.push(`«${f.name}» no quedó adjunto: no es ${tipos}.`);
+				problemas.push(`«${f.name}» no quedó adjunto: ${noRecibido}`);
 				continue;
 			}
-			if (items.length >= MAX_ARCHIVOS) {
-				problemas.push(`«${f.name}» no quedó adjunto: se pueden 2 archivos como máximo (quite uno para cambiarlo).`);
+			if (items.length >= maxArchivos) {
+				problemas.push(`«${f.name}» no quedó adjunto: se pueden ${maxArchivos} archivos como máximo (quite uno para cambiarlo).`);
 				continue;
 			}
 			const problema = await preparar(f, c);

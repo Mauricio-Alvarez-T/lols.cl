@@ -83,6 +83,11 @@
 	text-transform: uppercase;
 	color: var(--lols-verde-oscuro);
 }
+/* Extensiones largas (SLDPRT, IFCZIP) en letra más chica para que quepan. */
+.formulario .adjunto-miniatura[data-largo] {
+	font-size: 0.62rem;
+	letter-spacing: 0;
+}
 .formulario .adjunto-miniatura img {
 	width: 100%;
 	height: 100%;
@@ -145,6 +150,44 @@
 }
 .formulario .adjuntos-aviso:empty {
 	display: none;
+}
+/* Ayuda con más de un párrafo y la lista de formatos que se abre (cotización). */
+.formulario div.ayuda > p {
+	margin: 0;
+}
+.formulario .formatos summary {
+	display: inline-flex;
+	align-items: center;
+	min-height: 2.75rem;
+	font-family: var(--fuente-titulos);
+	font-weight: 600;
+	color: var(--lols-verde-oscuro);
+	cursor: pointer;
+}
+.formulario .formatos dl {
+	display: grid;
+	gap: 0.5rem;
+	margin: 0.25rem 0 0.75rem;
+}
+.formulario .formatos dl > div {
+	display: grid;
+	grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr);
+	gap: 0.15rem 1rem;
+}
+.formulario .formatos dt {
+	font-weight: 600;
+	color: var(--lols-carbon);
+}
+.formulario .formatos dd {
+	margin: 0;
+	font-family: var(--fuente-datos);
+	letter-spacing: 0.02em;
+	overflow-wrap: anywhere;
+}
+@media (max-width: 560px) {
+	.formulario .formatos dl > div {
+		grid-template-columns: minmax(0, 1fr);
+	}
 }
 .formulario input:focus-visible,
 .formulario select:focus-visible,
