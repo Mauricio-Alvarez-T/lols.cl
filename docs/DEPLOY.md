@@ -202,13 +202,19 @@ Sin `config.ini` el formulario responde "aún no está habilitado" y no envía n
 envío (`post_max_size`). Por eso el formulario avisa 2 MB y 7 MB entre todos, y achica las fotos
 a menos de 1,5 MB en el navegador (`MAX_MB` y `MAX_TOTAL_MB` de `src/data/formatos.ts`).
 `public/api/.user.ini` (va con el build y está en `PERMITIDOS`) los sube a 10 MB y 32 MB, pero
-PHP solo lo lee si en el hosting corre como CGI/FastCGI/FPM. Tras el deploy, medir; si pasa,
-subir `MAX_MB` a 10 y `MAX_TOTAL_MB` a 20 (los topes de `formulario.php`). No usar el MultiPHP
-INI Editor sobre la carpeta del sitio: escribe el `.user.ini` en la raíz del docroot y el
-`rsync --delete` del deploy lo borra.
+**este hosting no lo lee** (medido el 11-11-2026 a las 15:06, 6 minutos después del deploy de
+e62603f: 1,9 MB pasa, 2,1 MB no; 9,5 MB pasa de `post_max_size`). PHP lee `.user.ini` solo como
+CGI/FastCGI/FPM, así que aquí corre de otra forma (módulo de Apache o LSAPI). Se deja el archivo
+porque no molesta y sirve si el hosting cambia. Para subir el peso hay que usar el **MultiPHP INI
+Editor** de cPanel sobre el dominio y ver qué archivo escribe (en módulo de Apache o LSAPI suelen
+ser líneas `php_value` en el `.htaccess` del docroot): el deploy repone el `.htaccess` y borra lo
+que no viene en el build, así que lo escrito hay que copiarlo al repo (`public/.htaccess`) con su
+hash en `PERMITIDOS`. Recién con eso medido, subir `MAX_MB` a 10 y `MAX_TOTAL_MB` a 20 (los topes
+de `formulario.php`).
 Medir sin mandar correos: un POST a `postulacion.php` con los datos completos, un PDF del peso a
-probar y **sin** `consentimiento` → si el archivo pasa responde `consentimiento`; si no,
-`archivos`.
+probar, **sin** `consentimiento` y con `Accept: application/json` (sin ese encabezado el PHP
+redirige a la página) → si el archivo pasa responde `consentimiento`; si no, `archivos`; si el
+envío entero pasa de `post_max_size`, `datos`.
 
 **Verificar:** `curl -s https://nuevo.lols.cl/api/contacto.php` (y `postulacion.php`) →
 `{"ok":false,"error":"metodo"}`
