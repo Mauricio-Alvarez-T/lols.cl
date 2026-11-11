@@ -86,11 +86,12 @@ const horario = empresa.horario.charAt(0).toLowerCase() + empresa.horario.slice(
 </Base>
 
 <style>
+	/* Aire bajo la franja de la portada, como en Cotizar (11-11-2026: el título quedaba pegado). */
 	.columnas {
 		display: grid;
 		grid-template-columns: 1fr 1.2fr;
 		gap: clamp(2rem, 6vw, 5rem);
-		padding-top: 0;
+		padding-top: clamp(2.5rem, 6vw, 4.5rem);
 	}
 	.columnas h2 {
 		margin-bottom: 1.25rem;

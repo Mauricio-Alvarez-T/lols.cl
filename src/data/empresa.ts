@@ -8,8 +8,9 @@ export const empresa = {
 	rut: '77.085.560-8',
 	lema: 'Sus proyectos en las mejores manos',
 	directrices: 'Experiencia, seguridad y calidad son nuestras directrices.',
-	// Oficina (Marcos, 19-10-2026; antes El Mirador 150, Cerrillos). Calle Rodulfo Amado Philippi.
-	direccion: { valor: 'Philippi 36, Santiago' },
+	// Oficina (Marcos, 19-10-2026; antes El Mirador 150, Cerrillos), barrio Meiggs. Con el nombre
+	// completo de la calle desde el 11-11-2026 (Marcos); en avisos sale también «Rodulfo Phillippi».
+	direccion: { valor: 'Rodolfo Philippi 36, Santiago' },
 	// Número de relleno (Marcos, 11-11-2026): la empresa compra un teléfono nuevo y su número llega
 	// después (antes: +56 652 710 609). Mientras `pendiente` tenga texto, el pie muestra el marcador
 	// y el build de producción (lols.cl) falla, para que el relleno no salga a la página real.
