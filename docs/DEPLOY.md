@@ -41,17 +41,36 @@ Luego **borrar este cron**.
 
 ### 2. Script fijado (una vez, y cada vez que cambie el script)
 
-1. File Manager → `/home/lolscl/` → crear la carpeta `bin` (si no existe).
-2. Subir `scripts/cpanel-deploy.sh` desde una copia local del repo **ya revisada** (la de `main`
-   después del merge) y renombrarlo a `cpanel-deploy-lols.sh`. Queda en
-   `/home/lolscl/bin/cpanel-deploy-lols.sh`. No necesita permiso de ejecución (lo corre `/bin/bash`).
-3. Comprobar que llegó igual: en local, `sha256sum scripts/cpanel-deploy.sh`; en el servidor,
-   un cron temporal "Once Per Minute" con
-   `sha256sum /home/lolscl/bin/cpanel-deploy-lols.sh > /home/lolscl/bin/cpanel-deploy-lols.sha256`;
-   abrir ese archivo en File Manager, comparar y **borrar el cron**.
+**Instalado el 11-11-2026.** Hasta ese día `/home/lolscl/bin` no existía y el cron seguía con el
+comando viejo (el del «Cambio del 28-oct-2026», más abajo): el servidor ejecutaba el script del
+clon y la protección no estaba activa. Se instaló con la forma B de abajo (huella
+`de55030341cb…` = `scripts/cpanel-deploy.sh` de cdb9ad7).
 
-Nunca se copia el script desde el clon con un cron (`git checkout`, `git show`, `cp`): eso
-vuelve a dejar que el repo decida qué se ejecuta en el servidor.
+La copia tiene que quedar **byte a byte** igual a la versión revisada de `main` (LF). Dos formas:
+
+- **A. Subirla desde el PC.** File Manager → `/home/lolscl/` → crear `bin` → subir el archivo
+  sacado con `git show origin/main:scripts/cpanel-deploy.sh > cpanel-deploy-lols.sh` (no la
+  copia de trabajo de Windows, que tiene CRLF y bash no la corre). Queda en
+  `/home/lolscl/bin/cpanel-deploy-lols.sh`. No necesita permiso de ejecución (lo corre `/bin/bash`).
+- **B. Copiarla una sola vez desde el clon, con un cron temporal "Once Per Minute"**, cuando la
+  rama `deploy` ya trae la versión revisada:
+
+  ```
+  mkdir -p /home/lolscl/bin && { test -e /home/lolscl/bin/cpanel-deploy-lols.sh || cp /home/lolscl/deploy-lols.cl/scripts/cpanel-deploy.sh /home/lolscl/bin/cpanel-deploy-lols.sh; } && sha256sum /home/lolscl/bin/cpanel-deploy-lols.sh > /home/lolscl/bin/cpanel-deploy-lols.sha256
+  ```
+
+  El `test -e` hace que copie solo la primera vez: si alguien empujara otra versión mientras el
+  cron temporal existe, no la toma.
+
+En ambos casos: comparar `/home/lolscl/bin/cpanel-deploy-lols.sha256` (File Manager → View) con
+`git show origin/main:scripts/cpanel-deploy.sh | sha256sum` en local, **borrar el cron
+temporal** y solo si coinciden pasar al paso 3. Para **reemplazar** una copia ya instalada (cambió
+el script): lo mismo con otro nombre (`cpanel-deploy-lols.nuevo` y su `.sha256`), comparar,
+borrar el cron y en File Manager borrar la vieja y renombrar la nueva.
+
+Nunca se deja un cron que copie el script desde el clon en cada pasada (`git checkout`,
+`git show`, `cp`): eso vuelve a dejar que el repo decida qué se ejecuta en el servidor. Una copia
+única con la huella comprobada antes de usarla sí sirve.
 
 ### 3. Cron de deploy (permanente)
 
@@ -61,10 +80,16 @@ Cron Jobs → Add New Cron Job → "Every 5 Minutes" (`*/5 * * * *`) → Command
 HOME=/home/lolscl GIT_TERMINAL_PROMPT=0 /bin/bash /home/lolscl/bin/cpanel-deploy-lols.sh >> /home/lolscl/deploy-lols.cl.log 2>&1
 ```
 
-**Cambio del 28-oct-2026:** este cron **reemplaza** al anterior, que empezaba con
+**Cambio del 28-oct-2026 (aplicado recién el 11-11-2026):** este cron **reemplaza** al anterior,
+que empezaba con
 `cd /home/lolscl/deploy-lols.cl && git fetch … && git checkout -q -f origin/deploy -- scripts/cpanel-deploy.sh`
 y ejecutaba el script del clon. Editar ese cron y dejar solo la línea de arriba (el script ya
-hace el `git fetch` por su cuenta). Hacerlo **después** del paso 2.
+hace el `git fetch` por su cuenta). Hacerlo **después** del paso 2. Desde el 11-11-2026 el cron
+de cPanel es exactamente la línea de arriba.
+
+Los crons de la Bóveda (`deploy-staging`, `deploy-prod`) siguen corriendo el script de su clon a
+propósito: el backend de la Bóveda ya es código del repo que corre en el servidor, así que una
+copia fijada no agregaría protección ahí.
 
 ### 4. Verificar
 
@@ -124,7 +149,8 @@ quedará en `FALLO · filtro` hasta hacer esto):
    se agrega al `for` con su ruta relativa a `dist/`.
 3. File Manager → editar `/home/lolscl/bin/cpanel-deploy-lols.sh` → en `PERMITIDOS` agregar
    la línea `<hash>  <ruta>` (dos espacios). La lista admite varias líneas por ruta: se puede
-   agregar la nueva antes del push y borrar la vieja después.
+   agregar la nueva antes del push y borrar la vieja después. Es el ÚNICO lugar que cuenta: la
+   lista del repo (paso 4) es solo la referencia y el servidor no la lee.
 4. Hacer el mismo cambio en `scripts/cpanel-deploy.sh` del repo, para que la referencia no se
    desfase de la copia.
 
