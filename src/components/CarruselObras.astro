@@ -22,14 +22,22 @@
 // Sin ficha (obras sin `ficha` ni `href`, como "Han confiado en nosotros": solo foto y
 // dirección, por pedido de don Luis): mismo carrusel, sin "Ver ficha", sin panel y sin enlaces;
 // tocar una foto que asoma lleva a esa obra.
+//
+// Editor visual (docs/editor-visual.md): las obras reales llevan marcas data-ed-* en el texto, la
+// foto y la ficha, y la sección dice qué lista es (`lista`). El comportamiento está en
+// src/scripts/carrusel.ts, que también atiende a lols:refrescar y lols:ir. Mantener las marcas
+// al cambiar el marcado.
 import Pendiente from './Pendiente.astro';
 import Referencial from './Referencial.astro';
 import FichaObra from './FichaObra.astro';
 import type { EjemploTarjeta, ImagenReferencial } from '../data/referencia';
 import type { FotoObra, Proyecto } from '../data/proyectos';
+import type { Regla } from '../data/selecciones';
+import { lineaResumen } from '../data/vistaObra';
 
 export interface ObraCarrusel {
 	id: string | null; // slug; las muestras reciben uno según su posición
+	ed?: string; // obra de la Bóveda (`obras/<slug>`): lleva las marcas del editor visual
 	href: string | null; // null: sin página propia (el título y la foto no son enlaces)
 	imagen: ImagenReferencial | FotoObra;
 	tipo: string | null;
@@ -47,8 +55,9 @@ interface Props {
 	id?: string;
 	enlace?: { href: string; texto: string };
 	nota?: string;
+	lista?: Regla; // regla de src/data/selecciones.ts que eligió las obras (data-ed-lista)
 }
-const { obras, titulo, id, enlace, nota } = Astro.props;
+const { obras, titulo, id, enlace, nota, lista } = Astro.props;
 const esReferencial = (i: ObraCarrusel['imagen']): i is ImagenReferencial => 'origen' in i;
 const seccion = id ?? titulo.toLowerCase().replace(/[^a-z]+/g, '-');
 const idTitulo = `carrusel-${seccion}`;
@@ -57,7 +66,7 @@ const idFicha = (o: ObraCarrusel, i: number) => `obra-${o.id ?? `${seccion}-${i 
 const conFicha = obras.every((o) => o.ficha);
 ---
 
-<section class="carrusel" id={id} aria-labelledby={idTitulo} aria-roledescription="carrusel" data-carrusel data-panel={conFicha ? idPanel : undefined}>
+<section class="carrusel" id={id} aria-labelledby={idTitulo} aria-roledescription="carrusel" data-carrusel data-panel={conFicha ? idPanel : undefined} data-ed-lista={lista} data-ed-vista={lista && 'carrusel'}>
 	<div class="avance" aria-hidden="true"><span></span></div>
 	<div class="franja" aria-hidden="true"></div>
 
@@ -80,26 +89,30 @@ const conFicha = obras.every((o) => o.ficha);
 			<div class="textos">
 				{
 					obras.map((o, i) => (
-						<article class:list={['texto', i === 0 ? 'activo' : 'despues']} inert={i === 0 ? undefined : true} data-indice={i}>
-							<p class="categoria">{o.ejemplo ? <Pendiente texto="tipo de obra">{o.tipo}</Pendiente> : o.tipo}</p>
+						<article class:list={['texto', i === 0 ? 'activo' : 'despues']} inert={i === 0 ? undefined : true} data-indice={i} data-ed-item={o.ed}>
+							<p class="categoria" data-ed-derivado={o.ed && '/tipo'}>{o.ejemplo ? <Pendiente texto="tipo de obra">{o.tipo}</Pendiente> : o.tipo}</p>
 							<h3>
-								{o.href ? <a href={o.href}>{o.ejemplo ? <Pendiente texto="nombre del proyecto">{o.nombre}</Pendiente> : o.nombre}</a> : o.nombre}
+								{o.href ? <a href={o.href} data-ed-campo={o.ed && '/nombre'}>{o.ejemplo ? <Pendiente texto="nombre del proyecto">{o.nombre}</Pendiente> : o.nombre}</a> : o.nombre}
 							</h3>
-							<p class="resumen">
-								{o.ejemplo ? <Pendiente texto="comuna">{o.comuna}</Pendiente> : o.comuna}
-								{o.superficie && (
-									<>
-										{' · '}
-										{o.ejemplo ? <Pendiente texto="m² construidos">{o.superficie}</Pendiente> : o.superficie}
-									</>
-								)}
-								{o.anio && (
-									<>
-										{' · '}
-										{o.ejemplo ? <Pendiente texto="año">{o.anio}</Pendiente> : o.anio}
-									</>
-								)}
-							</p>
+							{o.ejemplo ? (
+								<p class="resumen">
+									{<Pendiente texto="comuna">{o.comuna}</Pendiente>}
+									{o.superficie && (
+										<>
+											{' · '}
+											<Pendiente texto="m² construidos">{o.superficie}</Pendiente>
+										</>
+									)}
+									{o.anio && (
+										<>
+											{' · '}
+											<Pendiente texto="año">{o.anio}</Pendiente>
+										</>
+									)}
+								</p>
+							) : (
+								<p class="resumen" data-ed-linea={o.ed && 'resumen'}>{lineaResumen(o.comuna, o.superficie, o.anio ?? null)}</p>
+							)}
 							{conFicha && (
 								<button type="button" class="ver-ficha" aria-expanded="false" aria-controls={idPanel} hidden>
 									<span>Ver ficha</span>
@@ -115,9 +128,9 @@ const conFicha = obras.every((o) => o.ficha);
 				<ul class="pista" style="--i: 0">
 					{
 						obras.map((o, i) => (
-							<li class:list={['foto', { futura: i > 0 }]} aria-hidden={i === 0 ? undefined : 'true'}>
+							<li class:list={['foto', { futura: i > 0 }]} aria-hidden={i === 0 ? undefined : 'true'} data-ed-item={o.ed}>
 								{o.href ? (
-									<a href={o.href} tabindex="-1" class="marco">
+									<a href={o.href} tabindex="-1" class="marco" data-ed-foto={o.ed && '/fotos/0'}>
 										{esReferencial(o.imagen) ? (
 											<Referencial imagen={o.imagen} sizes="(max-width: 760px) 88vw, 60vw" />
 										) : (
@@ -125,7 +138,7 @@ const conFicha = obras.every((o) => o.ficha);
 										)}
 									</a>
 								) : (
-									<div class="marco">
+									<div class="marco" data-ed-foto={o.ed && '/fotos/0'}>
 										{esReferencial(o.imagen) ? (
 											<Referencial imagen={o.imagen} sizes="(max-width: 760px) 88vw, 60vw" />
 										) : (
@@ -198,122 +211,8 @@ const conFicha = obras.every((o) => o.ficha);
 )}
 
 <script>
-	import { registrar, abrir, cambiar, cerrar, abiertaEn, type Grupo } from '../scripts/despliegue';
-
-	for (const c of document.querySelectorAll<HTMLElement>('[data-carrusel]')) {
-		const pista = c.querySelector<HTMLElement>('.pista')!;
-		const fotos = [...pista.children] as HTMLElement[];
-		const textos = [...c.querySelectorAll<HTMLElement>('.texto')];
-		const anuncio = c.querySelector<HTMLElement>('[data-anuncio]')!;
-		const total = textos.length;
-		let actual = 0;
-
-		// Sin ficha (data-panel ausente): solo el carrusel.
-		const panel = c.dataset.panel ? document.getElementById(c.dataset.panel) : null;
-		const fichas = panel ? [...panel.querySelectorAll<HTMLElement>('[data-ficha]')] : [];
-		const ids = fichas.map((f) => f.dataset.ficha!);
-		const posicion = panel?.querySelector<HTMLElement>('[data-posicion]');
-		const botones = panel ? textos.map((t) => t.querySelector<HTMLButtonElement>('.ver-ficha')!) : [];
-		for (const b of botones) b.hidden = false;
-
-		const marcar = (abierta: boolean) => {
-			c.classList.toggle('con-ficha', abierta);
-			botones.forEach((b, i) => {
-				const esta = abierta && i === actual;
-				b.setAttribute('aria-expanded', String(esta));
-				b.querySelector('span')!.textContent = esta ? 'Cerrar ficha' : 'Ver ficha';
-			});
-		};
-		const grupo: Grupo = {
-			tiene: (id) => ids.includes(id),
-			mostrar: (id) => {
-				const n = ids.indexOf(id);
-				if (n !== actual) mostrar(n, false);
-				fichas.forEach((f, i) => (f.hidden = i !== n));
-				if (posicion) posicion.textContent = `${n + 1} de ${total}`;
-				marcar(true);
-			},
-			panel: () => panel!,
-			disparador: () => botones[actual],
-			alCerrar: () => marcar(false),
-		};
-
-		const mostrar = (n: number, sincronizar = true) => {
-			actual = (n + total) % total; // después de la última vuelve a la primera
-			pista.style.setProperty('--i', String(actual));
-			textos.forEach((t, i) => {
-				t.classList.toggle('activo', i === actual);
-				t.classList.toggle('antes', i < actual);
-				t.classList.toggle('despues', i > actual);
-				t.inert = i !== actual;
-			});
-			fotos.forEach((f, i) => {
-				f.classList.toggle('pasada', i < actual);
-				f.classList.toggle('futura', i > actual);
-				if (i === actual) f.removeAttribute('aria-hidden');
-				else f.setAttribute('aria-hidden', 'true');
-			});
-			anuncio.textContent = `Obra ${actual + 1} de ${total}: ${textos[actual].querySelector('h3')?.textContent?.trim() ?? ''}`;
-			// Con la ficha abierta, cambiar de obra cambia también la ficha.
-			if (sincronizar && panel && abiertaEn(grupo)) cambiar(grupo, ids[actual]);
-		};
-
-		c.querySelector('.anterior')!.addEventListener('click', () => mostrar(actual - 1));
-		c.querySelector('.siguiente')!.addEventListener('click', () => mostrar(actual + 1));
-		c.addEventListener('keydown', (e) => {
-			if (e.key === 'ArrowRight') mostrar(actual + 1);
-			if (e.key === 'ArrowLeft') mostrar(actual - 1);
-		});
-
-		// Deslizar con el dedo sobre las fotos.
-		let x0: number | null = null;
-		pista.addEventListener('pointerdown', (e) => {
-			if (e.pointerType !== 'mouse') x0 = e.clientX;
-		});
-		pista.addEventListener('pointerup', (e) => {
-			if (x0 === null) return;
-			const dx = e.clientX - x0;
-			x0 = null;
-			if (Math.abs(dx) > 40) mostrar(actual + (dx < 0 ? 1 : -1));
-		});
-		pista.addEventListener('pointercancel', () => (x0 = null));
-
-		// Ficha en el lugar: el botón la abre o la cierra; el título o la foto activa la abren;
-		// una foto que asoma al lado lleva a esa obra. Ctrl/Cmd + clic sigue abriendo la página.
-		for (const b of botones) {
-			b.addEventListener('click', () => (abiertaEn(grupo) ? cerrar() : abrir(grupo, ids[actual])));
-		}
-		if (!panel) {
-			// Sin ficha: tocar una foto que asoma lleva a esa obra.
-			pista.addEventListener('click', (e) => {
-				const foto = (e.target as HTMLElement).closest<HTMLElement>('.foto');
-				const n = foto ? fotos.indexOf(foto) : -1;
-				if (n >= 0 && n !== actual) mostrar(n);
-			});
-			continue;
-		}
-		c.addEventListener('click', (e) => {
-			const a = (e.target as HTMLElement).closest('a');
-			if (!a || a.classList.contains('ver-todos') || e.ctrlKey || e.metaKey || e.shiftKey) return;
-			e.preventDefault();
-			const foto = a.closest<HTMLElement>('.foto');
-			const n = foto ? fotos.indexOf(foto) : actual;
-			if (n !== actual) mostrar(n);
-			else abrir(grupo, ids[actual]);
-		});
-		for (const b of panel.querySelectorAll<HTMLButtonElement>('[data-paso]')) {
-			b.addEventListener('click', () => mostrar(actual + Number(b.dataset.paso)));
-		}
-		// Las flechas de la barra de la ficha solo aparecen cuando las del carrusel ya no se ven
-		// (al bajar leyendo la ficha); si no, quedarían dos pares de flechas juntos.
-		const controles = c.querySelector<HTMLElement>('.controles')!;
-		new IntersectionObserver(([e]) => panel.classList.toggle('con-flechas', !e.isIntersecting), {
-			rootMargin: '-80px 0px 0px 0px', // bajo el encabezado fijo
-		}).observe(controles);
-		for (const b of panel.querySelectorAll<HTMLButtonElement>('[data-cerrar]')) b.addEventListener('click', cerrar);
-
-		registrar(grupo);
-	}
+	// Flechas, teclado, deslizar y la ficha en el lugar: src/scripts/carrusel.ts.
+	import '../scripts/carrusel';
 </script>
 
 <style>

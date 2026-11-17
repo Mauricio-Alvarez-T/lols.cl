@@ -1,0 +1,106 @@
+---
+// Ficha de una obra «En proyecto» (contratada que aún no parte) en la lista de /proyectos/: el
+// render de lo que se hará, el inicio previsto, el pictograma del tipo, el nombre y los datos.
+// Sin enlace ni ficha: es cartera. Las muestras (`ejemplo`) llevan sus datos en <Pendiente>.
+//
+// Una obra real (`ed`) lleva las marcas del editor visual (docs/editor-visual.md): mantenerlas.
+// La línea de datos es un solo texto (data-ed-linea, lineaContratada): el puente la rearma entera.
+import Pendiente from './Pendiente.astro';
+import Pictograma from './Pictograma.astro';
+import Referencial from './Referencial.astro';
+import { pictogramaDeTipo } from '../data/pictogramas';
+import { lineaContratada, textoInicioContratada } from '../data/vistaObra';
+import type { FotoObra } from '../data/vistaObra';
+import type { ImagenReferencial } from '../data/referencia';
+
+export interface FichaContratada {
+	nombre: string | null;
+	tipo: string | null;
+	comuna: string | null;
+	superficie: string | null;
+	inicio: string | null | undefined;
+	imagen: FotoObra | ImagenReferencial;
+	ejemplo: boolean;
+	ed?: string; // obra de la Bóveda (`obras/<slug>`)
+}
+
+interface Props {
+	ficha: FichaContratada;
+}
+const { ficha: f } = Astro.props;
+const ed = f.ejemplo ? undefined : f.ed;
+const sizes = '(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw';
+---
+
+<li data-ed-item={ed}>
+	<div class="marco foto" data-ed-foto={ed && '/fotos/0'}>
+		{'origen' in f.imagen ? (
+			<Referencial imagen={f.imagen} sizes={sizes} />
+		) : (
+			<img src={f.imagen.src} srcset={f.imagen.srcset} sizes={f.imagen.srcset && sizes} width={f.imagen.width} height={f.imagen.height} alt={f.imagen.alt} loading="lazy" />
+		)}
+	</div>
+	<p class="inicio" data-ed-derivado={ed && '/inicio'}>
+		{f.ejemplo ? (
+			<>Inicio previsto: <Pendiente texto="inicio previsto">{f.inicio}</Pendiente></>
+		) : (
+			textoInicioContratada(f.inicio ?? null)
+		)}
+	</p>
+	<h3 class="obra">
+		<span class="picto"><Pictograma nombre={pictogramaDeTipo(f.tipo)} ed={ed && '/tipo'} /></span>
+		{f.ejemplo ? <Pendiente texto="nombre">{f.nombre}</Pendiente> : ed ? <span data-ed-campo="/nombre">{f.nombre}</span> : (f.nombre ?? <Pendiente texto="nombre" />)}
+	</h3>
+	{
+		f.ejemplo ? (
+			<p class="datos-obra">
+				{<Pendiente texto="tipo">{f.tipo}</Pendiente>}
+				{<> · <Pendiente texto="comuna">{f.comuna}</Pendiente></>}
+				{<> · <Pendiente texto="m²">{f.superficie}</Pendiente></>}
+			</p>
+		) : (
+			<p class="datos-obra" data-ed-linea={ed && 'contratada'}>{lineaContratada(f.tipo, f.comuna, f.superficie)}</p>
+		)
+	}
+</li>
+
+<style>
+	.foto {
+		aspect-ratio: 4 / 3;
+		margin-bottom: 1rem;
+	}
+	.inicio {
+		margin: 0 0 0.4rem;
+		font-family: var(--fuente-datos);
+		font-size: 0.85rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--lols-verde-oscuro);
+	}
+	.obra {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin: 0 0 0.4rem;
+		font-size: 1.25rem;
+		letter-spacing: -0.02em;
+	}
+	.picto {
+		display: grid;
+		place-items: center;
+		flex-shrink: 0;
+		width: 2.25rem;
+		height: 2.25rem;
+		border: 1.5px solid var(--lols-verde);
+		color: var(--lols-verde);
+	}
+	.picto :global(.pictograma) {
+		width: 1.4rem;
+		height: 1.4rem;
+	}
+	.datos-obra {
+		margin: 0;
+		color: var(--lols-gris);
+	}
+</style>

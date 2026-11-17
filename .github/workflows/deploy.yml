@@ -34,11 +34,23 @@ jobs:
 
       - run: npm ci
 
+      # PUBLIC_BUILD_SHA: el commit compilado, que el puente del editor visual le dice a la Bóveda
+      # en su saludo (docs/editor-visual.md).
       - run: npm run build
+        env:
+          PUBLIC_BUILD_SHA: ${{ github.sha }}
 
       # Una obra real (src/content/obras) con un marcador de propuesta no sale al sitio.
       - name: Verificar obras reales
         run: node scripts/verificar-obras-reales.mjs
+
+      # Editor visual de la Bóveda: cada obra con sus marcas, la página de moldes y el puente sin
+      # APIs prohibidas; después las pruebas del puente sobre el HTML del build (tests/).
+      - name: Verificar editor visual
+        run: node scripts/verificar-editor.mjs
+
+      - name: Pruebas
+        run: npx vitest run
 
       # Commit de main que queda en línea: la Bóveda lo lee en /build.txt.
       - name: build.txt

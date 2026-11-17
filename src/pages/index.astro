@@ -21,13 +21,15 @@ import CarruselObras from '../components/CarruselObras.astro';
 import { deProyecto, deMuestra, deConfianza } from '../data/carrusel';
 import Contacto from '../components/Contacto.astro';
 import { empresa, fundacion, servicios } from '../data/empresa';
-import { proyectosPorEstado, obrasConfianza } from '../data/proyectos';
+import { proyectos, obrasConfianza } from '../data/proyectos';
+import { seleccionar } from '../data/selecciones';
 import MosaicoServicios from '../components/MosaicoServicios.astro';
 import { obrasEnCurso, videos } from '../data/referencia';
 import ObraPortada from '../components/ObraPortada.astro';
 
-const enObra = proyectosPorEstado('en-curso').slice(0, 3);
-const contratados = proyectosPorEstado('contratado');
+// Listas de obras: reglas de src/data/selecciones.ts (marcas del editor visual en cada carrusel).
+const enObra = seleccionar('portada-en-obra', proyectos);
+const contratados = seleccionar('portada-proximos', proyectos);
 // Datos reales: años (fundación 1995), trabajadores (200, don Luis) y obras ejecutadas (70+,
 // Marcos, 08-10-2026). Sin m² construidos: no hay registro (don Luis). Al llegar a ellas cuentan
 // desde 0 (Marcos, 19-10-2026; script al final); el HTML ya trae el número final.
@@ -86,6 +88,7 @@ const queHacemos = `${nombresServicios.slice(0, -1).join(', ')} y ${nombresServi
 		titulo="En obra ahora"
 		enlace={{ href: '/proyectos/#en-construccion', texto: 'Todos los proyectos' }}
 		obras={enObra.length ? enObra.map(deProyecto) : obrasEnCurso.map(deMuestra)}
+		lista={enObra.length ? 'portada-en-obra' : undefined}
 	/>
 
 	<!-- Don Luis (08-10-2026): sin logos ni nombres; la foto del edificio y su dirección. En el
@@ -101,6 +104,7 @@ const queHacemos = `${nombresServicios.slice(0, -1).join(', ')} y ${nombresServi
 				id="proximos-proyectos"
 				enlace={{ href: '/proyectos/#contratados', texto: 'Todos los proyectos' }}
 				obras={contratados.map(deProyecto)}
+				lista="portada-proximos"
 			/>
 		)
 	}

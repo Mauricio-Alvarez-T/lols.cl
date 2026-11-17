@@ -1,0 +1,83 @@
+---
+// Moldes del editor visual (docs/editor-visual.md § 3). Página interna: no se enlaza, no se indexa
+// (noindex y Disallow en public/robots.txt). Dibuja cada vista una vez con una obra de muestra
+// completa (slug reservado `molde`, prohibido para obras reales en src/content.config.ts) y el
+// puente (src/scripts/editor/) la lee con fetch + DOMParser para clonar de aquí lo que a una obra
+// le falta en la página: una fila de la ficha, el titular, el relato (y en A2, una diapositiva o
+// una tarjeta entera).
+//
+// Sin <Pendiente> ni <Referencial>: tiene que compilar también en producción (SITE=https://lols.cl).
+// La foto es el recuadro «render por recibir» del sitio. Usa el mismo layout que las demás páginas
+// (así los estilos se agrupan igual que sin ella y se ve como el sitio, para revisarla); lo que
+// importa es el marcado (y los data-astro-cid de cada componente, iguales en todas las páginas).
+import Base from '../../layouts/Base.astro';
+import CarruselObras from '../../components/CarruselObras.astro';
+import FichaObra from '../../components/FichaObra.astro';
+import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
+import TarjetaContratada from '../../components/TarjetaContratada.astro';
+import { deProyecto } from '../../data/carrusel';
+import { fotoPrincipal, proyectoDesdeJson, type ObraJson } from '../../data/vistaObra';
+
+// Todos los campos llenos. La terminada trae año; la en construcción y la contratada, inicio
+// (la ficha muestra una fila u otra según el estado).
+const base: ObraJson = {
+	slug: 'molde',
+	orden: 0,
+	estado: 'terminado',
+	nombre: 'Nombre de la obra',
+	titular: 'El resultado de la obra en una frase.',
+	tipo: 'Edificio de oficinas',
+	mandante: 'Mandante de la obra',
+	comuna: 'Comuna',
+	direccion: 'Calle 123',
+	superficieM2: 1000,
+	anio: 2026,
+	inicio: null,
+	servicios: ['construccion'],
+	desafio: 'Qué problema tenía el mandante.',
+	solucion: 'Qué hizo LOLS y cómo.',
+	resultado: 'Qué se logró.',
+	// La segunda foto arma la galería de la ficha: el relato se clona antes de ella.
+	fotos: [
+		{ src: '/proyectos/render-por-recibir.svg', alt: 'Foto de la obra' },
+		{ src: '/proyectos/foto-por-recibir.svg', alt: 'Foto de la galería' },
+	],
+};
+const terminada = proyectoDesdeJson(base);
+const enCurso = proyectoDesdeJson({ ...base, estado: 'en-curso', anio: null, inicio: 'Marzo 2027' });
+const contratada = proyectoDesdeJson({ ...base, estado: 'contratado', anio: null, inicio: 'Marzo 2027' });
+---
+
+<Base title="Moldes del editor visual" interna>
+	<div class="contenedor">
+		<div data-ed-molde="carrusel">
+			<CarruselObras titulo="Molde" id="molde" obras={[deProyecto(terminada)]} />
+		</div>
+		<div data-ed-molde="ficha-1">
+			<FichaObra proyecto={terminada} />
+			<FichaObra proyecto={enCurso} />
+		</div>
+		<div data-ed-molde="ficha-3">
+			<FichaObra proyecto={terminada} nivel={3} />
+			<FichaObra proyecto={enCurso} nivel={3} />
+		</div>
+		<ul data-ed-molde="contratada">
+			<TarjetaContratada
+				ficha={{
+					nombre: contratada.nombre,
+					tipo: contratada.tipo,
+					comuna: contratada.comuna,
+					superficie: contratada.superficie,
+					inicio: contratada.inicio,
+					imagen: fotoPrincipal(contratada),
+					ejemplo: false,
+					ed: 'obras/molde',
+				}}
+			/>
+		</ul>
+		<div data-ed-molde="tarjeta">
+			<TarjetaProyecto proyecto={terminada} />
+			<TarjetaProyecto proyecto={enCurso} />
+		</div>
+	</div>
+</Base>

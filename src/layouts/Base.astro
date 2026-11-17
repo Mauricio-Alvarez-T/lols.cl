@@ -18,8 +18,9 @@ interface Props {
 	title: string;
 	description?: string;
 	sinWhatsapp?: boolean; // sin el botón flotante de WhatsApp (la portada, Marcos 20-10-2026)
+	interna?: boolean; // página interna (moldes del editor visual): nunca se indexa
 }
-const { title, description, sinWhatsapp = false } = Astro.props;
+const { title, description, sinWhatsapp = false, interna = false } = Astro.props;
 // Fuera del dominio definitivo (nuevo.lols.cl, localhost) no se indexa.
 const indexable = Astro.site?.hostname === 'lols.cl';
 const titulo = title === 'LOLS Ingeniería' ? title : `${title} · LOLS Ingeniería`;
@@ -32,7 +33,7 @@ const titulo = title === 'LOLS Ingeniería' ? title : `${title} · LOLS Ingenier
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="theme-color" content="#006739" />
 		{description && <meta name="description" content={description} />}
-		{!indexable && <meta name="robots" content="noindex, nofollow" />}
+		{(!indexable || interna) && <meta name="robots" content="noindex, nofollow" />}
 		<title>{titulo}</title>
 		<script is:inline>
 			// Animaciones solo si no se pidió reducir movimiento. Si el script de Animaciones.astro
@@ -56,6 +57,11 @@ const titulo = title === 'LOLS Ingeniería' ? title : `${title} · LOLS Ingenier
 		<BarraContacto flotante={!sinWhatsapp} />
 		<Animaciones />
 		{!indexable && <AvisoPropuesta />}
+		<script>
+			// Editor visual de la Bóveda (docs/editor-visual.md): el puente se descarga solo si la
+			// página está dentro de un iframe y la URL trae ?editor.
+			if (window.top !== window.self && new URLSearchParams(location.search).has('editor')) import('../scripts/editor/puente');
+		</script>
 	</body>
 </html>
 

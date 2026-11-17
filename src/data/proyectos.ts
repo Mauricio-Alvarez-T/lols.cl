@@ -14,57 +14,15 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { getCollection } from 'astro:content';
-import type { NombrePictograma } from './pictogramas';
-import { estados, tiposObra, formatoSuperficie, urlsDeSrcset, type Estado, type TipoObra } from './catalogo';
-import { referenciasDeObra, type ImagenReferencial } from './referencia';
+import { estados, tiposObra, urlsDeSrcset, type Estado, type TipoObra } from './catalogo';
+import { compararObras, proyectoDesdeJson, type ObraJson, type Proyecto } from './vistaObra';
 
+// Lo que no lee la colección vive en módulos puros (también los usa el editor visual en el
+// navegador): vistaObra.ts (Proyecto, fotoPrincipal y los textos derivados) y pictogramas.ts.
+// Se reexportan para que los componentes sigan importando desde aquí.
 export { estados, tiposObra, type Estado, type TipoObra };
-
-// Pictograma de cada tipo de obra (src/components/Pictograma.astro). Acepta texto libre
-// porque las tarjetas de muestra traen el tipo como string; lo desconocido cae en "edificio".
-const pictogramas: Record<TipoObra, NombrePictograma> = {
-	'Edificio de oficinas': 'edificio',
-	'Edificio y oficinas': 'edificio-oficinas',
-	'Edificio comercial': 'comercial',
-	Bodegaje: 'bodegaje',
-	'Centro de bodegas': 'centro-bodegas',
-	Industrial: 'industrial',
-	Habilitación: 'habilitacion',
-};
-export const pictogramaDeTipo = (tipo: string | null | undefined): NombrePictograma =>
-	(tipo && pictogramas[tipo as TipoObra]) || 'edificio';
-
-// Foto propia de una obra (public/proyectos/<slug>/). srcset, width y height son opcionales.
-export interface FotoObra {
-	src: string;
-	alt: string;
-	srcset?: string;
-	width?: number;
-	height?: number;
-}
-
-export interface Proyecto {
-	slug: string;
-	nombre: string | null;
-	titular: string | null; // el resultado en una frase, no el nombre (patrón Arup)
-	tipo: TipoObra | null;
-	mandante: string | null;
-	comuna: string | null;
-	direccion: string | null; // calle y número (se publica: decisión del dueño, 28-10-2026)
-	superficie: string | null; // superficie construida, ej. "3.200 m²" (en el JSON: superficieM2)
-	anio: number | null; // año de término (terminados)
-	inicio: string | null; // inicio real o previsto, ej. "Marzo 2027" (en construcción y contratados)
-	servicios: string[]; // slugs de src/data/empresa.ts
-	estado: Estado | null;
-	desafio: string | null;
-	solucion: string | null;
-	resultado: string | null;
-	// Terminadas: fotos de la obra terminada. En construcción y contratadas: el render de lo que
-	// se hará (don Luis, 08-10-2026: nada de fotos por etapa ni videos de avance). Una imagen
-	// referencial (con `origen`, campo `referencia` del JSON) se muestra con su etiqueta hasta
-	// tener la foto real.
-	fotos: (FotoObra | ImagenReferencial)[];
-}
+export { fotoPrincipal, type FotoObra, type Proyecto } from './vistaObra';
+export { pictogramaDeTipo } from './pictogramas';
 
 // "Han confiado en nosotros" (portada): foto del edificio terminado y su dirección, sin nombres
 // (don Luis, 08-10-2026). Fotos del currículum empresarial de LOLS 2026 (páginas 6 a 12).
@@ -91,13 +49,11 @@ for (const o of obrasConfianza) {
 	}
 }
 
-// Obras de src/content/obras/, en el orden del sitio: por estado (el de `estados`), después por
-// `orden` y al final por nombre y slug (el orden en que el glob entrega los archivos no significa
-// nada). Lo que el esquema no puede ver hace fallar el build aquí: un `slug` distinto del nombre
-// del archivo (o dos archivos con el mismo slug) y una foto que no existe en public/.
+// Obras de src/content/obras/, en el orden del sitio (compararObras en vistaObra.ts). Lo que el
+// esquema no puede ver hace fallar el build aquí: un `slug` distinto del nombre del archivo (o dos
+// archivos con el mismo slug) y una foto que no existe en public/.
 async function cargar(): Promise<Proyecto[]> {
-	const ordenEstados = Object.keys(estados);
-	const lista = (await getCollection('obras')).map(({ id, data: o }) => {
+	const lista: ObraJson[] = (await getCollection('obras')).map(({ id, data: o }) => {
 		const archivo = `src/content/obras/${id}.json`;
 		if (o.slug !== id) throw new Error(`${archivo}: slug «${o.slug}» distinto del nombre del archivo`);
 		for (const f of o.fotos) {
@@ -105,47 +61,14 @@ async function cargar(): Promise<Proyecto[]> {
 				if (!existsSync(join(process.cwd(), 'public', url))) throw new Error(`${archivo}: no existe public${url}`);
 			}
 		}
-		const proyecto: Proyecto = {
-			slug: o.slug,
-			nombre: o.nombre,
-			titular: o.titular,
-			tipo: o.tipo,
-			mandante: o.mandante,
-			comuna: o.comuna,
-			direccion: o.direccion,
-			superficie: o.superficieM2 === null ? null : formatoSuperficie(o.superficieM2),
-			anio: o.anio,
-			inicio: o.inicio,
-			servicios: o.servicios,
-			estado: o.estado,
-			desafio: o.desafio,
-			solucion: o.solucion,
-			resultado: o.resultado,
-			fotos: o.referencia ? [referenciasDeObra[o.referencia]] : o.fotos,
-		};
-		return { proyecto, estado: o.estado, orden: o.orden };
+		return o;
 	});
-	lista.sort(
-		(a, b) =>
-			ordenEstados.indexOf(a.estado) - ordenEstados.indexOf(b.estado) ||
-			a.orden - b.orden ||
-			a.proyecto.nombre!.localeCompare(b.proyecto.nombre!, 'es') ||
-			(a.proyecto.slug < b.proyecto.slug ? -1 : 1),
-	);
-	return lista.map((e) => e.proyecto);
+	return lista.sort(compararObras).map(proyectoDesdeJson);
 }
 
 export const proyectos: Proyecto[] = await cargar();
 
 export const proyectosPorEstado = (estado: Estado) => proyectos.filter((p) => p.estado === estado);
-
-// Foto principal, o un recuadro gris que dice qué falta: el render (lo que se hará) o la foto
-// (lo terminado). Nunca una foto de obra a medio hacer en su lugar.
-export const fotoPrincipal = (p: Proyecto): FotoObra | ImagenReferencial =>
-	p.fotos[0] ??
-	(p.estado === 'terminado'
-		? { src: '/proyectos/foto-por-recibir.svg', alt: `Foto de ${p.nombre ?? 'la obra'} por recibir` }
-		: { src: '/proyectos/render-por-recibir.svg', alt: `Render de ${p.nombre ?? 'la obra'} por recibir` });
 
 // Ficha de ejemplo para revisar el diseño mientras no hay proyectos reales. Solo existe fuera
 // de producción (ver src/pages/proyectos/[slug].astro).

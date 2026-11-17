@@ -23,10 +23,12 @@ const { proyecto: p } = Astro.props as { proyecto: Proyecto };
 const esEjemplo = p.slug === plantilla.slug;
 const portada = esEjemplo ? p.fotos[0] : fotoPrincipal(p);
 const otros = proyectos.filter((o) => o.slug !== p.slug).slice(0, 2);
+// Marcas del editor visual (docs/editor-visual.md) en la portada; la ficha y las tarjetas ponen las suyas.
+const ed = esEjemplo ? undefined : `obras/${p.slug}`;
 ---
 
 <Base title={p.nombre ?? ej.nombre}>
-	<div class="portada marco" style="view-transition-name: foto-proyecto">
+	<div class="portada marco" style="view-transition-name: foto-proyecto" data-ed-item={ed} data-ed-foto={ed && '/fotos/0'}>
 		{
 			portada && 'origen' in portada ? (
 				<Referencial imagen={portada} carga="eager" />
