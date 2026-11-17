@@ -12,6 +12,7 @@ import { z } from 'astro/zod';
 import { estados, tiposObra, urlsDeSrcset, type Estado } from './data/catalogo';
 import { servicios } from './data/empresa';
 import { referenciasDeObra } from './data/referencia';
+import { limites } from './data/limitesObra';
 
 const texto = (max: number) => z.string().trim().min(1).max(max);
 const opcional = (max: number) => texto(max).nullable();
@@ -22,7 +23,7 @@ const archivo = /^\/proyectos\/[a-z0-9]+(-[a-z0-9]+)*\/[a-z0-9][a-z0-9._-]*\.(we
 const foto = z
 	.strictObject({
 		src: z.string().regex(archivo),
-		alt: texto(200).min(5),
+		alt: texto(limites.alt).min(5),
 		srcset: z
 			.string()
 			.trim()
@@ -38,29 +39,30 @@ const obra = z
 	.strictObject({
 		slug: z
 			.string()
-			.max(80)
+			.max(limites.slug)
 			.regex(/^[a-z0-9]+(-[a-z0-9]+)*$/)
-			.refine((s) => s !== 'ejemplo', 'slug reservado (ficha de ejemplo)'),
+			.refine((s) => s !== 'ejemplo', 'slug reservado (ficha de ejemplo)')
+			.refine((s) => s !== 'molde', 'slug reservado (moldes del editor visual, /editor/moldes/)'),
 		orden: z.number().int().min(0),
 		estado: z.enum(Object.keys(estados) as [Estado, ...Estado[]]),
-		nombre: texto(160),
-		titular: opcional(240),
+		nombre: texto(limites.nombre),
+		titular: opcional(limites.titular),
 		tipo: z.enum(tiposObra).nullable(),
-		mandante: opcional(160),
+		mandante: opcional(limites.mandante),
 		// Obligatoria: la tarjeta de la obra (TarjetaProyecto) muestra [PENDIENTE] si falta.
-		comuna: texto(80),
-		direccion: opcional(200),
+		comuna: texto(limites.comuna),
+		direccion: opcional(limites.direccion),
 		// Entero: es-CL redondea a 3 decimales (0.0004 saldría «0 m²»).
 		superficieM2: z.number().int().min(1).nullable(),
 		anio: z.number().int().min(1995).max(2100).nullable(),
-		inicio: opcional(40),
+		inicio: opcional(limites.inicio),
 		servicios: z
 			.array(z.enum(servicios.map((s) => s.slug) as [string, ...string[]]))
 			.min(1)
 			.refine((l) => new Set(l).size === l.length, 'servicio repetido'),
-		desafio: opcional(1200),
-		solucion: opcional(1200),
-		resultado: opcional(1200),
+		desafio: opcional(limites.desafio),
+		solucion: opcional(limites.solucion),
+		resultado: opcional(limites.resultado),
 		fotos: z.array(foto),
 		// Imagen referencial (src/data/referencia.ts → referenciasDeObra) mientras no hay foto propia.
 		// null y la ausencia del campo valen lo mismo (la Bóveda lo pone en null al aprobar una portada).

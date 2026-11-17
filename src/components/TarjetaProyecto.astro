@@ -3,6 +3,7 @@
 // contar): foto, pictograma del tipo de obra (como BIG), nombre y comuna. Nada más: el tipo,
 // la superficie, las fechas y la dirección están en la ficha, a un clic. Toda la tarjeta es el
 // enlace. Al hacer clic, su foto viaja a la portada de la ficha (view transition).
+// Una obra real lleva las marcas del editor visual (docs/editor-visual.md): mantenerlas.
 import Pendiente from './Pendiente.astro';
 import Pictograma from './Pictograma.astro';
 import { plantilla, estados, pictogramaDeTipo, fotoPrincipal, type Estado, type Proyecto } from '../data/proyectos';
@@ -24,21 +25,22 @@ const foto = proyecto ? fotoPrincipal(proyecto) : undefined;
 const href = `/proyectos/${proyecto?.slug ?? plantilla.slug}/`;
 const ej = referencia?.ejemplo;
 const tipo = proyecto?.tipo ?? ej?.tipo;
+const ed = proyecto && proyecto.slug !== plantilla.slug ? `obras/${proyecto.slug}` : undefined;
 ---
 
-<article class:list={['tarjeta', { destacada, 'en-obra': enObra }]} data-estado={estado}>
+<article class:list={['tarjeta', { destacada, 'en-obra': enObra }]} data-estado={estado} data-ed-item={ed}>
 	<a href={href} class="vinculo">
-		<div class="foto marco">
+		<div class="foto marco" data-ed-foto={ed && '/fotos/0'}>
 			{foto && 'origen' in foto ? <Referencial imagen={foto} /> : foto ? <img src={foto.src} srcset={foto.srcset} sizes={foto.srcset && '(max-width: 640px) 100vw, 50vw'} width={foto.width} height={foto.height} alt={foto.alt} loading="lazy" /> : referencia ? <Referencial imagen={referencia} /> : <Pendiente bloque texto="foto" />}
 			{enObra && <span class="sello">{estados['en-curso']}</span>}
 		</div>
 		<div class="titulo">
 			<span class="picto" title={tipo ?? undefined}>
-				<Pictograma nombre={pictogramaDeTipo(tipo)} />
+				<Pictograma nombre={pictogramaDeTipo(tipo)} ed={ed && '/tipo'} />
 			</span>
 			<div>
-				<h3>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto">{ej?.nombre}</Pendiente>}</h3>
-				<p class="ubicacion">{proyecto?.comuna ?? <Pendiente texto="comuna">{ej?.comuna}</Pendiente>}</p>
+				<h3 data-ed-campo={ed && '/nombre'}>{proyecto?.nombre ?? <Pendiente texto="nombre del proyecto">{ej?.nombre}</Pendiente>}</h3>
+				<p class="ubicacion" data-ed-campo={ed && '/comuna'}>{proyecto?.comuna ?? <Pendiente texto="comuna">{ej?.comuna}</Pendiente>}</p>
 			</div>
 		</div>
 	</a>

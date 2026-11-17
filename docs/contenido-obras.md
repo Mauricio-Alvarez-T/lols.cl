@@ -49,7 +49,7 @@ puede ir en `null` u omitirse (es lo mismo).
 
 | Campo | Regla |
 |---|---|
-| `slug` | `^[a-z0-9]+(-[a-z0-9]+)*$`, máx. 80. Igual al nombre del archivo. No puede ser `ejemplo` (la ficha de muestra) ni `<sección>-<n>` (`terminados-1`, `en-construccion-2`…: es el id de las muestras de un carrusel; `verificar-obras-reales.mjs` falla si choca). |
+| `slug` | `^[a-z0-9]+(-[a-z0-9]+)*$`, máx. 80. Igual al nombre del archivo. No puede ser `ejemplo` (la ficha de muestra), `molde` (la obra de muestra de `/editor/moldes/`, docs/editor-visual.md) ni `<sección>-<n>` (`terminados-1`, `en-construccion-2`…: es el id de las muestras de un carrusel; `verificar-obras-reales.mjs` falla si choca). |
 | `orden` | entero ≥ 0. Orden dentro de su estado (10, 20, 30…); empata el nombre y después el slug. |
 | `estado` | `en-curso` \| `contratado` \| `terminado` (el sitio dice «En construcción», «En proyecto», «Terminado») |
 | `nombre` | texto 1..160, obligatorio |

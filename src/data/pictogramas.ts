@@ -1,4 +1,9 @@
-// Nombres de los pictogramas LOLS (dibujos en src/components/Pictograma.astro).
+// Pictogramas LOLS: nombres, dibujos y el de cada tipo de obra. Los dibuja
+// src/components/Pictograma.astro (al compilar) y el puente del editor visual
+// (src/scripts/editor/aplicar.ts, en el navegador, con createElementNS): por eso viven aquí, en
+// un módulo sin dependencias de Astro, y los dos sacan los atributos de piezasPictograma.
+import type { TipoObra } from './catalogo';
+
 export type NombrePictograma =
 	| 'construccion'
 	| 'montaje'
@@ -20,3 +25,140 @@ export type NombrePictograma =
 	| 'faena'
 	| 'vehiculo'
 	| 'seguridad';
+
+// m = macizo [x, y, ancho, alto]; c = contorno [x0, y0, x1, y1] (bordes exteriores).
+export type Forma = { m?: number[][]; c?: number[][]; trazo?: string };
+const suelo = [1, 20, 22, 2]; // la losa de abajo del logo
+export const dibujos: Record<NombrePictograma, Forma> = {
+	// El isotipo mismo: construir es lo que hace LOLS.
+	construccion: {
+		m: [[3, 1.75, 18, 1.5], [3, 20.75, 18, 1.5], [3, 4.75, 7.5, 14.5], [12.25, 15.25, 8.75, 4]],
+		c: [[12.5, 5, 21, 8.75], [12.5, 10.25, 21, 14]],
+	},
+	// Pórtico con viga reticulada izando una carga.
+	montaje: {
+		m: [[7.4, 3, 1.2, 4], [11.4, 3, 1.2, 4], [15.4, 3, 1.2, 4], [3, 7, 2, 13], [19, 7, 2, 13], [11.4, 7, 1.2, 4], [8.5, 11, 7, 4], suelo],
+		c: [[3, 3, 21, 7]],
+	},
+	// Plan de mantención: tablilla con ítems marcados.
+	mantencion: {
+		m: [[9, 2, 6, 3.5], [7, 8.5, 2.25, 2.25], [11, 8.9, 6, 1.5], [7, 12.5, 2.25, 2.25], [11, 12.9, 6, 1.5], [7, 16.5, 2.25, 2.25], [11, 16.9, 4, 1.5]],
+		c: [[4.5, 4, 19.5, 22]],
+	},
+	// Tablero eléctrico con dos filas de automáticos.
+	electricidad: {
+		m: [[6.5, 5.5, 2, 4.5], [9.5, 5.5, 2, 4.5], [12.5, 5.5, 2, 4.5], [15.5, 5.5, 2, 4.5], [6.5, 13, 2, 4.5], [9.5, 13, 2, 4.5], [12.5, 13, 2, 4.5], [15.5, 13, 2, 4.5]],
+		c: [[4, 2, 20, 22]],
+	},
+	// Red: un nodo central que baja a tres puntos.
+	datos: {
+		m: [[9, 2, 6, 5], [11.25, 7, 1.5, 4], [4, 11, 16, 1.5], [4.25, 12.5, 1.5, 3.5], [11.25, 12.5, 1.5, 3.5], [18.25, 12.5, 1.5, 3.5]],
+		c: [[2, 16, 8, 22], [9, 16, 15, 22], [16, 16, 22, 22]],
+	},
+	// Escritorio con cajonera.
+	muebles: {
+		m: [[2, 8, 20, 2.5], [5.5, 13.5, 3, 1.2], [5.5, 17, 3, 1.2], [19, 10.5, 2, 10.5]],
+		c: [[3, 10.5, 11, 21]],
+	},
+	// Torre de oficinas: losa de techo, cuerpo en contorno y pisos.
+	edificio: {
+		m: [[6, 2, 12, 2], [9.5, 7, 5, 1.5], [9.5, 10, 5, 1.5], [9.5, 13, 5, 1.5], [9.5, 16, 5, 1.5], suelo],
+		c: [[7, 4, 17, 20]],
+	},
+	// Torre y cuerpo bajo macizo (edificio y oficinas).
+	'edificio-oficinas': {
+		m: [[5.5, 6.5, 4, 1.5], [5.5, 9.5, 4, 1.5], [5.5, 12.5, 4, 1.5], [5.5, 15.5, 4, 1.5], [13, 10, 8, 10], suelo],
+		c: [[3, 3, 12, 20]],
+	},
+	// Comercio: cornisa, piso alto con ventanas y vitrinas con acceso al centro.
+	comercial: {
+		m: [[2, 4, 20, 2], [5.5, 8.25, 3, 2.5], [10.5, 8.25, 3, 2.5], [15.5, 8.25, 3, 2.5], [3, 14.5, 7, 5.5], [14, 14.5, 7, 5.5], suelo],
+		c: [[3, 6, 21, 13.5]],
+	},
+	// Bodega: losa de techo y portón grande.
+	bodegaje: {
+		m: [[2, 6, 20, 2.5], [8, 12, 8, 8], suelo],
+		c: [[3, 8.5, 21, 20]],
+	},
+	// Centro de bodegas: tres módulos bajo una misma losa.
+	'centro-bodegas': {
+		m: [[1, 6, 22, 2], [3.5, 13, 3, 7], [10.5, 13, 3, 7], [17.5, 13, 3, 7], suelo],
+		c: [[2, 8, 8, 20], [9, 8, 15, 20], [16, 8, 22, 20]],
+	},
+	// Planta industrial con chimenea.
+	industrial: {
+		m: [[17, 3, 3, 17], [2, 8, 15, 2], [5.5, 13, 3, 3], [10.5, 13, 3, 3], suelo],
+		c: [[3, 10, 17, 20]],
+	},
+	// Habilitación: planta de un recinto (muros, tabique y mesón), como en un plano.
+	habilitacion: {
+		m: [[3, 11, 9, 1.5], [15, 6, 4, 3]],
+		trazo: 'M14 21H21V3H3V21H10',
+	},
+
+	// Equipamiento propio (empresa.ts, categorías del inventario de la Bóveda).
+	// Andamio: dos cuerpos con sus horizontales y el pie central.
+	andamio: {
+		m: [[4, 8.25, 16, 1.5], [4, 14.25, 16, 1.5], [11.25, 3, 1.5, 17], suelo],
+		c: [[4, 3, 20, 20.5]],
+	},
+	// Alzaprimas bajo una losa, con su collar de ajuste.
+	alzaprima: {
+		m: [[2, 3, 20, 2.5], [6, 5.5, 1.5, 14.5], [16.5, 5.5, 1.5, 14.5], suelo],
+		c: [[4.75, 10, 8.75, 12.75], [15.25, 10, 19.25, 12.75]],
+	},
+	// Panel de moldaje con su refuerzo y los pasadores.
+	moldaje: {
+		m: [[11.25, 3, 1.5, 18], [6.5, 7, 2.5, 2.5], [15, 7, 2.5, 2.5], [6.5, 14.5, 2.5, 2.5], [15, 14.5, 2.5, 2.5]],
+		c: [[3, 3, 21, 21]],
+	},
+	// Grúa horquilla: cabina, mástil y horquillas.
+	maquinaria: {
+		m: [[3, 11, 11, 5.5], [16, 3, 1.5, 15.5], [17.5, 16.5, 4.5, 1.5], [4, 17, 3.5, 3.5], [10, 17, 3.5, 3.5]],
+		c: [[5, 4, 13.5, 11.5]],
+	},
+	// Instalación de faena: contenedor con ventana y puerta.
+	faena: {
+		m: [[5, 9.5, 5, 3.5], [14, 9.5, 4.5, 10.5], [1, 4, 22, 2], suelo],
+		c: [[2, 6, 22, 20]],
+	},
+	// Camioneta: caja y cabina, con las ruedas.
+	vehiculo: {
+		m: [[2, 11, 20, 5], [4.5, 16, 3.5, 3.5], [15.5, 16, 3.5, 3.5]],
+		c: [[8, 5, 17, 11.5]],
+	},
+	// Cono de seguridad: franjas escalonadas sobre su base.
+	seguridad: {
+		m: [[10, 2.5, 4, 4], [8.5, 8.5, 7, 4], [7, 14.5, 10, 4], [3, 19.5, 18, 2.5]],
+	},
+};
+
+// Rectángulos y trazo del pictograma, con los atributos tal como van en el <svg>. Un contorno se
+// dibuja con el trazo centrado en el borde exterior: se mete 0,75 (medio trazo) por lado.
+export interface PiezasPictograma {
+	macizos: { x: number; y: number; width: number; height: number }[];
+	contornos: { x: number; y: number; width: number; height: number }[];
+	trazo: string | null;
+}
+export function piezasPictograma(nombre: NombrePictograma): PiezasPictograma {
+	const d = dibujos[nombre];
+	return {
+		macizos: (d.m ?? []).map(([x, y, width, height]) => ({ x, y, width, height })),
+		contornos: (d.c ?? []).map(([x0, y0, x1, y1]) => ({ x: x0 + 0.75, y: y0 + 0.75, width: x1 - x0 - 1.5, height: y1 - y0 - 1.5 })),
+		trazo: d.trazo ?? null,
+	};
+}
+
+// Pictograma de cada tipo de obra. Acepta texto libre porque las tarjetas de muestra traen el
+// tipo como string; lo desconocido cae en "edificio".
+const deTipo: Record<TipoObra, NombrePictograma> = {
+	'Edificio de oficinas': 'edificio',
+	'Edificio y oficinas': 'edificio-oficinas',
+	'Edificio comercial': 'comercial',
+	Bodegaje: 'bodegaje',
+	'Centro de bodegas': 'centro-bodegas',
+	Industrial: 'industrial',
+	Habilitación: 'habilitacion',
+};
+export const pictogramaDeTipo = (tipo: string | null | undefined): NombrePictograma =>
+	(tipo && deTipo[tipo as TipoObra]) || 'edificio';

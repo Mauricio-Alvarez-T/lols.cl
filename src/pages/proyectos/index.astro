@@ -7,33 +7,32 @@
 //   3. Terminados: el portafolio de siempre.
 // Arriba, un índice con la cantidad de cada bloque. Las URLs viejas (?estado=...) saltan al
 // bloque que corresponde.
+// Las listas salen de las reglas de src/data/selecciones.ts y llevan las marcas del editor visual
+// (data-ed-lista, data-ed-cuenta; docs/editor-visual.md): mantenerlas al cambiar el marcado.
 import Base from '../../layouts/Base.astro';
 import Pendiente from '../../components/Pendiente.astro';
 import CarruselObras from '../../components/CarruselObras.astro';
 import { deProyecto, deMuestra } from '../../data/carrusel';
 import Contacto from '../../components/Contacto.astro';
-import Pictograma from '../../components/Pictograma.astro';
-import { proyectosPorEstado, pictogramaDeTipo, fotoPrincipal } from '../../data/proyectos';
-import Referencial from '../../components/Referencial.astro';
+import TarjetaContratada, { type FichaContratada } from '../../components/TarjetaContratada.astro';
+import { proyectos, fotoPrincipal } from '../../data/proyectos';
+import { seleccionar } from '../../data/selecciones';
 import { obras2018, obrasEnCurso, rendersContratados } from '../../data/referencia';
 import { ejemplosContratados } from '../../data/ejemplos';
 
-const enCurso = proyectosPorEstado('en-curso');
-const contratados = proyectosPorEstado('contratado');
-const terminados = proyectosPorEstado('terminado');
+const enCurso = seleccionar('proyectos-en-curso', proyectos);
+const contratados = seleccionar('proyectos-contratados', proyectos);
+const terminados = seleccionar('proyectos-terminados', proyectos);
 const hayReales = enCurso.length + contratados.length + terminados.length > 0;
 // Las contratadas pueden faltar aunque haya obras reales: mientras tanto, las fichas de muestra.
 const contratadosMuestra = contratados.length === 0;
 // Fichas de las contratadas: las reales o, mientras no haya, las de muestra con su render de ejemplo.
-const fichasContratadas = contratadosMuestra
+const fichasContratadas: FichaContratada[] = contratadosMuestra
 	? ejemplosContratados.map((c, i) => ({ ...c, imagen: rendersContratados[i], ejemplo: true }))
-	: contratados.map((p) => ({ nombre: p.nombre, tipo: p.tipo, comuna: p.comuna, superficie: p.superficie, inicio: p.inicio, imagen: fotoPrincipal(p), ejemplo: false }));
+	: contratados.map((p) => ({ nombre: p.nombre, tipo: p.tipo, comuna: p.comuna, superficie: p.superficie, inicio: p.inicio, imagen: fotoPrincipal(p), ejemplo: false, ed: `obras/${p.slug}` }));
 // Terminadas, de la más nueva a la más antigua (todas reales: currículum de LOLS y sitio de 2018);
-// en el mismo año, primero las que tienen imagen propia (no de ejemplo).
-const imagenPropia = (p: (typeof terminados)[number]) => (p.fotos[0] && !('origen' in p.fotos[0]) ? 1 : 0);
-const terminadasCarrusel = [...terminados]
-	.sort((a, b) => (b.anio ?? 0) - (a.anio ?? 0) || imagenPropia(b) - imagenPropia(a))
-	.map(deProyecto);
+// en el mismo año, primero las que tienen imagen propia (no de ejemplo): regla proyectos-terminados.
+const terminadasCarrusel = terminados.map(deProyecto);
 
 // Cantidades del índice: las reales, o las de las muestras mientras no haya proyectos.
 const cuenta = hayReales
@@ -60,7 +59,7 @@ import { bandas } from '../../data/referencia';
 			{
 				bloques.map((b) => (
 					<a href={`#${b.id}`} data-estado={b.estado}>
-						<span class="n">{b.muestra ? <Pendiente texto="cantidad">{b.n}</Pendiente> : b.n}</span>
+						<span class="n" data-ed-cuenta={b.muestra ? undefined : b.estado}>{b.muestra ? <Pendiente texto="cantidad">{b.n}</Pendiente> : b.n}</span>
 						<span>{b.titulo}</span>
 					</a>
 				))
@@ -70,7 +69,7 @@ import { bandas } from '../../data/referencia';
 
 	{
 		hayReales ? (
-			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={enCurso.map(deProyecto)}>
+			<CarruselObras id="en-construccion" titulo="En construcción" nota="Obras en ejecución hoy." obras={enCurso.map(deProyecto)} lista="proyectos-en-curso">
 				<Pendiente texto="render real de las obras sin render en el currículum (los que se ven son de ejemplo) e inicio de cada una" />
 			</CarruselObras>
 		) : (
@@ -87,45 +86,15 @@ import { bandas } from '../../data/referencia';
 				<p class="nota">Obras en etapa de proyecto: las próximas en construirse.</p>
 			</div>
 			{contratadosMuestra && <Pendiente texto="obras contratadas que aún no parten, con su render o plano" />}
-			<ul class="contratadas">
-				{
-					fichasContratadas.map((f) => (
-						<li>
-							<div class="marco foto">
-								{'origen' in f.imagen ? (
-									<Referencial imagen={f.imagen} sizes="(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw" />
-								) : (
-									<img src={f.imagen.src} srcset={f.imagen.srcset} sizes={f.imagen.srcset && '(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw'} width={f.imagen.width} height={f.imagen.height} alt={f.imagen.alt} loading="lazy" />
-								)}
-							</div>
-							<p class="inicio">
-								{f.ejemplo ? (
-									<>Inicio previsto: <Pendiente texto="inicio previsto">{f.inicio}</Pendiente></>
-								) : f.inicio ? (
-									`Inicio previsto: ${f.inicio}`
-								) : (
-									'En etapa de proyecto'
-								)}
-							</p>
-							<h3 class="obra">
-								<span class="picto"><Pictograma nombre={pictogramaDeTipo(f.tipo)} /></span>
-								{f.ejemplo ? <Pendiente texto="nombre">{f.nombre}</Pendiente> : (f.nombre ?? <Pendiente texto="nombre" />)}
-							</h3>
-							<p class="datos-obra">
-								{f.ejemplo ? <Pendiente texto="tipo">{f.tipo}</Pendiente> : f.tipo}
-								{(f.ejemplo || f.comuna) && <> · {f.ejemplo ? <Pendiente texto="comuna">{f.comuna}</Pendiente> : f.comuna}</>}
-								{(f.ejemplo || f.superficie) && <> · {f.ejemplo ? <Pendiente texto="m²">{f.superficie}</Pendiente> : f.superficie}</>}
-							</p>
-						</li>
-					))
-				}
+			<ul class="contratadas" data-ed-lista={contratadosMuestra ? undefined : 'proyectos-contratados'} data-ed-vista={contratadosMuestra ? undefined : 'contratada'}>
+				{fichasContratadas.map((f) => <TarjetaContratada ficha={f} />)}
 			</ul>
 		</div>
 	</section>
 
 	{
 		hayReales ? (
-			<CarruselObras id="terminados" titulo="Terminados" nota="Las más recientes y una obra por año de las anteriores." obras={terminadasCarrusel}>
+			<CarruselObras id="terminados" titulo="Terminados" nota="Las más recientes y una obra por año de las anteriores." obras={terminadasCarrusel} lista="proyectos-terminados">
 				<Pendiente texto="fotos reales de las terminadas en 2025 y 2026 (las que se ven son de ejemplo); en 2021, 2023 y 2024 el currículum no trae obras" />
 			</CarruselObras>
 		) : (
@@ -196,44 +165,6 @@ import { bandas } from '../../data/referencia';
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2vw, 1.5rem);
-	}
-	.contratadas .foto {
-		aspect-ratio: 4 / 3;
-		margin-bottom: 1rem;
-	}
-	.inicio {
-		margin: 0 0 0.4rem;
-		font-family: var(--fuente-datos);
-		font-size: 0.85rem;
-		font-weight: 600;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		color: var(--lols-verde-oscuro);
-	}
-	.obra {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		margin: 0 0 0.4rem;
-		font-size: 1.25rem;
-		letter-spacing: -0.02em;
-	}
-	.picto {
-		display: grid;
-		place-items: center;
-		flex-shrink: 0;
-		width: 2.25rem;
-		height: 2.25rem;
-		border: 1.5px solid var(--lols-verde);
-		color: var(--lols-verde);
-	}
-	.picto :global(.pictograma) {
-		width: 1.4rem;
-		height: 1.4rem;
-	}
-	.datos-obra {
-		margin: 0;
-		color: var(--lols-gris);
 	}
 	@media (max-width: 960px) {
 		.contratadas {

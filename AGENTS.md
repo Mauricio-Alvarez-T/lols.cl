@@ -8,6 +8,14 @@ astro dev --background
 
 Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
 
+## Editor visual (marcas `data-ed-*`)
+
+La Bóveda edita las obras dentro de este sitio, en un iframe. El contrato está en `docs/editor-visual.md`.
+Al cambiar `CarruselObras`, `FichaObra`, `TarjetaProyecto`, `TarjetaContratada`, `Pictograma` o las listas de
+`src/pages/index.astro` y `src/pages/proyectos/index.astro`, mantener las marcas `data-ed-*` y la página
+`src/pages/editor/moldes.astro`. Después de `npm run build`: `node scripts/verificar-editor.mjs` y `npx vitest run`.
+`node scripts/huella-dist.mjs --comparar <distA> <distB>` muestra si un cambio movió algo que ve el visitante.
+
 ## Documentation
 
 Full documentation: https://docs.astro.build

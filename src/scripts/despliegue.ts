@@ -10,6 +10,10 @@
 //   - Esc cierra; la página que carga con el hash abre esa ficha (enlace directo);
 //   - el despliegue animado del panel (grid-template-rows 0fr → 1fr), el foco y el scroll.
 // Sin JavaScript, los enlaces siguen yendo a las páginas de cada obra y servicio.
+//
+// Dentro del editor visual de la Bóveda (página enmarcada y con ?editor, docs/editor-visual.md)
+// abrir una ficha no agrega entradas al historial: usa replaceState, para no ensuciar el «Atrás»
+// de la Bóveda (el iframe comparte el historial de la pestaña).
 
 export interface Grupo {
 	tiene(id: string): boolean;
@@ -25,6 +29,7 @@ const grupos: Grupo[] = [];
 let abierta: { grupo: Grupo; id: string } | null = null;
 let empujada = false; // la entrada del historial es nuestra (Atrás la cierra)
 const reducir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const enEditor = window.top !== window.self && new URLSearchParams(location.search).has('editor');
 
 const buscar = (hash: string) => {
 	const id = decodeURIComponent(hash.slice(1));
@@ -117,7 +122,7 @@ export function registrar(grupo: Grupo) {
 export function abrir(grupo: Grupo, id: string) {
 	const url = sinHash() + '#' + encodeURIComponent(id);
 	if (abierta && empujada) history.replaceState(history.state, '', url);
-	else if (abierta) history.replaceState(null, '', url);
+	else if (abierta || enEditor) history.replaceState(null, '', url);
 	else {
 		history.pushState({ despliegue: true }, '', url);
 		empujada = true;

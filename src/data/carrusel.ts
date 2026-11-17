@@ -3,16 +3,20 @@
 import type { ObraCarrusel } from '../components/CarruselObras.astro';
 import { plantilla, fotoPrincipal, obrasConfianza, type Proyecto } from './proyectos';
 import type { ImagenReferencial } from './referencia';
+import { anioCarrusel } from './vistaObra';
 
+// Solo las obras reales llevan las marcas del editor visual (`ed`, docs/editor-visual.md); las de
+// «Han confiado en nosotros» y las muestras no son obras de la Bóveda.
 export const deProyecto = (p: Proyecto): ObraCarrusel => ({
 	id: p.slug,
+	ed: `obras/${p.slug}`,
 	href: `/proyectos/${p.slug}/`,
 	imagen: fotoPrincipal(p),
 	tipo: p.tipo,
 	nombre: p.nombre,
 	comuna: p.comuna,
 	superficie: p.superficie,
-	anio: p.estado === 'terminado' && p.anio ? String(p.anio) : null,
+	anio: anioCarrusel(p.estado, p.anio),
 	ficha: { proyecto: p },
 });
 

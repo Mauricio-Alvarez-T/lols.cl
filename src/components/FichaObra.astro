@@ -11,11 +11,16 @@
 //
 // `muestra`: datos de una tarjeta de ejemplo (referencia.ts) que reemplazan nombre, tipo,
 // comuna y superficie del ejemplo general, para que cada obra de muestra tenga los suyos.
+//
+// Editor visual (docs/editor-visual.md): en una obra real, la ficha lleva data-ed-item, cada fila
+// del recuadro y cada paso del relato data-ed-fila, y cada valor data-ed-campo (texto que se
+// escribe en el lugar) o data-ed-derivado (formateado, se cambia en el panel de la Bóveda). Las
+// filas que faltan las clona el puente de /editor/moldes/. Mantener las marcas al cambiar esto.
 import Pendiente from './Pendiente.astro';
 import Pictograma from './Pictograma.astro';
 import Referencial from './Referencial.astro';
-import { servicioPorSlug } from '../data/empresa';
-import { plantilla, estados, pictogramaDeTipo, type Estado, type FotoObra, type Proyecto } from '../data/proyectos';
+import { plantilla, pictogramaDeTipo, type Estado, type FotoObra, type Proyecto } from '../data/proyectos';
+import { conAnio as fechaEsAnio, rotuloInicio, textoAnio, textoEstado, textoServicios } from '../data/vistaObra';
 import { obras2018, type EjemploTarjeta } from '../data/referencia';
 import { ejemploProyecto, ejemploFichaExtra } from '../data/ejemplos';
 
@@ -30,35 +35,42 @@ const Sub = `h${nivel + 1}` as 'h2' | 'h4';
 const compacta = nivel > 1;
 
 const esEjemplo = p.slug === plantilla.slug;
+// Marcas del editor: solo en una obra real (no en la ficha de ejemplo ni en las de muestra).
+const ed = esEjemplo || muestra ? undefined : `obras/${p.slug}`;
+const marca = (valor: string) => (ed ? valor : undefined);
 const ej = { ...ejemploProyecto, ...muestra };
 // Estado de la muestra: las terminadas traen año; las en construcción, fecha de inicio.
 const estado: Estado | null = p.estado ?? (muestra ? (muestra.anio ? 'terminado' : 'en-curso') : null);
-const conAnio = estado === 'terminado' || (esEjemplo && !estado);
+const conAnio = fechaEsAnio(estado) || (esEjemplo && !estado);
 // Solo fotos propias: una imagen referencial (campo `referencia`) va sola, como portada.
 const galeria = p.fotos.slice(1).filter((f): f is FotoObra => !('origen' in f));
 const relato = [
-	{ titulo: 'Desafío', texto: p.desafio, pendiente: 'qué problema tenía el mandante', ejemplo: ej.desafio },
-	{ titulo: 'Solución', texto: p.solucion, pendiente: 'qué hizo LOLS y cómo', ejemplo: ej.solucion },
-	{ titulo: 'Resultado', texto: p.resultado, pendiente: 'qué se logró', ejemplo: ej.resultado },
+	{ fila: 'desafio', titulo: 'Desafío', texto: p.desafio, pendiente: 'qué problema tenía el mandante', ejemplo: ej.desafio },
+	{ fila: 'solucion', titulo: 'Solución', texto: p.solucion, pendiente: 'qué hizo LOLS y cómo', ejemplo: ej.solucion },
+	{ fila: 'resultado', titulo: 'Resultado', texto: p.resultado, pendiente: 'qué se logró', ejemplo: ej.resultado },
 ].filter((r) => r.texto || esEjemplo);
-// Datos del recuadro: [rótulo, dato real, qué falta, ejemplo]. En una obra real se omite lo que falta.
-const datos = [
-	['Mandante', p.mandante, 'mandante', ej.mandante],
-	['Comuna', p.comuna, 'comuna', ej.comuna],
-	['Dirección', p.direccion, 'dirección (confirmar si se puede publicar)', ej.direccion],
-	['Superficie construida', p.superficie, 'm² construidos', ej.superficie],
-	conAnio
-		? ['Año de término', p.anio ? String(p.anio) : null, 'año', ej.anio]
-		: [estado === 'contratado' ? 'Inicio previsto' : 'Inicio', p.inicio, 'mes y año de inicio', ej.inicio],
-].filter(([, dato]) => dato || esEjemplo) as [string, string | null, string, string][];
+// Datos del recuadro: fila (marca del editor), rótulo, dato real, qué falta, ejemplo y marca del
+// valor (campo que se escribe en el lugar o derivado). En una obra real se omite lo que falta.
+type Dato = { fila: string; rotulo: string; dato: string | null; falta: string; ejemplo: string; campo?: string; derivado?: string };
+const datos = (
+	[
+		{ fila: 'mandante', rotulo: 'Mandante', dato: p.mandante, falta: 'mandante', ejemplo: ej.mandante, derivado: '/mandante' },
+		{ fila: 'comuna', rotulo: 'Comuna', dato: p.comuna, falta: 'comuna', ejemplo: ej.comuna, campo: '/comuna' },
+		{ fila: 'direccion', rotulo: 'Dirección', dato: p.direccion, falta: 'dirección (confirmar si se puede publicar)', ejemplo: ej.direccion, campo: '/direccion' },
+		{ fila: 'superficie', rotulo: 'Superficie construida', dato: p.superficie, falta: 'm² construidos', ejemplo: ej.superficie, derivado: '/superficieM2' },
+		conAnio
+			? { fila: 'anio', rotulo: 'Año de término', dato: textoAnio(p.anio), falta: 'año', ejemplo: ej.anio, derivado: '/anio' }
+			: { fila: 'inicio', rotulo: rotuloInicio(estado), dato: p.inicio, falta: 'mes y año de inicio', ejemplo: ej.inicio, campo: '/inicio' },
+	] as Dato[]
+).filter((d) => d.dato || esEjemplo);
 ---
 
-<div class:list={['ficha-obra', { compacta }]}>
+<div class:list={['ficha-obra', { compacta }]} data-ed-item={ed}>
 	<header class="cabeza">
-		<p class="nombre">{p.nombre ?? <Pendiente texto="nombre del proyecto">{ej.nombre}</Pendiente>}</p>
+		<p class="nombre" data-ed-campo={marca('/nombre')}>{p.nombre ?? <Pendiente texto="nombre del proyecto">{ej.nombre}</Pendiente>}</p>
 		{
 			(p.titular || esEjemplo) && (
-				<Titulo class="titulo-ficha" tabindex={compacta ? '-1' : undefined}>
+				<Titulo class="titulo-ficha" tabindex={compacta ? '-1' : undefined} data-ed-campo={marca('/titular')}>
 					{p.titular ?? <Pendiente texto="el resultado en una frase (no el nombre de la obra)">{ej.titular}</Pendiente>}
 				</Titulo>
 			)
@@ -68,28 +80,28 @@ const datos = [
 	<dl class="datos">
 		{
 			(p.tipo || esEjemplo) && (
-				<div>
+				<div data-ed-fila={marca('tipo')}>
 					<dt>Tipo de obra</dt>
-					<dd class="con-picto">
-						<Pictograma nombre={pictogramaDeTipo(p.tipo ?? ej.tipo)} />
+					<dd class="con-picto" data-ed-derivado={marca('/tipo')}>
+						<Pictograma nombre={pictogramaDeTipo(p.tipo ?? ej.tipo)} ed={marca('/tipo')} />
 						{p.tipo ?? <Pendiente texto="tipo de obra">{ej.tipo}</Pendiente>}
 					</dd>
 				</div>
 			)
 		}
-		{datos.map(([rotulo, dato, falta, ejemplo]) => <div><dt>{rotulo}</dt><dd>{dato ?? <Pendiente texto={falta}>{ejemplo}</Pendiente>}</dd></div>)}
+		{datos.map((d) => <div data-ed-fila={marca(d.fila)}><dt>{d.rotulo}</dt><dd data-ed-campo={d.campo && marca(d.campo)} data-ed-derivado={d.derivado && marca(d.derivado)}>{d.dato ?? <Pendiente texto={d.falta}>{d.ejemplo}</Pendiente>}</dd></div>)}
 		{esEjemplo && <div><dt>Rol de LOLS</dt><dd><Pendiente texto="contratista principal o subcontrato">{ejemploFichaExtra.rol}</Pendiente></dd></div>}
-		<div><dt>Servicios</dt><dd>{p.servicios.map((s) => servicioPorSlug(s).nombre).join(', ')}</dd></div>
-		<div><dt>Estado</dt><dd>{estado ? estados[estado] : <Pendiente texto="estado">{ej.estado}</Pendiente>}</dd></div>
+		<div data-ed-fila={marca('servicios')}><dt>Servicios</dt><dd data-ed-derivado={marca('/servicios')}>{textoServicios(p.servicios)}</dd></div>
+		<div data-ed-fila={marca('estado')}><dt>Estado</dt><dd data-ed-derivado={marca('/estado')}>{textoEstado(estado) ?? <Pendiente texto="estado">{ej.estado}</Pendiente>}</dd></div>
 	</dl>
 
 	{
 		relato.length > 0 && (
 			<div class="relato">
 				{relato.map((r) => (
-					<div class="paso">
+					<div class="paso" data-ed-fila={marca(r.fila)}>
 						<Sub>{r.titulo}</Sub>
-						<p>{r.texto ?? <Pendiente texto={r.pendiente}>{r.ejemplo}</Pendiente>}</p>
+						<p data-ed-campo={marca(`/${r.fila}`)}>{r.texto ?? <Pendiente texto={r.pendiente}>{r.ejemplo}</Pendiente>}</p>
 					</div>
 				))}
 			</div>
