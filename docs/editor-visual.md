@@ -121,8 +121,9 @@ Detalles de la versión 1 (etapa A0):
   formado entero se ignora. Las fotos no se toman del borrador (solo del mensaje `foto`). Una obra que está en la
   página y no viene en el borrador se oculta como `incluir: false`. Pendiente para A2: obras nuevas
   (`meta.nueva`), cambio de lista por estado y orden (`TODO(A2)` en `src/scripts/editor/aplicar.ts`).
-- El puente no copia lo escrito a las otras apariciones del mismo campo: lo hace al llegar el `campo` o
-  `borrador` de vuelta (así la Bóveda sigue siendo la fuente). El campo que se está escribiendo no se toca.
+- Al escribir en el lugar, el puente copia lo escrito a las otras apariciones del mismo campo (carrusel, ficha,
+  tarjeta) sin esperar a la Bóveda, que no lo devuelve como `campo`. Un `borrador` posterior manda: es el estado
+  que la Bóveda aceptó. El campo que se está escribiendo nunca se toca.
 - `mostrar` despacha `lols:ir` (`detail: { slug, ficha: true }`) en el carrusel que tiene la obra; si no está en
   un carrusel, la lleva a la vista.
 - `src/scripts/carrusel.ts` atiende `lols:refrescar` (se rearma con las diapositivas cuyo texto no está `hidden`)

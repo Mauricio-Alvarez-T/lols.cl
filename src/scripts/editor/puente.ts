@@ -72,7 +72,12 @@ function cambio(el: HTMLElement, final: boolean) {
 	const item = el.closest('[data-ed-item]')?.getAttribute('data-ed-item');
 	if (!item) return;
 	const texto = el.textContent ?? '';
-	enviar({ tipo: 'cambio', item, campo: el.getAttribute('data-ed-campo')!, valor: final ? texto.trim() || null : texto });
+	const campo = el.getAttribute('data-ed-campo')!;
+	const valor = final ? texto.trim() || null : texto;
+	enviar({ tipo: 'cambio', item, campo, valor });
+	// Las otras apariciones del mismo campo (carrusel, ficha, tarjeta) siguen lo que se escribe; la Bóveda
+	// no lo devuelve como `campo`. El que se está escribiendo no se toca (ctx.editando).
+	void ponerCampo(item, campo, valor);
 }
 function vaciarPendiente() {
 	if (!pendiente) return;
@@ -257,6 +262,17 @@ addEventListener(
 	true,
 );
 
+// Un campo de una obra, en todas sus apariciones (menos el que se está escribiendo).
+async function ponerCampo(item: string, campo: string, valor: unknown) {
+	const doc = await cargarMoldes();
+	const slug = item.slice(6);
+	const o = { ...(obras.get(slug) ?? { slug }), [campo.slice(1)]: valor } as ObraParcial;
+	obras.set(slug, o);
+	aplicarObra(document, o, { moldes: doc, editando: editando() });
+	for (const c of document.querySelectorAll('[data-carrusel]')) if (c.querySelector('[data-ed-item]')) c.dispatchEvent(new CustomEvent('lols:refrescar'));
+	prepararEdicion();
+}
+
 // --- Mensajes de la Bóveda ---
 async function procesar(m: Entrante) {
 	const ctx = (): Contexto => ({ moldes: null, editando: editando() });
@@ -269,16 +285,9 @@ async function procesar(m: Entrante) {
 			prepararEdicion();
 			break;
 		}
-		case 'campo': {
-			const doc = await cargarMoldes();
-			const slug = m.item.slice(6);
-			const o = { ...(obras.get(slug) ?? { slug }), [m.campo.slice(1)]: m.valor } as ObraParcial;
-			obras.set(slug, o);
-			aplicarObra(document, o, { ...ctx(), moldes: doc });
-			for (const c of document.querySelectorAll('[data-carrusel]')) if (c.querySelector('[data-ed-item]')) c.dispatchEvent(new CustomEvent('lols:refrescar'));
-			prepararEdicion();
+		case 'campo':
+			await ponerCampo(m.item, m.campo, m.valor);
 			break;
-		}
 		case 'modo':
 			ponerModo(m.modo);
 			break;
