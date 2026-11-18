@@ -5,19 +5,21 @@
 //      `iniciar` válido (origen permitido, desde window.parent y con un puerto) y desde ahí habla
 //      solo por ese puerto.
 //   2. Bóveda → puente: borrador, campo, modo, mostrar, foto (aplicar.ts hace el trabajo en el DOM).
-//   3. Puente → Bóveda: seleccion, cambio, navegar, atajo.
+//   3. Puente → Bóveda: seleccion, cambio, navegar, atajo y (etapa A2, controles.ts) nueva y mover.
 // Prohibido aquí (verificar-editor.mjs lo revisa): innerHTML, outerHTML, insertAdjacentHTML,
 // document.write, eval y new Function. Texto siempre con textContent.
 import { limites } from '../../data/limitesObra';
 import { aplicarBorrador, aplicarObra, itemDe, listasDe, partesDe, ponerFoto, tipoDeFoto, type Contexto } from './aplicar';
+import { montarControles } from './controles';
 import { estilosEditor } from './estilos';
-import { aceptarIniciar, leerEntrante, origenesHola, sobre, type Entrante, type Modo, type ObraParcial, type Saliente } from './protocolo';
+import { aceptarIniciar, leerEntrante, origenesHola, sobre, type Entrante, type Modo, type ObraBorrador, type ObraParcial, type Saliente } from './protocolo';
 import type { DetalleIr } from '../carrusel';
 
 const build: string | null = import.meta.env.PUBLIC_BUILD_SHA ?? null;
 let puerto: MessagePort | null = null;
 let modo: Modo = 'mirar';
 const obras = new Map<string, ObraParcial>(); // último JSON de cada obra (para aplicar un `campo`)
+let borrador: ObraBorrador[] = []; // el último borrador (las listas se rearman con él)
 const fotos = new Map<string, string>(); // blob: vigente de cada obra
 
 const enviar = (m: Saliente) => puerto?.postMessage(sobre(m));
@@ -26,6 +28,9 @@ const enviar = (m: Saliente) => puerto?.postMessage(sobre(m));
 const estilo = document.createElement('style');
 estilo.textContent = estilosEditor;
 document.head.append(estilo);
+
+// --- Controles de estructura (A2): «+ Nueva obra», Ordenar y arrastrar ---
+const controles = montarControles(document, enviar);
 
 // --- Moldes: documento inerte (DOMParser no corre scripts), una sola vez ---
 let moldes: Promise<Document | null> | null = null;
@@ -62,6 +67,7 @@ function prepararEdicion() {
 function ponerModo(m: Modo) {
 	modo = m;
 	document.documentElement.classList.toggle('ed-editar', m === 'editar');
+	controles.modo(m);
 	if (m === 'mirar') editando()?.blur();
 	prepararEdicion();
 }
@@ -268,6 +274,16 @@ async function ponerCampo(item: string, campo: string, valor: unknown) {
 	const slug = item.slice(6);
 	const o = { ...(obras.get(slug) ?? { slug }), [campo.slice(1)]: valor } as ObraParcial;
 	obras.set(slug, o);
+	// Un campo que mueve la obra de lista o de lugar (estado, orden, año): se rearman las listas.
+	const b = borrador.find((x) => x.json.slug === slug);
+	if (b) b.json = o;
+	if (b && ['/estado', '/orden', '/anio'].includes(campo)) {
+		aplicarBorrador(document, borrador, { moldes: doc, editando: editando() });
+		for (const [i, url] of fotos) ponerFoto(document, i, url);
+		controles.refrescar();
+		prepararEdicion();
+		return;
+	}
 	aplicarObra(document, o, { moldes: doc, editando: editando() });
 	for (const c of document.querySelectorAll('[data-carrusel]')) if (c.querySelector('[data-ed-item]')) c.dispatchEvent(new CustomEvent('lols:refrescar'));
 	prepararEdicion();
@@ -281,7 +297,11 @@ async function procesar(m: Entrante) {
 			const doc = await cargarMoldes();
 			obras.clear();
 			for (const b of m.obras) obras.set(b.json.slug, b.json);
+			borrador = m.obras;
 			aplicarBorrador(document, m.obras, { ...ctx(), moldes: doc });
+			// Las diapositivas y tarjetas clonadas también llevan la foto que llegó por el mensaje `foto`.
+			for (const [item, url] of fotos) ponerFoto(document, item, url);
+			controles.refrescar();
 			prepararEdicion();
 			break;
 		}
@@ -292,6 +312,7 @@ async function procesar(m: Entrante) {
 			ponerModo(m.modo);
 			break;
 		case 'mostrar': {
+			controles.salirDeOrdenar();
 			const slug = m.item.slice(6);
 			const carrusel = [...document.querySelectorAll<HTMLElement>('[data-carrusel]')].find((c) =>
 				[...c.querySelectorAll('.texto[data-ed-item]')].some((t) => t.getAttribute('data-ed-item') === m.item && !(t as HTMLElement).hidden),

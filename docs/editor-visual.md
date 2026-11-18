@@ -41,7 +41,10 @@ Reglas:
 - El titular de la ficha no tiene fila: el elemento con `data-ed-campo="/titular"` es lo que se oculta o se clona.
 - Atributos que pone **solo el puente** (no van en el HTML del build): `data-ed-vacio` (fila o campo vacío:
   oculto para el visitante, con hueco «+ Dirección» en modo editar), `data-ed-hueco` (texto de ese hueco),
-  `data-ed-quitada` (obra oculta por el borrador) y `data-ed-dibujo` (pictograma redibujado).
+  `data-ed-quitada` (obra oculta por el borrador), `data-ed-dibujo` (pictograma redibujado) y, desde A2,
+  `data-ed-clon` (diapositiva, ficha o tarjeta clonada del molde), `data-ed-nueva` (obra nueva sin guardar) y
+  `data-ed-mini` (miniatura del modo «Ordenar»). También son solo del puente las clases `ed-*` (`ed-editar`,
+  `ed-ordenando`, `ed-ui`, `ed-insignia`…).
 - `scripts/huella-dist.mjs` compara dos builds sin las marcas: sirve para comprobar que un cambio en estos
   componentes no cambia lo que ve el visitante.
 
@@ -118,21 +121,77 @@ Todo mensaje es un objeto `{ p: 'lols-editor', v: 1, tipo, ... }`. Se ignora cua
 
 Detalles de la versión 1 (etapa A0):
 - `borrador`: un campo con tipo o largo inválido se descarta (no se muestra) y el resto se aplica; un mensaje mal
-  formado entero se ignora. Las fotos no se toman del borrador (solo del mensaje `foto`). Una obra que está en la
-  página y no viene en el borrador se oculta como `incluir: false`. Pendiente para A2: obras nuevas
-  (`meta.nueva`), cambio de lista por estado y orden (`TODO(A2)` en `src/scripts/editor/aplicar.ts`).
+  formado entero se ignora. Las fotos del borrador no cambian la foto de una obra que ya está en la página (eso
+  es el mensaje `foto`); desde A2 `fotos` y `referencia` se leen solo para ordenar las terminadas (foto propia
+  primero) y para la foto de lo que se clona del molde, y solo si son del propio sitio (`fotos[].src` y `srcset`
+  en `/proyectos/<slug>/…`; `referencia`, una clave de `referenciasDeObra`); si no, se descartan como cualquier
+  campo inválido. Un `campo` nunca trae `fotos` ni `referencia`. Una obra que está en la página y no viene en el
+  borrador se oculta como `incluir: false`.
 - Al escribir en el lugar, el puente copia lo escrito a las otras apariciones del mismo campo (carrusel, ficha,
   tarjeta) sin esperar a la Bóveda, que no lo devuelve como `campo`. Un `borrador` posterior manda: es el estado
   que la Bóveda aceptó. El campo que se está escribiendo nunca se toca.
 - `mostrar` despacha `lols:ir` (`detail: { slug, ficha: true }`) en el carrusel que tiene la obra; si no está en
   un carrusel, la lleva a la vista.
-- `src/scripts/carrusel.ts` atiende `lols:refrescar` (se rearma con las diapositivas cuyo texto no está `hidden`)
-  y `lols:ir`. El puente dispara `lols:refrescar` después de cada `borrador` o `campo`.
+- `src/scripts/carrusel.ts` atiende `lols:refrescar` (se rearma con las diapositivas cuyo texto no está `hidden`,
+  en el orden del DOM, y sigue en la misma obra aunque haya cambiado de lugar) y `lols:ir`. El puente dispara `lols:refrescar` después de cada `borrador` o `campo`.
 - Las cuentas del índice de `/proyectos/` (`data-ed-cuenta`) pasan a ser las del borrador.
 - En modo `mirar` los enlaces internos igual se frenan con `navegar` (el iframe no puede perder `?editor`).
 
 Un `cambio` es solo una **propuesta**: la Bóveda la valida (campo permitido, largo, obra existente) antes de tocar el
 borrador, y nada se guarda hasta «Guardar».
+
+### Etapa A2: estructura (sigue siendo la versión 1; solo se agregan cosas)
+
+**El `borrador` es la verdad sobre qué obras hay, dónde y en qué orden.** Al aplicarlo, el puente rearma cada lista
+de la página (`data-ed-lista`) con la regla de `src/data/selecciones.ts` sobre las obras del borrador con
+`meta.incluir === true` (más las `meta.nueva`, que se muestran aunque todavía no estén incluidas, para verlas
+mientras se escriben), usando `json.estado`, `json.orden`, `json.anio`, nombre y slug como en el build:
+- una obra que la lista ya tiene se **reutiliza** (mismos nodos) y se mueve a su posición;
+- una que falta se **clona del molde** de esa vista (`/editor/moldes/`) y se rellena con su JSON;
+- una que ya no corresponde (cambió de estado, se quitó, o dejó de estar entre las 3 de la portada) se **oculta**
+  (`hidden` + `data-ed-quitada`); una obra creada por el puente que ya no viene en el borrador se **elimina**;
+- las diapositivas y las fichas del panel del carrusel se reordenan igual y se dispara `lols:refrescar`;
+- las cuentas `data-ed-cuenta` se recalculan (cuentan también las obras nuevas que se ven).
+
+Cómo lo hace (`rearmarListas` en `src/scripts/editor/aplicar.ts`): cada lista son uno o más carriles paralelos (el
+carrusel: `.textos`, `.pista` y las `.fichas` de su panel; «En proyecto»: la `<ul>`), y en cada uno la obra ocupa un
+elemento. Lo que falta se clona del molde (`carrusel` o `contratada`) con `data-ed-clon` y se rellena con el JSON
+completo (lo que no trae, vacío): sin la galería del molde, con su `data-ficha`, el `aria-controls` de su panel y
+la foto de `fotoPrincipal` (la del JSON o «render/foto por recibir»). Los carriles se reordenan igual (primero las
+de la lista, después las ocultas). Un `campo` de `/estado`, `/orden` o `/anio` también rearma las listas.
+
+Límite: solo se rearman las listas que **están** en la página. Si el build no dibujó una (la portada sin
+contratadas no tiene «Próximos proyectos»; sin obras reales en construcción, el carrusel es de muestras y no
+lleva `data-ed-lista`), una obra nueva de esa lista no se ve en esa página hasta publicar.
+
+**Obras nuevas sin guardar:** la Bóveda les da un slug provisorio `~n1`, `~n2`… (no puede ser un slug real: el `~`
+no pasa el esquema). Llevan `meta.nueva: true` y el puente les pone `data-ed-nueva` (insignia «Borrador · fuera del
+sitio» en modo editar). Al guardar, la Bóveda manda un `borrador` nuevo con el slug definitivo: el puente elimina el
+`~n1` y crea el definitivo. El `~` no va en ids ni en el hash: la ficha de `~n1` es `obra--n1` (un slug real nunca
+lleva `--`), y su título enlaza a `#obra--n1` (no tiene página). `campo`, `mostrar` y `foto` aceptan
+`obras/~n1` como `item` (`~n` y un número).
+
+**Una obra con `meta.incluir === false`** que no es nueva no aparece en ninguna lista (la Bóveda la muestra en su
+bandeja «Fuera del sitio»).
+
+**Mensajes nuevos, puente → Bóveda:**
+
+| tipo | datos | cuándo |
+|---|---|---|
+| `nueva` | `lista` (regla) | al tocar la tarjeta «+ Nueva obra» que el puente agrega al final de cada lista en modo editar. La Bóveda crea la obra provisoria con el estado de esa lista (`portada-en-obra`/`proyectos-en-curso` → `en-curso`; `portada-proximos`/`proyectos-contratados` → `contratado`; `proyectos-terminados` → `terminado`) y manda el `borrador` + `mostrar` |
+| `mover` | `lista`, `item`, `indice` (posición final, 0 = primera, entre las visibles de esa lista) | al soltar una obra arrastrada dentro de su lista (grilla «En proyecto»: arrastrar la tarjeta, con pulsación larga en pantallas táctiles; carruseles: en el modo «Ordenar», ver abajo). Es una propuesta: la Bóveda recalcula `orden`, valida (las terminadas solo se ordenan dentro del mismo año) y manda el `borrador` |
+
+**Modo «Ordenar» en los carruseles:** en modo editar el puente agrega un botón «Ordenar» en el encabezado de cada
+carrusel editable; al tocarlo, el carrusel se muestra como una tira de miniaturas (clase `ed-ordenando`) que se
+arrastran; «Listo» vuelve al carrusel normal. Fuera del editor no existe. En los carruseles «+ Nueva obra» es un
+botón en ese mismo encabezado (junto a «Ordenar»); en la grilla «En proyecto», una tarjeta punteada al final.
+Arrastrar: con el mouse, al moverlo más de 5 px; en pantallas táctiles, pulsación larga (350 ms) y después se
+arrastra (la página se desplaza sola cerca del borde). Una barra verde marca dónde caería; soltar donde estaba no
+envía nada. Tocar una miniatura (sin arrastrar) envía `seleccion`. Todo esto está en
+`src/scripts/editor/controles.ts`; en modo `mirar` no se ve ni responde.
+
+**Fotos de obras nuevas:** hasta que llegue un `foto`, la obra nueva muestra el recuadro «render/foto por recibir»
+del molde (`fotoPrincipal`). Un `foto` ya recibido se vuelve a poner en lo que se clone después (otra lista).
 
 ## 5. Seguridad del puente
 - Se carga solo enmarcado y con `?editor`; los visitantes descargan una línea.
@@ -154,4 +213,5 @@ borrador, y nada se guarda hasta «Guardar».
 - `scripts/verificar-editor.mjs` (deploy, después del build): cada obra real con su `data-ed-item` y su `/nombre`
   en `/proyectos/`, la página de moldes con cada vista y sin marcadores, y el puente sin las APIs prohibidas.
 - `npx vitest run` (`tests/editor.test.ts`, deploy, después del build): aplica borradores al HTML de `dist/`
-  (cambios, filas que aparecen desde el molde, filas que se ocultan, `incluir: false`) y revisa el protocolo.
+  (cambios, filas que aparecen desde el molde, filas que se ocultan, `incluir: false`; desde A2, obras nuevas,
+  cambio de estado, orden, `~n1` → slug definitivo, cuentas, «+ Nueva obra» y arrastrar) y revisa el protocolo.

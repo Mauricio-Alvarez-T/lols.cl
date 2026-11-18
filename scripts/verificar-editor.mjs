@@ -81,7 +81,7 @@ const prohibidas = /\binnerHTML\b|\bouterHTML\b|\binsertAdjacentHTML\b|document\
 const dirPuente = join(raiz, 'src/scripts/editor');
 for (const f of existsSync(dirPuente) ? readdirSync(dirPuente) : []) {
 	readFileSync(join(dirPuente, f), 'utf8')
-		.split('\n')
+		.split(/\r?\n/) // con CRLF (checkout en Windows) un comentario no llegaría al $ de la regla
 		.forEach((linea, i) => {
 			const codigo = linea.replace(/^\s*\/\/.*$/, '');
 			const m = codigo.match(prohibidas);

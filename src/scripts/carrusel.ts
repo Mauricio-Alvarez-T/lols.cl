@@ -149,9 +149,11 @@ function montar(c: HTMLElement) {
 
 	// Editor visual: rearmar después de cambios en el DOM, e ir a una obra.
 	c.addEventListener('lols:refrescar', () => {
-		const antes = slides[actual];
+		// La obra actual se busca por su texto (leer() arma objetos nuevos), así sigue siendo la
+		// actual aunque el editor haya cambiado el orden.
+		const antes = slides[actual]?.texto;
 		leer();
-		const sigue = antes ? slides.indexOf(antes) : -1;
+		const sigue = antes ? slides.findIndex((s) => s.texto === antes) : -1;
 		actual = sigue >= 0 ? sigue : Math.min(actual, Math.max(total() - 1, 0));
 		dibujar();
 		const abierta = abiertaEn(grupo);

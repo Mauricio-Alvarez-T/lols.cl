@@ -87,7 +87,8 @@ function abrirSinHistorial(grupo: Grupo, id: string, enfocar: boolean) {
 	const panel = grupo.panel();
 	if (!yaAbierto || !panel.classList.contains('abierto')) desplegar(panel);
 	if (enfocar) {
-		panel.querySelector<HTMLElement>('[data-ficha]:not([hidden]) .titulo-ficha')?.focus({ preventScroll: true });
+		// En el editor el foco es de la Bóveda (su panel, o el campo que se toca): no se lo quita la ficha.
+		if (!enEditor) panel.querySelector<HTMLElement>('[data-ficha]:not([hidden]) .titulo-ficha')?.focus({ preventScroll: true });
 		requestAnimationFrame(() => acercar(panel));
 	}
 }

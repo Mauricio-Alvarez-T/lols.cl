@@ -3,6 +3,9 @@
 // tiene cada mensaje. Lo que no pasa estas revisiones se ignora sin aviso.
 import { estados, tiposObra } from '../../data/catalogo';
 import { limites } from '../../data/limitesObra';
+import { referenciasDeObra } from '../../data/referencia';
+import type { Regla } from '../../data/selecciones';
+import { reglas } from '../../data/selecciones';
 import type { ObraJson } from '../../data/vistaObra';
 
 export const P = 'lols-editor';
@@ -52,7 +55,10 @@ export type Saliente =
 	| { tipo: 'seleccion'; item: string; campo: string | null }
 	| { tipo: 'cambio'; item: string; campo: string; valor: string | null }
 	| { tipo: 'navegar'; ruta: string }
-	| { tipo: 'atajo'; accion: 'deshacer' | 'rehacer' | 'guardar' };
+	| { tipo: 'atajo'; accion: 'deshacer' | 'rehacer' | 'guardar' }
+	// Etapa A2: la tarjeta «+ Nueva obra» de una lista, y soltar una obra arrastrada en su lista.
+	| { tipo: 'nueva'; lista: Regla }
+	| { tipo: 'mover'; lista: Regla; item: string; indice: number };
 
 export const sobre = <T extends object>(m: T) => ({ p: P, v: V, ...m });
 
@@ -61,7 +67,31 @@ export const esSobre = (d: unknown): d is Record<string, unknown> & { tipo: stri
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 export const esSlug = (s: unknown): s is string => typeof s === 'string' && s.length <= limites.slug && SLUG.test(s);
-export const esItem = (s: unknown): s is string => typeof s === 'string' && s.startsWith('obras/') && esSlug(s.slice(6));
+// Obra nueva sin guardar (etapa A2): la Bóveda le da un slug provisorio `~n1`, `~n2`… (el `~` no
+// pasa el esquema, así que nunca choca con una obra real).
+const PROVISORIO = /^~n[1-9][0-9]{0,5}$/;
+export const esProvisorio = (s: unknown): s is string => typeof s === 'string' && PROVISORIO.test(s);
+export const esSlugObra = (s: unknown): s is string => esSlug(s) || esProvisorio(s);
+export const esItem = (s: unknown): s is string => typeof s === 'string' && s.startsWith('obras/') && esSlugObra(s.slice(6));
+export const esRegla = (s: unknown): s is Regla => typeof s === 'string' && Object.prototype.hasOwnProperty.call(reglas, s);
+
+// Fotos del borrador: solo rutas del propio sitio, como las exige el esquema
+// (/proyectos/<slug>/<archivo>, también en el srcset). El puente no cambia con ellas la foto de una
+// obra que ya está en la página (eso es el mensaje `foto`): las usa para ordenar las terminadas
+// (foto propia primero) y para la foto de una diapositiva o tarjeta que clona del molde.
+const RUTA_FOTO = /^\/proyectos\/[a-z0-9]+(?:-[a-z0-9]+)*\/[A-Za-z0-9_-][A-Za-z0-9._-]*\.(?:webp|avif|jpe?g|png)$/;
+const esEnteroPositivo = (x: unknown) => Number.isInteger(x) && (x as number) > 0;
+function fotoValida(f: unknown): boolean {
+	if (!esObjeto(f) || typeof f.src !== 'string' || !RUTA_FOTO.test(f.src) || typeof f.alt !== 'string' || f.alt.length > 300) return false;
+	if (f.srcset !== undefined) {
+		if (typeof f.srcset !== 'string' || f.srcset.length > 3000) return false;
+		const trozos = f.srcset.split(',').map((t) => t.trim().split(/\s+/));
+		if (!trozos.every((t) => t.length === 2 && RUTA_FOTO.test(t[0]) && /^[1-9][0-9]{0,4}w$/.test(t[1]))) return false;
+	}
+	return (f.width === undefined || esEnteroPositivo(f.width)) && (f.height === undefined || esEnteroPositivo(f.height));
+}
+// Solo en el borrador (un `campo` no los cambia).
+const SOLO_BORRADOR = ['fotos', 'referencia'];
 
 // Campos que el puente sabe mostrar. Texto: se escribe en el lugar (data-ed-campo) o, mandante,
 // en el panel; el resto son derivados (data-ed-derivado).
@@ -85,8 +115,12 @@ export function valorValido(clave: string, valor: unknown): boolean {
 			return Array.isArray(valor) && valor.length <= 20 && valor.every((s) => typeof s === 'string' && s.length <= 80);
 		case 'orden':
 			return Number.isInteger(valor);
+		case 'referencia':
+			return valor === null || (typeof valor === 'string' && Object.prototype.hasOwnProperty.call(referenciasDeObra, valor));
+		case 'fotos':
+			return Array.isArray(valor) && valor.length <= 50 && valor.every(fotoValida);
 		default:
-			return false; // fotos, referencia y lo desconocido: el puente no los muestra
+			return false; // lo desconocido: el puente no lo muestra
 	}
 }
 
@@ -94,7 +128,7 @@ export function valorValido(clave: string, valor: unknown): boolean {
 function leerObra(x: unknown): ObraBorrador | null {
 	if (!esObjeto(x) || !esObjeto(x.json) || !esObjeto(x.meta)) return null;
 	const { json, meta } = x;
-	if (!esSlug(json.slug) || typeof meta.incluir !== 'boolean' || typeof meta.nueva !== 'boolean') return null;
+	if (!esSlugObra(json.slug) || typeof meta.incluir !== 'boolean' || typeof meta.nueva !== 'boolean') return null;
 	const limpio: ObraParcial = { slug: json.slug };
 	for (const [clave, valor] of Object.entries(json)) {
 		if (clave !== 'slug' && valorValido(clave, valor)) (limpio as Record<string, unknown>)[clave] = valor;
@@ -113,7 +147,7 @@ export function leerEntrante(d: unknown): Entrante | null {
 		}
 		case 'campo': {
 			const clave = typeof d.campo === 'string' && /^\/[a-zA-Z0-9]+$/.test(d.campo) ? d.campo.slice(1) : '';
-			if (!esItem(d.item) || !clave || clave === 'slug' || !valorValido(clave, d.valor)) return null;
+			if (!esItem(d.item) || !clave || clave === 'slug' || SOLO_BORRADOR.includes(clave) || !valorValido(clave, d.valor)) return null;
 			return { tipo: 'campo', item: d.item, campo: d.campo as string, valor: d.valor };
 		}
 		case 'modo':
