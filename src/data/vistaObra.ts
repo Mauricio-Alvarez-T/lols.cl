@@ -108,12 +108,24 @@ export function proyectoDesdeJson(o: ObraJson): Proyecto {
 
 // Orden del sitio: por estado (el de `estados`), después por `orden` y al final por nombre y slug
 // (el orden en que el glob entrega los archivos no significa nada).
+// Sirve también para el JSON parcial del borrador del editor visual (un campo que falta va al final
+// o vale 0); con el JSON completo del build da lo mismo que siempre.
 const ordenEstados = Object.keys(estados);
-export const compararObras = (a: ObraJson, b: ObraJson) =>
-	ordenEstados.indexOf(a.estado) - ordenEstados.indexOf(b.estado) ||
-	a.orden - b.orden ||
-	a.nombre.localeCompare(b.nombre, 'es') ||
-	(a.slug < b.slug ? -1 : 1);
+interface Ordenable {
+	slug: string;
+	estado?: Estado | null;
+	orden?: number;
+	nombre?: string | null;
+}
+const posicionEstado = (e: Estado | null | undefined) => {
+	const i = e ? ordenEstados.indexOf(e) : -1;
+	return i < 0 ? ordenEstados.length : i;
+};
+export const compararObras = (a: Ordenable, b: Ordenable) =>
+	posicionEstado(a.estado) - posicionEstado(b.estado) ||
+	(a.orden ?? 0) - (b.orden ?? 0) ||
+	(a.nombre ?? '').localeCompare(b.nombre ?? '', 'es') ||
+	(a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0);
 
 // Foto principal, o un recuadro gris que dice qué falta: el render (lo que se hará) o la foto
 // (lo terminado). Nunca una foto de obra a medio hacer en su lugar.

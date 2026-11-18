@@ -12,11 +12,16 @@
 //     en el lugar, la fila queda «vacía» (data-ed-vacio): oculta para el visitante y, en modo
 //     editar, con el hueco «+ Dirección» para escribirla (estilos.ts).
 //   - meta.incluir === false (u obra que ya no está en el borrador) oculta todas sus partes.
-// Pendiente para la etapa A2: obras nuevas (meta.nueva), cambio de lista por estado y orden.
+//   - Etapa A2 (estructura): el borrador dice qué obras hay en cada lista (data-ed-lista) y en qué
+//     orden, con las mismas reglas que el build (src/data/selecciones.ts). Ver rearmarListas.
 import { pictogramaDeTipo, piezasPictograma } from '../../data/pictogramas';
+import { referenciasDeObra } from '../../data/referencia';
+import { seleccionar } from '../../data/selecciones';
 import {
 	anioCarrusel,
+	compararObras,
 	conAnio,
+	fotoPrincipal,
 	lineaContratada,
 	lineaResumen,
 	rotuloInicio,
@@ -25,8 +30,10 @@ import {
 	textoInicioContratada,
 	textoServicios,
 	textoSuperficie,
+	type FotoObra,
+	type Proyecto,
 } from '../../data/vistaObra';
-import type { ListaHola, ObraBorrador, ObraParcial } from './protocolo';
+import { esRegla, type ListaHola, type ObraBorrador, type ObraParcial } from './protocolo';
 
 const SVG = 'http://www.w3.org/2000/svg';
 export const itemDe = (slug: string) => `obras/${slug}`;
@@ -295,29 +302,218 @@ export function aplicarAParte(parte: HTMLElement, o: ObraParcial, ctx: Contexto)
 	}
 }
 
-// Muestra u oculta todas las partes de una obra (incluir = false, o fuera del borrador).
-export function incluirObra(doc: ParentNode, item: string, incluir: boolean) {
-	for (const parte of partesDe(doc, item)) {
-		if (!incluir) {
-			if (!parte.hidden) parte.setAttribute('data-ed-quitada', '');
-			ocultar(parte, true);
-		} else if (parte.hasAttribute('data-ed-quitada')) {
-			parte.removeAttribute('data-ed-quitada');
-			ocultar(parte, false);
-		}
-	}
-}
-
 // Aplica a todas las partes de una obra.
 export function aplicarObra(doc: Document, o: ObraParcial, ctx: Contexto) {
 	for (const parte of partesDe(doc, itemDe(o.slug))) aplicarAParte(parte, o, ctx);
 }
 
-// Cantidad de obras de cada estado (índice de /proyectos/).
+// --- Listas (etapa A2) ---
+//
+// Cada lista de la página (data-ed-lista) se rearma con su regla sobre las obras del borrador que
+// se muestran (meta.incluir, o meta.nueva para verlas mientras se escriben), en el orden base del
+// build (compararObras). Una lista es uno o varios «carriles» paralelos: el carrusel tiene tres (los
+// textos, las fotos y las fichas del panel, que van en el mismo orden) y «En proyecto», uno.
+// Cada obra ocupa una «raíz» en cada carril: se reutiliza la que hay, se clona del molde la que
+// falta, se oculta (hidden + data-ed-quitada) la que ya no corresponde y se reordenan.
+
+const SIZES: Record<string, string> = {
+	carrusel: '(max-width: 760px) 88vw, 60vw',
+	contratada: '(max-width: 640px) 100vw, (max-width: 960px) 50vw, 33vw',
+};
+export const INSIGNIA_NUEVA = 'Borrador · fuera del sitio';
+
+// id y hash de la ficha de una obra: `obra-<slug>`. El provisorio `~n1` pasa a `obra--n1` (sin
+// caracteres que haya que escapar en un selector o en el hash; un slug real nunca lleva `--`).
+export const idFicha = (slug: string) => `obra-${slug.replace('~', '-')}`;
+// A dónde lleva el título de una obra (el carrusel lo frena y abre la ficha).
+const enlaceDe = (slug: string) => (slug.startsWith('~') ? `#${idFicha(slug)}` : `/proyectos/${slug}/`);
+
+export const enSitio = (b: ObraBorrador) => b.meta.incluir || b.meta.nueva;
+// Fotos como las ve el build (proyectoDesdeJson): la referencial, si la hay, o las propias.
+const fotosDe = (o: ObraParcial) => (o.referencia && referenciasDeObra[o.referencia] ? [referenciasDeObra[o.referencia]] : (o.fotos ?? []));
+// El JSON completo (lo que falta, vacío): para rellenar un clon sin dejar textos del molde.
+const VACIA = {
+	nombre: null,
+	titular: null,
+	tipo: null,
+	mandante: null,
+	comuna: null,
+	direccion: null,
+	superficieM2: null,
+	anio: null,
+	inicio: null,
+	servicios: [],
+	desafio: null,
+	solucion: null,
+	resultado: null,
+} as unknown as Omit<ObraParcial, 'slug'>;
+const completa = (o: ObraParcial): ObraParcial => ({ ...VACIA, ...o });
+
+// Obras de cada regla, en orden: los slugs.
+export function obrasDeLista(regla: string, obras: ObraBorrador[]): string[] {
+	if (!esRegla(regla)) return [];
+	const lista = obras
+		.filter((b) => enSitio(b) && b.json.estado)
+		.map((b) => ({ ...b.json, estado: b.json.estado ?? null, anio: b.json.anio ?? null, fotos: fotosDe(b.json) }))
+		.sort(compararObras);
+	return seleccionar(regla, lista).map((o) => o.slug);
+}
+
+interface Carril {
+	caja: Element; // contenedor de las raíces (.textos, .pista, .fichas, la <ul>)
+	molde: string; // selector de la raíz en el documento de los moldes
+}
+const parteDe = (raiz: Element): HTMLElement | null =>
+	raiz.hasAttribute('data-ed-item') ? (raiz as HTMLElement) : raiz.querySelector<HTMLElement>(':scope > [data-ed-item]');
+const itemDeRaiz = (raiz: Element) => parteDe(raiz)?.getAttribute('data-ed-item') ?? null;
+const raicesDe = (c: Carril) => [...c.caja.children].filter((r) => itemDeRaiz(r) !== null);
+
+export function carrilesDe(doc: Document, lista: Element): Carril[] {
+	const vista = lista.getAttribute('data-ed-vista');
+	if (vista === 'contratada') return [{ caja: lista, molde: '[data-ed-molde="contratada"] > li[data-ed-item]' }];
+	if (vista !== 'carrusel') return [];
+	const panel = lista.getAttribute('data-panel');
+	const fichas = panel ? doc.getElementById(panel)?.querySelector('.fichas') : null;
+	const carriles = [
+		{ caja: lista.querySelector('.textos'), molde: '[data-ed-molde="carrusel"] .textos > article.texto' },
+		{ caja: lista.querySelector('.pista'), molde: '[data-ed-molde="carrusel"] .pista > li.foto' },
+		{ caja: fichas ?? null, molde: '[data-ed-molde="carrusel"] .fichas > [data-ficha]' },
+	];
+	return carriles.filter((c): c is Carril => !!c.caja);
+}
+
+// Muestra u oculta una parte (sin destapar lo que ocultó otro: solo lo que tapó el puente).
+function mostrarParte(parte: HTMLElement, si: boolean) {
+	if (!si) {
+		if (!parte.hidden) parte.setAttribute('data-ed-quitada', '');
+		ocultar(parte, true);
+	} else if (parte.hasAttribute('data-ed-quitada')) {
+		parte.removeAttribute('data-ed-quitada');
+		ocultar(parte, false);
+	}
+}
+
+// Foto principal de un clon: la del JSON (rutas del sitio, protocolo.ts) o el recuadro «por recibir».
+function ponerFotoClon(raiz: Element, o: ObraParcial, vista: string) {
+	const img = raiz.querySelector('[data-ed-foto] img');
+	if (!img) return;
+	const f = fotoPrincipal({ fotos: fotosDe(o), estado: o.estado ?? null, nombre: o.nombre ?? null } as Proyecto) as FotoObra;
+	img.setAttribute('src', f.src);
+	img.setAttribute('alt', f.alt);
+	for (const k of ['srcset', 'sizes', 'width', 'height']) img.removeAttribute(k);
+	if (f.srcset) {
+		img.setAttribute('srcset', f.srcset);
+		img.setAttribute('sizes', SIZES[vista] ?? '100vw');
+	}
+	if (f.width && f.height) {
+		img.setAttribute('width', String(f.width));
+		img.setAttribute('height', String(f.height));
+	}
+}
+
+// Clona la raíz del molde `m` para la obra `o` (completa) en una lista de la vista `vista`, cuyo
+// panel de fichas es `panel`.
+function clonar(doc: Document, m: Element, o: ObraParcial, vista: string, panel: string | null): Element {
+	const raiz = doc.importNode(m, true) as HTMLElement;
+	const item = itemDe(o.slug);
+	for (const e of [raiz, ...raiz.querySelectorAll('[data-ed-item]')]) {
+		if (e.getAttribute('data-ed-item') === 'obras/molde') e.setAttribute('data-ed-item', item);
+	}
+	raiz.setAttribute('data-ed-clon', '');
+	if (raiz.matches('article.texto')) {
+		raiz.classList.remove('activo', 'antes');
+		raiz.classList.add('despues');
+		raiz.inert = true;
+		raiz.removeAttribute('data-indice');
+		const boton = raiz.querySelector('.ver-ficha');
+		if (boton) {
+			boton.setAttribute('hidden', '');
+			if (panel) boton.setAttribute('aria-controls', panel);
+		}
+	} else if (raiz.matches('li.foto')) {
+		raiz.classList.add('futura');
+		raiz.setAttribute('aria-hidden', 'true');
+	} else if (raiz.hasAttribute('data-ficha')) {
+		raiz.setAttribute('data-ficha', idFicha(o.slug));
+		raiz.hidden = true;
+		// La galería del molde es la de la obra de muestra.
+		for (const g of [...raiz.querySelectorAll('.galeria')]) (g.parentElement && g.parentElement.parentElement === parteDe(raiz) ? g.parentElement : g).remove();
+	}
+	for (const a of raiz.querySelectorAll('a[href]')) if (a.getAttribute('href') === '/proyectos/molde/') a.setAttribute('href', enlaceDe(o.slug));
+	ponerFotoClon(raiz, o, vista);
+	return raiz;
+}
+
+// Insignia «Borrador · fuera del sitio» de una obra nueva (en el texto del carrusel y en la tarjeta).
+function marcarNueva(parte: HTMLElement, nueva: boolean) {
+	parte.toggleAttribute('data-ed-nueva', nueva);
+	if (!parte.matches('article.texto, li')) return;
+	const insignia = [...parte.children].find((h) => h.classList.contains('ed-insignia'));
+	if (!nueva) {
+		insignia?.remove();
+		return;
+	}
+	if (insignia) return;
+	const nuevaInsignia = parte.ownerDocument.createElement('span');
+	nuevaInsignia.className = 'ed-insignia';
+	nuevaInsignia.textContent = INSIGNIA_NUEVA;
+	parte.prepend(nuevaInsignia);
+}
+
+// Rearma todas las listas. Devuelve las partes que quedaron a cargo de alguna lista.
+export function rearmarListas(doc: Document, obras: ObraBorrador[], ctx: Contexto): Set<HTMLElement> {
+	const porItem = new Map(obras.map((b) => [itemDe(b.json.slug), b]));
+	const enListas = new Set<HTMLElement>();
+	// Clones del puente de obras que ya no vienen en el borrador (el ~n1 al guardarse): fuera.
+	for (const c of [...doc.querySelectorAll('[data-ed-clon]')]) {
+		const item = itemDeRaiz(c);
+		if (!item || !porItem.has(item)) c.remove();
+	}
+	for (const lista of doc.querySelectorAll<HTMLElement>('[data-ed-lista]')) {
+		const carriles = carrilesDe(doc, lista);
+		if (!carriles.length) continue;
+		const vista = lista.getAttribute('data-ed-vista')!;
+		const panel = lista.getAttribute('data-panel');
+		const deseadas = obrasDeLista(lista.getAttribute('data-ed-lista')!, obras).map(itemDe);
+		const quedan = new Set(deseadas);
+		for (const c of carriles) {
+			const raices = raicesDe(c);
+			const hay = new Map(raices.map((r) => [itemDeRaiz(r)!, r]));
+			// Las que faltan, del molde (se rellenan con el JSON completo).
+			const m = ctx.moldes?.querySelector(c.molde) ?? null;
+			for (const item of deseadas) {
+				if (hay.has(item) || !m) continue;
+				const o = completa(porItem.get(item)!.json);
+				const clon = clonar(doc, m, o, vista, panel);
+				aplicarAParte(parteDe(clon)!, o, ctx);
+				hay.set(item, clon);
+			}
+			// Orden: las de la lista y después las ocultas (en todos los carriles igual).
+			const orden = [...deseadas.map((i) => hay.get(i)).filter((r): r is Element => !!r), ...raices.filter((r) => !quedan.has(itemDeRaiz(r)!))];
+			const actual = raicesDe(c);
+			if (orden.length !== actual.length || orden.some((r, i) => r !== actual[i])) {
+				// Lo que no es una obra (la tarjeta «+ Nueva obra») queda al final.
+				const otros = [...c.caja.children].filter((h) => itemDeRaiz(h) === null);
+				for (const r of orden) c.caja.append(r);
+				for (const h of otros) c.caja.append(h);
+			}
+			for (const r of orden) {
+				const parte = parteDe(r)!;
+				const item = itemDeRaiz(r)!;
+				enListas.add(parte);
+				mostrarParte(parte, quedan.has(item));
+				marcarNueva(parte, !!porItem.get(item)?.meta.nueva);
+			}
+		}
+	}
+	return enListas;
+}
+
+// Cantidad de obras de cada estado (índice de /proyectos/): las que se ven, también las nuevas.
 function contar(doc: Document, obras: ObraBorrador[]) {
 	for (const el of doc.querySelectorAll<HTMLElement>('[data-ed-cuenta]')) {
 		const estado = el.getAttribute('data-ed-cuenta');
-		ponerTexto(el, String(obras.filter((b) => b.meta.incluir && b.json.estado === estado).length));
+		ponerTexto(el, String(obras.filter((b) => enSitio(b) && b.json.estado === estado).length));
 	}
 }
 
@@ -325,24 +521,21 @@ function contar(doc: Document, obras: ObraBorrador[]) {
 export function refrescarCarruseles(doc: Document) {
 	const Evento = doc.defaultView?.CustomEvent ?? CustomEvent;
 	for (const c of doc.querySelectorAll('[data-carrusel]')) {
-		if (c.querySelector('[data-ed-item]')) c.dispatchEvent(new Evento('lols:refrescar'));
+		if (c.hasAttribute('data-ed-lista') || c.querySelector('[data-ed-item]')) c.dispatchEvent(new Evento('lols:refrescar'));
 	}
 }
 
-// Borrador completo: el estado de todas las obras.
+// Borrador completo: el estado de todas las obras y de las listas.
 export function aplicarBorrador(doc: Document, obras: ObraBorrador[], ctx: Contexto) {
-	const enBorrador = new Set(obras.map((b) => itemDe(b.json.slug)));
-	for (const parte of doc.querySelectorAll('[data-ed-item]')) {
-		const item = parte.getAttribute('data-ed-item')!;
-		if (!enBorrador.has(item)) incluirObra(doc, item, false);
+	const porItem = new Map(obras.map((b) => [itemDe(b.json.slug), b]));
+	const enListas = rearmarListas(doc, obras, ctx);
+	// Fuera de las listas (la página de la obra, sus «otros proyectos»): se ve si está en el sitio.
+	for (const parte of doc.querySelectorAll<HTMLElement>('[data-ed-item]')) {
+		if (enListas.has(parte)) continue;
+		const b = porItem.get(parte.getAttribute('data-ed-item')!);
+		mostrarParte(parte, !!b && enSitio(b));
 	}
-	for (const { json, meta } of obras) {
-		// TODO(A2): meta.nueva u obra sin partes en la página → clonar tarjeta/diapositiva del molde
-		// en la lista que diga su regla (src/data/selecciones.ts); estado distinto del de su lista
-		// → moverla; y el orden de cada lista.
-		incluirObra(doc, itemDe(json.slug), meta.incluir);
-		aplicarObra(doc, json, ctx);
-	}
+	for (const { json } of obras) aplicarObra(doc, json, ctx);
 	contar(doc, obras);
 	refrescarCarruseles(doc);
 }

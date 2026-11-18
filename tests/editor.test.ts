@@ -5,7 +5,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { aplicarBorrador, listasDe, partesDe, ponerFoto, tipoDeFoto } from '../src/scripts/editor/aplicar';
-import { aceptarIniciar, leerEntrante, origenesHola, origenPermitido, P, V, type ObraBorrador } from '../src/scripts/editor/protocolo';
+import { indiceDeSoltar, montarControles } from '../src/scripts/editor/controles';
+import { aceptarIniciar, esItem, leerEntrante, origenesHola, origenPermitido, P, sobre, V, type ObraBorrador, type Saliente } from '../src/scripts/editor/protocolo';
 import { pictogramaDeTipo, piezasPictograma } from '../src/data/pictogramas';
 import type { ObraJson } from '../src/data/vistaObra';
 
@@ -285,5 +286,259 @@ describe('seguridad del puente', () => {
 			const codigo = readFileSync(join(dir, f), 'utf8').replace(/^\s*\/\/.*$/gm, '');
 			expect(codigo, f).not.toMatch(/\binnerHTML\b|\bouterHTML\b|\binsertAdjacentHTML\b|document\.write|\beval\s*\(|new\s+Function\b/);
 		}
+	});
+});
+
+describe('estructura (etapa A2)', () => {
+	// Una obra nueva sin guardar, con slug provisorio.
+	const nueva = (slug: string, cambios: Partial<ObraJson> = {}): ObraBorrador => ({
+		json: {
+			slug,
+			orden: 5,
+			estado: 'en-curso',
+			nombre: 'Obra nueva',
+			titular: null,
+			tipo: null,
+			mandante: null,
+			comuna: 'Santiago',
+			direccion: null,
+			superficieM2: null,
+			anio: null,
+			inicio: null,
+			servicios: ['construccion'],
+			desafio: null,
+			solucion: null,
+			resultado: null,
+			fotos: [],
+			...cambios,
+		},
+		meta: { incluir: false, nueva: true },
+	});
+	const lista = (doc: Document, regla: string) => doc.querySelector<HTMLElement>(`[data-ed-lista="${regla}"]`)!;
+	// Obras visibles de un carril, en el orden del DOM.
+	const orden = (raices: Iterable<Element>) =>
+		[...raices]
+			.map((r) => (r.hasAttribute('data-ed-item') ? r : r.querySelector(':scope > [data-ed-item]')))
+			.filter((p): p is HTMLElement => !!p && !(p as HTMLElement).hidden)
+			.map((p) => p.getAttribute('data-ed-item')!.slice(6));
+	const carriles = (doc: Document, regla: string) => {
+		const l = lista(doc, regla);
+		const panel = doc.getElementById(l.getAttribute('data-panel')!)!;
+		return {
+			textos: orden(l.querySelectorAll('.textos > article.texto')),
+			fotos: orden(l.querySelectorAll('.pista > li.foto')),
+			fichas: orden(panel.querySelectorAll('.fichas > [data-ficha]')),
+			ids: [...panel.querySelectorAll<HTMLElement>('.fichas > [data-ficha]')].filter((f) => !f.querySelector<HTMLElement>('.ficha-obra')!.hidden).map((f) => f.dataset.ficha),
+		};
+	};
+	const enCurso = obrasReales.filter((o) => o.estado === 'en-curso').sort((a, b) => a.orden - b.orden).map((o) => o.slug);
+	const contratadas = obrasReales.filter((o) => o.estado === 'contratado').sort((a, b) => a.orden - b.orden).map((o) => o.slug);
+
+	it('una obra nueva (~n1) aparece en su lugar en /proyectos/: texto, foto y ficha, con su insignia, y la cuenta sube', () => {
+		const doc = leer('proyectos/index.html');
+		aplicarBorrador(doc, [...borrador(), nueva('~n1', { orden: 25, nombre: 'Edificio Nuevo', superficieM2: 1500 })], { moldes });
+		const c = carriles(doc, 'proyectos-en-curso');
+		const esperado = [...enCurso.slice(0, 2), '~n1', ...enCurso.slice(2)];
+		expect(c.textos).toEqual(esperado);
+		expect(c.fotos).toEqual(esperado);
+		expect(c.fichas).toEqual(esperado);
+		expect(c.ids).toContain('obra--n1'); // id y hash sin «~»
+		const texto = partesDe(doc, 'obras/~n1').find((p) => p.matches('article.texto'))!;
+		expect(texto.querySelector('[data-ed-campo="/nombre"]')!.textContent).toBe('Edificio Nuevo');
+		expect(texto.querySelector('[data-ed-linea="resumen"]')!.textContent).toBe('Santiago · 1.500 m²');
+		expect(texto.hasAttribute('data-ed-nueva')).toBe(true);
+		expect(texto.querySelector('.ed-insignia')!.textContent).toBe('Borrador · fuera del sitio');
+		expect(texto.querySelector('.ver-ficha')!.getAttribute('aria-controls')).toBe(lista(doc, 'proyectos-en-curso').getAttribute('data-panel'));
+		// La foto: el recuadro «render por recibir»; la ficha sin la galería ni los textos del molde.
+		const foto = partesDe(doc, 'obras/~n1').find((p) => p.matches('li.foto'))!;
+		expect(foto.querySelector('img')!.getAttribute('src')).toBe('/proyectos/render-por-recibir.svg');
+		expect(foto.querySelector('img')!.getAttribute('alt')).toBe('Render de Edificio Nuevo por recibir');
+		const ficha = fichaDe(doc, '~n1');
+		expect(ficha.querySelector('.galeria')).toBeNull();
+		expect(visible(fila(ficha, 'mandante'))).toBe(false);
+		expect(visible(fila(ficha, 'anio'))).toBe(false);
+		expect(fila(ficha, 'estado')!.querySelector('dd')!.textContent).toBe('En construcción');
+		expect(doc.body.textContent).not.toContain('Mandante de la obra');
+		expect(doc.querySelector('[data-ed-cuenta="en-curso"]')!.textContent).toBe(String(enCurso.length + 1));
+		// Al final de la lista si su orden es el más alto.
+		aplicarBorrador(doc, [...borrador(), nueva('~n1', { orden: 999 })], { moldes });
+		expect(carriles(doc, 'proyectos-en-curso').textos).toEqual([...enCurso, '~n1']);
+		expect(carriles(doc, 'proyectos-en-curso').fichas).toEqual([...enCurso, '~n1']);
+	});
+
+	it('en la portada, la obra nueva entra a «En obra ahora» solo si queda entre las 3 primeras', () => {
+		const doc = leer('index.html');
+		aplicarBorrador(doc, [...borrador(), nueva('~n1', { orden: 999 })], { moldes });
+		expect(partesDe(doc, 'obras/~n1')).toHaveLength(0);
+		expect(carriles(doc, 'portada-en-obra').textos).toEqual(enCurso.slice(0, 3));
+		aplicarBorrador(doc, [...borrador(), nueva('~n1', { orden: 15 })], { moldes });
+		expect(carriles(doc, 'portada-en-obra').textos).toEqual([enCurso[0], '~n1', enCurso[1]]);
+		expect(carriles(doc, 'portada-en-obra').fichas).toEqual([enCurso[0], '~n1', enCurso[1]]);
+		// La tercera de antes queda oculta (no se borra: es del build).
+		expect(partesDe(doc, item(enCurso[2])).every((p) => p.hidden && p.hasAttribute('data-ed-quitada'))).toBe(true);
+		// Un borrador sin la nueva: el clon se elimina y vuelve la de antes.
+		aplicarBorrador(doc, borrador(), { moldes });
+		expect(partesDe(doc, 'obras/~n1')).toHaveLength(0);
+		expect(carriles(doc, 'portada-en-obra').textos).toEqual(enCurso.slice(0, 3));
+	});
+
+	it('cambiar el estado lleva la obra de «En construcción» a la grilla «En proyecto» (y de vuelta)', () => {
+		const doc = leer('proyectos/index.html');
+		aplicarBorrador(doc, borrador({ 'maipu-40': { estado: 'contratado', orden: 35 } }), { moldes });
+		expect(carriles(doc, 'proyectos-en-curso').textos).not.toContain('maipu-40');
+		expect(partesDe(doc, item('maipu-40')).filter((p) => p.closest('[data-carrusel]')).every((p) => p.hidden)).toBe(true);
+		const grilla = orden(lista(doc, 'proyectos-contratados').children);
+		expect(grilla).toEqual([...contratadas.slice(0, 3), 'maipu-40', ...contratadas.slice(3)]);
+		const tarjeta = partesDe(doc, item('maipu-40')).find((p) => p.matches('.contratadas > li'))!;
+		expect(tarjeta.hasAttribute('data-ed-clon')).toBe(true);
+		expect(tarjeta.querySelector('[data-ed-campo="/nombre"]')!.textContent).toBe('Maipú 40');
+		expect(tarjeta.querySelector('[data-ed-derivado="/inicio"]')!.textContent).toBe('En etapa de proyecto');
+		expect(tarjeta.querySelector('[data-ed-foto] img')!.getAttribute('src')).toMatch(/^https:\/\/images\.unsplash\.com\//); // su referencial
+		expect(tarjeta.hasAttribute('data-ed-nueva')).toBe(false);
+		expect(doc.querySelector('[data-ed-cuenta="en-curso"]')!.textContent).toBe(String(enCurso.length - 1));
+		expect(doc.querySelector('[data-ed-cuenta="contratado"]')!.textContent).toBe(String(contratadas.length + 1));
+		aplicarBorrador(doc, borrador(), { moldes });
+		expect(carriles(doc, 'proyectos-en-curso').textos).toEqual(enCurso);
+		expect(orden(lista(doc, 'proyectos-contratados').children)).toEqual(contratadas);
+	});
+
+	it('cambiar el orden reordena las diapositivas, las fotos y las fichas del panel', () => {
+		const doc = leer('proyectos/index.html');
+		const ultima = enCurso.at(-1)!;
+		aplicarBorrador(doc, borrador({ [ultima]: { orden: 1 } }), { moldes });
+		const c = carriles(doc, 'proyectos-en-curso');
+		const esperado = [ultima, ...enCurso.slice(0, -1)];
+		expect(c.textos).toEqual(esperado);
+		expect(c.fotos).toEqual(esperado);
+		expect(c.fichas).toEqual(esperado);
+		expect(c.ids).toEqual(esperado.map((s) => `obra-${s}`));
+		// Terminadas: el año manda; en el mismo año, primero las con foto propia y después el orden.
+		aplicarBorrador(doc, borrador({ 'abate-molina-676': { orden: 1 } }), { moldes });
+		expect(carriles(doc, 'proyectos-terminados').textos.slice(0, 4)).toEqual(['monumento-2212', 'abate-molina-676', 'san-alfonso-607', 'abate-molina-80']);
+	});
+
+	it('incluir = false saca la obra de su lista; una obra nueva se muestra aunque no esté incluida', () => {
+		const doc = leer('proyectos/index.html');
+		aplicarBorrador(doc, [...borrador({}, [contratadas[0]]), nueva('~n2', { estado: 'contratado', orden: 1 })], { moldes });
+		expect(orden(lista(doc, 'proyectos-contratados').children)).toEqual(['~n2', ...contratadas.slice(1)]);
+		expect(doc.querySelector('[data-ed-cuenta="contratado"]')!.textContent).toBe(String(contratadas.length));
+	});
+
+	it('al guardar, el ~n1 se reemplaza por su slug definitivo', () => {
+		const doc = leer('proyectos/index.html');
+		aplicarBorrador(doc, [...borrador(), nueva('~n1')], { moldes });
+		expect(partesDe(doc, 'obras/~n1').length).toBe(3);
+		const real = nueva('edificio-nuevo');
+		real.meta = { incluir: true, nueva: false };
+		aplicarBorrador(doc, [...borrador(), real], { moldes });
+		expect(partesDe(doc, 'obras/~n1')).toHaveLength(0);
+		expect(doc.querySelectorAll('[data-ficha="obra--n1"]')).toHaveLength(0);
+		const partes = partesDe(doc, 'obras/edificio-nuevo');
+		expect(partes).toHaveLength(3);
+		expect(partes.some((p) => p.hasAttribute('data-ed-nueva') || p.querySelector('.ed-insignia'))).toBe(false);
+		expect(partes.find((p) => p.matches('article.texto'))!.querySelector('a')!.getAttribute('href')).toBe('/proyectos/edificio-nuevo/');
+		expect(carriles(doc, 'proyectos-en-curso').textos).toEqual(['edificio-nuevo', ...enCurso]);
+	});
+
+	it('el protocolo acepta slugs provisorios y fotos del propio sitio', () => {
+		expect(esItem('obras/~n1')).toBe(true);
+		expect(esItem('obras/~x')).toBe(false);
+		expect(esItem('obras/~n1/..')).toBe(false);
+		const leida = (obra: object) => {
+			const b = leerEntrante({ p: P, v: V, tipo: 'borrador', obras: [{ json: obra, meta: { incluir: false, nueva: true } }] });
+			return b && b.tipo === 'borrador' ? b.obras[0].json : null;
+		};
+		expect(leida({ slug: '~n1', nombre: 'X' })).toEqual({ slug: '~n1', nombre: 'X' });
+		const foto = { src: '/proyectos/maipu-40/1.webp', alt: 'Render', srcset: '/proyectos/maipu-40/1-800.webp 800w, /proyectos/maipu-40/1.webp 1600w', width: 1600, height: 900 };
+		expect(leida({ slug: 'maipu-40', fotos: [foto] })).toEqual({ slug: 'maipu-40', fotos: [foto] });
+		expect(leida({ slug: 'maipu-40', fotos: [{ ...foto, src: 'https://evil.example/x.jpg' }] })).toEqual({ slug: 'maipu-40' });
+		expect(leida({ slug: 'maipu-40', fotos: [{ ...foto, srcset: 'javascript:alert(1) 1w' }] })).toEqual({ slug: 'maipu-40' });
+		expect(leida({ slug: 'maipu-40', referencia: 'rendersEjemplo/maipu-40' })).toEqual({ slug: 'maipu-40', referencia: 'rendersEjemplo/maipu-40' });
+		expect(leida({ slug: 'maipu-40', referencia: 'otra/cosa' })).toEqual({ slug: 'maipu-40' });
+		// Las fotos y la referencia no cambian con un `campo`.
+		expect(leerEntrante({ p: P, v: V, tipo: 'campo', item: 'obras/maipu-40', campo: '/referencia', valor: null })).toBeNull();
+		expect(leerEntrante({ p: P, v: V, tipo: 'campo', item: 'obras/~n1', campo: '/nombre', valor: 'Y' })).not.toBeNull();
+	});
+
+	it('«+ Nueva obra» envía `nueva` con su lista', () => {
+		const doc = leer('proyectos/index.html');
+		const enviados: Saliente[] = [];
+		const c = montarControles(doc, (m) => enviados.push(m));
+		c.modo('editar');
+		const grilla = lista(doc, 'proyectos-contratados');
+		expect(grilla.lastElementChild!.classList.contains('ed-nueva-obra')).toBe(true);
+		grilla.querySelector<HTMLElement>('[data-ed-accion="nueva"]')!.click();
+		lista(doc, 'proyectos-terminados').querySelector<HTMLElement>('.encabezado-carrusel [data-ed-accion="nueva"]')!.click();
+		expect(enviados).toEqual([
+			{ tipo: 'nueva', lista: 'proyectos-contratados' },
+			{ tipo: 'nueva', lista: 'proyectos-terminados' },
+		]);
+		expect(sobre(enviados[0])).toEqual({ p: 'lols-editor', v: 1, tipo: 'nueva', lista: 'proyectos-contratados' });
+		// En modo mirar no envía nada.
+		c.modo('mirar');
+		grilla.querySelector<HTMLElement>('[data-ed-accion="nueva"]')!.click();
+		expect(enviados).toHaveLength(2);
+		// Un borrador que reordena deja la tarjeta «+ Nueva obra» al final.
+		aplicarBorrador(doc, borrador({ [contratadas.at(-1)!]: { orden: 1 } }), { moldes });
+		expect(grilla.lastElementChild!.classList.contains('ed-nueva-obra')).toBe(true);
+	});
+
+	// Rectángulos de mentira (happy-dom no dibuja): una grilla de 100 × 100 con 10 px entre medio.
+	const grillaFalsa = (els: HTMLElement[], columnas = 3) =>
+		els.forEach((el, i) => {
+			const left = (i % columnas) * 110;
+			const top = Math.floor(i / columnas) * 110;
+			el.getBoundingClientRect = () => ({ left, top, width: 100, height: 100, right: left + 100, bottom: top + 100, x: left, y: top, toJSON: () => ({}) }) as DOMRect;
+		});
+	const puntero = (tipo: string, x: number, y: number) => new PointerEvent(tipo, { bubbles: true, clientX: x, clientY: y, pointerId: 1, pointerType: 'mouse', button: 0 });
+
+	it('arrastrar una tarjeta de «En proyecto» envía `mover` con la posición final', () => {
+		const r = (left: number) => ({ left, top: 0, width: 100, bottom: 100 });
+		expect(indiceDeSoltar([r(0), r(110)], 120, 50)).toBe(1);
+		expect(indiceDeSoltar([r(0), r(110)], 500, 500)).toBe(2);
+		const doc = leer('proyectos/index.html');
+		const enviados: Saliente[] = [];
+		montarControles(doc, (m) => enviados.push(m)).modo('editar');
+		const tarjetas = [...lista(doc, 'proyectos-contratados').querySelectorAll<HTMLElement>(':scope > li[data-ed-item]')];
+		grillaFalsa(tarjetas);
+		// La primera, soltada en la segunda fila antes de la mitad de la 4.ª: queda 3.ª (índice 2).
+		tarjetas[0].querySelector('.inicio')!.dispatchEvent(puntero('pointerdown', 50, 50));
+		window.dispatchEvent(puntero('pointermove', 60, 60));
+		expect(tarjetas[0].classList.contains('ed-arrastrando')).toBe(true);
+		window.dispatchEvent(puntero('pointermove', 20, 160));
+		window.dispatchEvent(puntero('pointerup', 20, 160));
+		expect(tarjetas[0].classList.contains('ed-arrastrando')).toBe(false);
+		expect(tarjetas[0].style.transform).toBe('');
+		expect(enviados).toEqual([{ tipo: 'mover', lista: 'proyectos-contratados', item: item(contratadas[0]), indice: 2 }]);
+		// No se reordena aquí: espera el borrador.
+		expect(orden(lista(doc, 'proyectos-contratados').children)).toEqual(contratadas);
+		// Soltar donde estaba no envía nada.
+		tarjetas[1].dispatchEvent(puntero('pointerdown', 150, 50));
+		window.dispatchEvent(puntero('pointermove', 160, 50));
+		window.dispatchEvent(puntero('pointerup', 160, 50));
+		expect(enviados).toHaveLength(1);
+	});
+
+	it('carrusel en modo «Ordenar»: tira de miniaturas que se arrastran; «Listo» vuelve', () => {
+		const doc = leer('proyectos/index.html');
+		const enviados: Saliente[] = [];
+		montarControles(doc, (m) => enviados.push(m)).modo('editar');
+		const seccion = lista(doc, 'proyectos-en-curso');
+		const ordenar = seccion.querySelector<HTMLElement>('[data-ed-accion="ordenar"]')!;
+		ordenar.click();
+		expect(seccion.classList.contains('ed-ordenando')).toBe(true);
+		expect(ordenar.textContent).toBe('Listo');
+		const minis = [...seccion.querySelectorAll<HTMLElement>('.ed-tira > li[data-ed-mini]')];
+		expect(minis.map((m) => m.getAttribute('data-ed-mini')!.slice(6))).toEqual(enCurso);
+		expect(minis[0].querySelector('.ed-mini-nombre')!.textContent).toBe(obrasReales.find((o) => o.slug === enCurso[0])!.nombre);
+		grillaFalsa(minis, 4);
+		// La última, al principio.
+		minis.at(-1)!.dispatchEvent(puntero('pointerdown', 50, 160));
+		window.dispatchEvent(puntero('pointermove', 5, 5));
+		window.dispatchEvent(puntero('pointerup', 5, 5));
+		expect(enviados).toEqual([{ tipo: 'mover', lista: 'proyectos-en-curso', item: item(enCurso.at(-1)!), indice: 0 }]);
+		ordenar.click();
+		expect(seccion.classList.contains('ed-ordenando')).toBe(false);
+		expect(seccion.querySelectorAll('.ed-tira > li')).toHaveLength(0);
 	});
 });
