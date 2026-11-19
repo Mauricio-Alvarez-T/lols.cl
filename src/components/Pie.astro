@@ -5,7 +5,8 @@
 // cierre la pone el bloque Contacto, justo antes.
 // El teléfono se abre con tres opciones: llamar, escribir por WhatsApp o guardarlo en los contactos
 // del equipo (Marcos, 11-11-2026); por eso ya no va la línea suelta «WhatsApp». Es un <details>:
-// funciona sin JavaScript y con teclado.
+// funciona sin JavaScript y con teclado. Mientras el número sea solo WhatsApp (19-11-2026), dice
+// «Solo WhatsApp» al lado y no ofrece «Llamar».
 import Pendiente from './Pendiente.astro';
 import { empresa, navegacion, telefonoHref, whatsappHref, contactoVcardHref, fundacion } from '../data/empresa';
 
@@ -21,11 +22,12 @@ const anio = new Date().getFullYear();
 				<details class="telefono">
 					<summary>
 						<span>{empresa.telefono.valor}</span>
+						{empresa.telefono.soloWhatsapp && <span class="solo">Solo WhatsApp</span>}
 						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
 					</summary>
 					{empresa.telefono.pendiente && <Pendiente texto={empresa.telefono.pendiente} />}
 					<ul class="opciones">
-						<li><a href={telefonoHref(empresa.telefono.valor)}>Llamar</a></li>
+						{!empresa.telefono.soloWhatsapp && <li><a href={telefonoHref(empresa.telefono.valor)}>Llamar</a></li>}
 						<li><a href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a></li>
 						<li><a href={contactoVcardHref()} download="LOLS Ingenieria.vcf">Guardar en mis contactos</a></li>
 					</ul>
@@ -95,6 +97,12 @@ const anio = new Date().getFullYear();
 	}
 	.telefono summary:hover {
 		color: var(--lols-lima);
+	}
+	.solo {
+		padding: 0.05rem 0.45rem;
+		border: 1px solid rgb(255 255 255 / 0.45);
+		font: 600 0.75rem/1.4 var(--fuente-datos);
+		white-space: nowrap;
 	}
 	.telefono svg {
 		width: 1rem;

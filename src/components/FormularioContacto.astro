@@ -215,7 +215,7 @@ const pasos = ['Qué necesita', 'Su proyecto', 'Sus datos'];
 
 	<div class="gracias" data-gracias hidden tabindex="-1">
 		<p class="gracias-titulo">Solicitud enviada</p>
-		<p>La recibimos y le responderemos a la brevedad. Si es urgente, llámenos o escríbanos por WhatsApp.</p>
+		<p>La recibimos y le responderemos a la brevedad. Si es urgente, {empresa.telefono.soloWhatsapp ? 'escríbanos' : 'llámenos o escríbanos'} por WhatsApp.</p>
 		<button type="button" class="boton secundario" data-otra>Enviar otra solicitud</button>
 	</div>
 </form>

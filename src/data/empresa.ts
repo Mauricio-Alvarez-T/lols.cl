@@ -11,10 +11,11 @@ export const empresa = {
 	// Oficina (Marcos, 19-10-2026; antes El Mirador 150, Cerrillos), barrio Meiggs. Con el nombre
 	// completo de la calle desde el 11-11-2026 (Marcos); en avisos sale también «Rodulfo Phillippi».
 	direccion: { valor: 'Rodolfo Philippi 36, Santiago' },
-	// Número de relleno (Marcos, 11-11-2026): la empresa compra un teléfono nuevo y su número llega
-	// después (antes: +56 652 710 609). Mientras `pendiente` tenga texto, el pie muestra el marcador
-	// y el build de producción (lols.cl) falla, para que el relleno no salga a la página real.
-	telefono: { valor: '+99999999', pendiente: 'número del teléfono nuevo (y el de WhatsApp)' as string | null },
+	// Teléfono nuevo (Marcos, 19-11-2026; del 11-11 al 19-11 hubo un relleno, y antes
+	// +56 652 710 609). Es SOLO WhatsApp: no recibe llamadas. Con `soloWhatsapp` el sitio no ofrece
+	// «Llamar» y lo dice junto al número. Mientras `pendiente` tenga texto, el pie muestra el
+	// marcador y el build de producción (lols.cl) falla.
+	telefono: { valor: '+56 9 3951 6639', soloWhatsapp: true, pendiente: null as string | null },
 	// También recibe las postulaciones (CV): don Luis, 08-10-2026.
 	correo: { valor: 'lols@lols.cl' },
 	horario: 'Lunes a viernes, de 9:00 a 17:00',
@@ -23,8 +24,8 @@ export const empresa = {
 	mutual: 'Mutual de Seguridad CChC',
 	// Número de WhatsApp comercial (formato 56XXXXXXXXX). Mientras sea null, los botones
 	// abren WhatsApp sin destinatario y el build de producción falla (marcador en BarraContacto).
-	// Relleno igual que el teléfono (11-11-2026): va el mismo número cuando llegue.
-	whatsapp: '99999999' as string | null,
+	// Es el mismo número del teléfono (19-11-2026).
+	whatsapp: '56939516639' as string | null,
 };
 
 // Año de fundación (reunión con don Luis, 2026). Los años de trayectoria se calculan al
@@ -105,7 +106,8 @@ export const contactoVcardHref = () => {
 		'VERSION:3.0',
 		'FN:LOLS Ingeniería',
 		`ORG:${empresa.razonSocial}`,
-		`TEL;TYPE=WORK,VOICE:${empresa.telefono.valor.replace(/[^\d+]/g, '')}`,
+		`TEL;TYPE=${empresa.telefono.soloWhatsapp ? 'CELL' : 'WORK,VOICE'}:${empresa.telefono.valor.replace(/[^\d+]/g, '')}`,
+		...(empresa.telefono.soloWhatsapp ? ['NOTE:Solo WhatsApp (no recibe llamadas)'] : []),
 		`EMAIL;TYPE=WORK:${empresa.correo.valor}`,
 		`ADR;TYPE=WORK:;;${calle};${ciudad};;;Chile`,
 		'URL:https://lols.cl',

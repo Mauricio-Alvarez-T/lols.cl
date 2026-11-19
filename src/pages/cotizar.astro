@@ -19,7 +19,7 @@ import { bandas } from '../data/referencia';
 		<p class="bajada">Cuéntenos qué necesita en tres pasos: después de recibir su solicitud, nos ponemos en contacto con usted. Si prefiere, escríbanos por WhatsApp.</p>
 		<p class="canales">
 			<a class="boton" href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a>
-			<a class="boton secundario" href={telefonoHref(empresa.telefono.valor)}>Llamar</a>
+			{!empresa.telefono.soloWhatsapp && <a class="boton secundario" href={telefonoHref(empresa.telefono.valor)}>Llamar</a>}
 		</p>
 	</ObraPortada>
 	<section class="seccion contenedor columnas">

@@ -12,9 +12,11 @@ import { empresa, telefonoHref, whatsappHref } from '../data/empresa';
 import { bandas } from '../data/referencia';
 
 const horario = empresa.horario.charAt(0).toLowerCase() + empresa.horario.slice(1);
+// Número solo WhatsApp (Marcos, 19-11-2026): sin «Llamar» y una sola fila «WhatsApp» con el número.
+const soloWa = empresa.telefono.soloWhatsapp;
 ---
 
-<Base title="Contacto" description="Teléfono, WhatsApp, correo, horario y oficina de LOLS Ingeniería en Santiago.">
+<Base title="Contacto" description={`${soloWa ? 'WhatsApp' : 'Teléfono, WhatsApp'}, correo, horario y oficina de LOLS Ingeniería en Santiago.`}>
 	<script is:inline>
 		(function () {
 			var s = location.search, h = location.hash;
@@ -30,19 +32,29 @@ const horario = empresa.horario.charAt(0).toLowerCase() + empresa.horario.slice(
 		<p class="bajada">Oficina en {empresa.direccion.valor}. Atendemos de {horario}.</p>
 		<p class="canales">
 			{empresa.whatsapp && <a class="boton" href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a>}
-			<a class="boton secundario" href={telefonoHref(empresa.telefono.valor)}>Llamar</a>
+			{!soloWa && <a class="boton secundario" href={telefonoHref(empresa.telefono.valor)}>Llamar</a>}
 		</p>
 	</ObraPortada>
 	<section class="seccion contenedor columnas">
 		<div>
 			<h2>Datos de contacto</h2>
 			<dl class="datos vertical">
-				<div>
-					<dt>Teléfono</dt>
-					<dd><a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a></dd>
-				</div>
+				{soloWa ? (
+					<div>
+						<dt>WhatsApp</dt>
+						<dd>
+							<a href={whatsappHref()} target="_blank" rel="noopener">{empresa.telefono.valor}</a>
+							<span class="nota">Solo WhatsApp, no recibe llamadas</span>
+						</dd>
+					</div>
+				) : (
+					<div>
+						<dt>Teléfono</dt>
+						<dd><a href={telefonoHref(empresa.telefono.valor)}>{empresa.telefono.valor}</a></dd>
+					</div>
+				)}
 				{
-					empresa.whatsapp && (
+					!soloWa && empresa.whatsapp && (
 						<div>
 							<dt>WhatsApp</dt>
 							<dd><a href={whatsappHref()} target="_blank" rel="noopener">Escribir por WhatsApp</a></dd>
@@ -108,6 +120,12 @@ const horario = empresa.horario.charAt(0).toLowerCase() + empresa.horario.slice(
 	}
 	.vertical > div {
 		padding-block: 0.9rem 1rem;
+	}
+	.nota {
+		display: block;
+		margin-top: 0.2rem;
+		color: var(--gris-medio);
+		font: 500 0.9rem/1.4 var(--fuente-datos);
 	}
 	.canales {
 		display: flex;

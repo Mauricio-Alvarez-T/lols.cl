@@ -106,7 +106,7 @@ Lema institucional ✅: **"Sus proyectos en las mejores manos"** (portada del si
 |---|---|---|
 | Razón social | LOLS Ingeniería Limitada | ✅ |
 | Dirección | Rodolfo Philippi 36, Santiago (oficina) | ✅ Marcos, 19-10-2026; nombre completo de la calle el 11-11-2026 (antes El Mirador 112-150, Cerrillos) |
-| Teléfono | +56 652 710 609 | ⚠️ **Revisar:** el prefijo 65 es de Osorno, no de Santiago |
+| Teléfono | +56 9 3951 6639 (solo WhatsApp: no recibe llamadas) | ✅ Marcos, 19-11-2026 (antes +56 652 710 609 y, del 11-11 al 19-11, un relleno) |
 | Correo | lols@lols.cl | ⚠️ Confirmar; idealmente un correo por área (cotizaciones, trabajo) |
 
 ### Textos institucionales (sitio de 2018)
