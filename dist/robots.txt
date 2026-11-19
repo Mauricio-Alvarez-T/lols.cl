@@ -1,0 +1,5 @@
+# Staging (nuevo.lols.cl): no indexar. Reemplazar al pasar a producción.
+User-agent: *
+Disallow: /
+# Moldes del editor visual (docs/editor-visual.md): página interna; dejar esta línea en producción.
+Disallow: /editor/
